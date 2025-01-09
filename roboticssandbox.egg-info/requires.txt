@@ -1,0 +1,7 @@
+roboticstoolbox_python>=1.1.1
+
+[dev]
+check-manifest
+
+[test]
+coverage
