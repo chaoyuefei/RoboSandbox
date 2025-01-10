@@ -1,9 +1,0 @@
-pyproject.toml
-roboticssandbox/__init__.py
-roboticssandbox/example.py
-roboticssandbox.egg-info/PKG-INFO
-roboticssandbox.egg-info/SOURCES.txt
-roboticssandbox.egg-info/dependency_links.txt
-roboticssandbox.egg-info/entry_points.txt
-roboticssandbox.egg-info/requires.txt
-roboticssandbox.egg-info/top_level.txt

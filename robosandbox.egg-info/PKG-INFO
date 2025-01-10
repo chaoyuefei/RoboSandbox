@@ -1,5 +1,5 @@
 Metadata-Version: 2.1
-Name: roboticssandbox
+Name: robosandbox
 Version: 0.0.1
 Summary: A sample Python project
 Author-email: "A. Random Developer" <author@example.com>
@@ -24,6 +24,8 @@ Classifier: Programming Language :: Python :: 3 :: Only
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
 Requires-Dist: roboticstoolbox_python>=1.1.1
+Requires-Dist: plotly
+Requires-Dist: pytest
 Provides-Extra: dev
 Requires-Dist: check-manifest; extra == "dev"
 Provides-Extra: test

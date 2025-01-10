@@ -26,7 +26,7 @@ build-backend = "setuptools.build_meta" # If not defined, then legacy behavior c
 # There are some restrictions on what makes a valid project name
 # specification here:
 # https://packaging.python.org/specifications/core-metadata/#name
-name = "roboticssandbox" # REQUIRED, is the only field that cannot be marked as dynamic.
+name = "robosandbox" # REQUIRED, is the only field that cannot be marked as dynamic.
 
 # Versions should comply with PEP 440:
 # https://www.python.org/dev/peps/pep-0440/
@@ -116,7 +116,7 @@ classifiers = [
 #
 # For an analysis of this field vs pip's requirements files see:
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
-dependencies = ["roboticstoolbox_python>=1.1.1"]
+dependencies = ["roboticstoolbox_python>=1.1.1", "plotly", "pytest"]
 
 # List additional groups of dependencies here (e.g. development
 # dependencies). Users will be able to install these using the "extras"
