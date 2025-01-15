@@ -26,6 +26,7 @@ Description-Content-Type: text/markdown
 Requires-Dist: roboticstoolbox_python>=1.1.1
 Requires-Dist: plotly
 Requires-Dist: pytest
+Requires-Dist: pandas
 Provides-Extra: dev
 Requires-Dist: check-manifest; extra == "dev"
 Provides-Extra: test

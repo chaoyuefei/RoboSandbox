@@ -1,6 +1,7 @@
 roboticstoolbox_python>=1.1.1
 plotly
 pytest
+pandas
 
 [dev]
 check-manifest
