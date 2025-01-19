@@ -9,8 +9,7 @@
 # https://packaging.python.org/en/latest/tutorials/packaging-projects/#choosing-a-build-backend
 [build-system]
 # A list of packages that are needed to build your package:
-requires = ["setuptools"] # REQUIRED if [build-system] table is used
-# The name of the Python object that frontends will use to perform the build:
+requires = ["setuptools"] # The name of the Python object that frontends will use to perform the build:
 build-backend = "setuptools.build_meta" # If not defined, then legacy behavior can happen.
 
 
@@ -110,7 +109,7 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 
-dependencies = ["roboticstoolbox_python>=1.1.1", "plotly", "pytest", "pandas"]
+dependencies = ["roboticstoolbox_python>=1.1.1", "plotly", "pytest", "pandas", "tqdm", "ipykernel", "kaleido", "nbformat>=4.2.0"]
 
 # This field lists other packages that your project depends on to run.
 # Any package you put here will be installed by pip when your project is
@@ -160,3 +159,6 @@ sample = "sample:main"
 # If there are data files included in your packages that need to be
 # installed, specify them here.
 package-data = { "sample" = ["*.dat"] }
+
+packages = ["robosandbox", "tutorial"]
+

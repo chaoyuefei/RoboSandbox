@@ -10,7 +10,6 @@ class WorkSpace:
         columns = columns + self.metrics
         self.df = pd.DataFrame(columns=columns)
         self.robot = robot
-        print(self.df)
 
     def add_samples(self, points, metric_values=None, metric: Union[str, None] = None):
         """
@@ -156,11 +155,11 @@ class WorkSpace:
             current_G = self.calc_global_indice(method=method)
             err_relative = np.abs(prev_G - current_G) / current_G
             iteration += 1
-            if len(self.df) % 10 == 0:
-                print(f"Iteration: {iteration}")
-                print(f"Current number of samples: {len(self.df)}")
-                print(f"Current global indice: {current_G}")
-                print(f"Current relative error: {err_relative}")
+            # if len(self.df) % 10 == 0:
+            #     print(f"Iteration: {iteration}")
+            #     print(f"Current number of samples: {len(self.df)}")
+            #     print(f"Current global indice: {current_G}")
+            #     print(f"Current relative error: {err_relative}")
 
         print("==> Iteration finished.")
         print(f"Converged after {iteration} iterations.")

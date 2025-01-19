@@ -2,6 +2,10 @@ roboticstoolbox_python>=1.1.1
 plotly
 pytest
 pandas
+tqdm
+ipykernel
+kaleido
+nbformat>=4.2.0
 
 [dev]
 check-manifest

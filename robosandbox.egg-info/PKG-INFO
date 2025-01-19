@@ -27,6 +27,10 @@ Requires-Dist: roboticstoolbox_python>=1.1.1
 Requires-Dist: plotly
 Requires-Dist: pytest
 Requires-Dist: pandas
+Requires-Dist: tqdm
+Requires-Dist: ipykernel
+Requires-Dist: kaleido
+Requires-Dist: nbformat>=4.2.0
 Provides-Extra: dev
 Requires-Dist: check-manifest; extra == "dev"
 Provides-Extra: test
