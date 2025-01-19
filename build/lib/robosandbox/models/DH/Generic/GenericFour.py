@@ -27,6 +27,7 @@ class GenericFour(DHRobot):
     """
 
     def __init__(self, dofs=4, linklengths=[0.4] * 4, alpha=[pi / 2, 0, 0, 0]):
+        self.dofs = dofs
         deg = pi / 180
         d = [
             linklengths[0],
