@@ -161,9 +161,9 @@ class WorkSpace:
             #     print(f"Current global indice: {current_G}")
             #     print(f"Current relative error: {err_relative}")
 
-        print("==> Iteration finished.")
-        print(f"Converged after {iteration} iterations.")
-        print(f"Final global indice: {current_G}")
-        print(f"Final number of samples: {len(self.df)}")
-        print(f"Final relative error: {err_relative}")
+        # print("==> Iteration finished.")
+        # print(f"Converged after {iteration} iterations.")
+        # print(f"Final global indice: {current_G}")
+        # print(f"Final number of samples: {len(self.df)}")
+        # print(f"Final relative error: {err_relative}")
         return current_G
