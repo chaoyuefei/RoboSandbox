@@ -6,6 +6,7 @@ tqdm
 ipykernel
 kaleido
 nbformat>=4.2.0
+casadi>=3.6.5
 
 [dev]
 check-manifest

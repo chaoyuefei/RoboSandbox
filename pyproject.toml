@@ -109,7 +109,7 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 
-dependencies = ["roboticstoolbox_python>=1.1.1", "plotly", "pytest", "pandas", "tqdm", "ipykernel", "kaleido", "nbformat>=4.2.0"]
+dependencies = ["roboticstoolbox_python>=1.1.1", "plotly", "pytest", "pandas", "tqdm", "ipykernel", "kaleido", "nbformat>=4.2.0", "casadi>=3.6.5"]
 
 # This field lists other packages that your project depends on to run.
 # Any package you put here will be installed by pip when your project is
