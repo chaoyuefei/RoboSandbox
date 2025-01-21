@@ -32,6 +32,7 @@ Requires-Dist: ipykernel
 Requires-Dist: kaleido
 Requires-Dist: nbformat>=4.2.0
 Requires-Dist: casadi>=3.6.5
+Requires-Dist: aerosandbox
 Provides-Extra: dev
 Requires-Dist: check-manifest; extra == "dev"
 Provides-Extra: test
