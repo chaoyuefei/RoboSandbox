@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+from matplotlib.pyplot import axis
+
 """
 ***************************************************************************
 Modern Robotics: Mechanics, Planning, and Control.
@@ -183,17 +185,34 @@ def MatrixExp3(so3mat):
                   [-0.19200697, -0.30378504,  0.93319235],
                   [ 0.69297817,  0.6313497 ,  0.34810748]])
     """
-    omgtheta = so3ToVec(so3mat)
-    if NearZero(np.linalg.norm(omgtheta)):
-        return np.eye(3)
-    else:
+
+    def compute_large_norm(omgtheta):
         theta = AxisAng3(omgtheta)[1]
         omgmat = so3mat / theta
-        return (
-            np.eye(3)
-            + np.sin(theta) * omgmat
-            + (1 - np.cos(theta)) * np.dot(omgmat, omgmat)
+        res = (np.eye(3) + \
+            np.sin(theta) * omgmat + \
+            (1 - np.cos(theta)) * np.dot(omgmat, omgmat)
         )
+        return res
+    omgtheta = so3ToVec(so3mat)
+    norm_is_small = ca.fabs(np.linalg.norm(omgtheta)) < 1e-6
+    result = ca.if_else(
+        norm_is_small,
+        np.eye(3),
+        compute_large_norm(omgtheta)
+    )
+    return result
+
+    # if NearZero(np.linalg.norm(omgtheta)):
+    #     return np.eye(3)
+    # else:
+    #     theta = AxisAng3(omgtheta)[1]
+    #     omgmat = so3mat / theta
+    #     return (
+    #         np.eye(3)
+    #         + np.sin(theta) * omgmat
+    #         + (1 - np.cos(theta)) * np.dot(omgmat, omgmat)
+    #     )
 
 
 def MatrixLog3(R):
@@ -433,46 +452,76 @@ def MatrixExp6(se3mat):
     """
     se3mat = np.array(se3mat)
     omgtheta = so3ToVec(se3mat[0:3, 0:3])
-    # if NearZero(np.linalg.norm(omgtheta)):
     norm_omgtheta = ca.norm_2(omgtheta)
     norm_is_small = ca.fabs(norm_omgtheta) < 1e-6
-    print(se3mat[0:3, 3])
-    result = ca.if_else(
-        norm_is_small,
-        np.concatenate([np.concatenate([np.eye(3), se3mat[0:3, 3].reshape((3, 1))], axis=1), np.array([[0, 0, 0, 1]])]),
-        np.concatenate([
-            np.concatenate([
+
+    def compute_small_theta():
+        # np.r_[np.c_[np.eye(3), se3mat[0:3, 3]], [[0, 0, 0, 1]]]
+        upper_part = np.concatenate([np.eye(3), se3mat[0:3, 3]], axis=1)
+        return np.concatenate([upper_part, np.array([[0, 0, 0, 1]])], axis=0)
+    def compute_large_theta():
+        theta = AxisAng3(omgtheta)[1]
+        omgmat = se3mat[0:3, 0:3] / theta
+        trans = (np.eye(3) * theta \
+                + (1 - np.cos(theta)) * omgmat \
+                + (theta - np.sin(theta)) * np.dot(omgmat, omgmat)) \
+                @ se3mat[0:3, 3]
+        upper = np.concatenate([
                 MatrixExp3(se3mat[0:3, 0:3]),
-                np.dot(
-                    np.eye(3) * theta
-                    + (1 - np.cos(theta)) * omgmat
-                    + (theta - np.sin(theta)) * np.dot(omgmat, omgmat),
-                    se3mat[0:3, 3]
-                ) / theta
-            ], axis=1),
+                trans / theta],
+                axis=1
+        )
+
+        print(upper.shape)
+        res = np.concatenate([
+            upper,
             np.array([[0, 0, 0, 1]])
-        ])
-    )
+        ],
+        axis=0
+        )
+        print(res.shape)
+        return res
+
+        # return np.concatenate(
+        #     np.concatenate(
+        #         MatrixExp3(se3mat[0:3, 0:3]),
+        #         (
+        #             np.eye(3) * theta
+        #             + (1 - np.cos(theta)) * omgmat
+        #             + (theta - np.sin(theta)) * np.dot(omgmat, omgmat) @
+        #             se3mat[0:3, 3]
+        #         )
+        #         / theta,
+        #         axis=1
+        #     ),
+        #     [[0, 0, 0, 1]],
+        #     axis=0
+        # )
+
+    result = ca.if_else(norm_is_small, compute_small_theta(), compute_large_theta())
     return result
 
+
+    # (AxisAng3(omgtheta)[1])
+    # (se3mat[0:3, 0:3] / theta)
     # if norm_is_small:
     #     return np.r_[np.c_[np.eye(3), se3mat[0:3, 3]], [[0, 0, 0, 1]]]
     # else:
     #     theta = AxisAng3(omgtheta)[1]
     #     omgmat = se3mat[0:3, 0:3] / theta
-    #     return np.r_[
-    #         np.c_[
-    #             MatrixExp3(se3mat[0:3, 0:3]),
-    #             np.dot(
-    #                 np.eye(3) * theta
-    #                 + (1 - np.cos(theta)) * omgmat
-    #                 + (theta - np.sin(theta)) * np.dot(omgmat, omgmat),
-    #                 se3mat[0:3, 3],
-    #             )
-    #             / theta,
-    #         ],
-    #         [[0, 0, 0, 1]],
-    #     ]
+        # return np.r_[
+        #     np.c_[
+        #         MatrixExp3(se3mat[0:3, 0:3]),
+        #         np.dot(
+        #             np.eye(3) * theta
+        #             + (1 - np.cos(theta)) * omgmat
+        #             + (theta - np.sin(theta)) * np.dot(omgmat, omgmat),
+        #             se3mat[0:3, 3],
+        #         )
+        #         / theta,
+        #     ],
+        #     [[0, 0, 0, 1]],
+        # ]
 
 
 def MatrixLog6(T):
@@ -744,7 +793,8 @@ def FKinSpace(M, Slist, thetalist):
     """
     T = np.array(M)
     for i in range(np.length(thetalist) - 1, -1, -1):
-        T = np.dot(MatrixExp6(VecTose3(np.array(Slist)[:, i] * thetalist[i])), T)
+        # T = np.dot(MatrixExp6(VecTose3(np.array(Slist)[:, i] * thetalist[i])), T)
+        T = MatrixExp6(VecTose3(np.array(Slist)[:, i] * thetalist[i])) @ T
     return T
 
 
