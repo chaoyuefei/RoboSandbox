@@ -2,6 +2,9 @@ from __future__ import print_function
 
 from matplotlib.pyplot import axis
 
+# from numpy.linalg import norm
+from typing import List
+
 """
 ***************************************************************************
 Modern Robotics: Mechanics, Planning, and Control.
@@ -25,6 +28,7 @@ Optional library: matplotlib
 # import numpy as np
 import aerosandbox.numpy as np
 import casadi as ca
+from aerosandbox.numpy.determine_type import is_casadi_type
 
 """
 Update Functions
@@ -417,7 +421,10 @@ def ScrewToAxis(q, s, h):
     Output:
         np.array([0, 0, 1, 0, -3, 2])
     """
-    return np.r_[s, np.cross(q, s) + np.dot(h, s)]
+    # return np.r_[s, np.cross(q, s) + np.dot(h, s)]
+    return np.concatenate(
+        [s, np.cross(q, s) + h * s], axis=0
+    )
 
 
 def AxisAng6(expc6):
@@ -475,7 +482,7 @@ def MatrixExp6(se3mat):
             [upper_part, np.array([[0, 0, 0, 1]]).reshape((1, 4))], axis=0
         )
 
-    def compute_large_theta(omgtheta):
+    def compute_large_theta(omgtheta, se3mat):
         theta = AxisAng3(omgtheta)[1]
         omgmat = se3mat[0:3, 0:3] / theta
         trans = (
@@ -505,10 +512,28 @@ def MatrixExp6(se3mat):
         #     axis=0
         # )
 
-    result = ca.if_else(
-        norm_is_small, compute_small_theta(se3mat), compute_large_theta(omgtheta)
-    )
-    return result
+    # result = ca.if_else(
+    #     norm_is_small,
+    #     compute_small_theta(se3mat),
+    #     compute_large_theta(omgtheta, se3mat),
+    # )
+    if is_casadi_type([se3mat], recursive=True):
+        result = ca.if_else(
+            norm_is_small,
+            compute_small_theta(se3mat),
+            compute_large_theta(omgtheta, se3mat),
+        )
+        return result
+    if not is_casadi_type([se3mat], recursive=True):
+        if norm_is_small:
+            return compute_small_theta(se3mat)
+        if not norm_is_small:
+            return compute_large_theta(omgtheta, se3mat)
+
+    #     return compute_small_theta(se3mat)
+    # if not norm_is_small:
+    #     return compute_large_theta(omgtheta, se3mat)
+    # return None
 
     # (AxisAng3(omgtheta)[1])
     # (se3mat[0:3, 0:3] / theta)
@@ -799,10 +824,31 @@ def FKinSpace(M, Slist, thetalist):
                   [0, 0, -1, 1.68584073],
                   [0, 0,  0,          1]])
     """
+    # if not is_casadi_type([M, Slist, thetalist]):
+    #     T = np.array(M)
+    # if is_casadi_type([M, Slist, thetalist]):
+
+    #     def make_row(contents: List):
+    #         try:
+    #             return ca.horzcat(*contents)
+    #         except (TypeError, Exception):
+    #             return contents
+
+    #     T = ca.vertcat(*[make_row(row) for row in M])
+    #     # M = ca.MX.sym('M', m.shape[0], m.shape[1])\
+    #     # T = ca.MX(m)
     T = np.array(M)
     for i in range(np.length(thetalist) - 1, -1, -1):
+        # print(f"i: {i}")
+        # print(MatrixExp6(VecTose3(np.array(Slist)[:, i] * thetalist[i])).shape)
+        # print(type(MatrixExp6(VecTose3(np.array(Slist)[:, i] * thetalist[i]))))
+        # print(T.shape)
+        # print(type(T))
         # T = np.dot(MatrixExp6(VecTose3(np.array(Slist)[:, i] * thetalist[i])), T)
         T = MatrixExp6(VecTose3(np.array(Slist)[:, i] * thetalist[i])) @ T
+        # print(T.shape)
+        # print(type(T))
+
     return T
 
 

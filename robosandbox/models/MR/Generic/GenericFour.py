@@ -9,17 +9,39 @@ import aerosandbox.numpy as np
 import matplotlib.pyplot as plt
 
 class GenericFour:
-    def __init__(self):
+    def __init__(self, link_length = np.array([0.4, 0.4, 0.4, 0.4])):
 
         # link length
-        l1, l2, l3, l4 = 0.4, 0.4, 0.4, 0.4
+        # l1, l2, l3, l4 = 0.4, 0.4, 0.4, 0.4
+        l1 = link_length[0]
+        l2 = link_length[1]
+        l3 = link_length[2]
+        l4 = link_length[3]
+        print(type(l1))
         # joints screw list
-        j1 = ScrewToAxis(q=[0, 0, 0], s=[0, 0, 1], h=0)
-        j2 = ScrewToAxis(q=[0, 0, l1], s=[0, 1, 0], h=0)
-        j3 = ScrewToAxis(q=[0, 0, l1+l2], s=[0, 1, 0], h=0)
-        j4 = ScrewToAxis(q=[0, 0, l1+l2+l3], s=[0, 1, 0], h=0)
-        self.Slist = np.array([j1, j2, j3, j4]).T # Screw axes Si of the joints in a space frame, in the format
-                                            # of a matrix with axes as the columns
+
+
+
+        def make_row(contents: List):
+            try:
+                return ca.horzcat(*contents)
+            except (TypeError, Exception):
+                return contents
+        if is_casadi_type(l1):
+            j1 = ScrewToAxis(q=ca.vertcat([0, 0, 0]), s=ca.vertcat([0, 0, 1]), h=0)
+        if not is_casadi_type(l1):
+            j1 = ScrewToAxis(q=np.array([0, 0, 0]), s=np.array([0, 0, 1]), h=0)
+        j2 = ScrewToAxis(q=np.array([0, 0, l1]), s=np.array([0, 1, 0]), h=0)
+        j3 = ScrewToAxis(q=np.array([0, 0, l1+l2]), s=np.array([0, 1, 0]), h=0)
+        j4 = ScrewToAxis(q=np.array([0, 0, l1+l2+l3]), s=np.array([0, 1, 0]), h=0)
+        # self.Slist = np.array([j1, j2, j3, j4]).T # Screw axes Si of the joints in a space frame, in the format
+        #                                     # of a matrix with axes as the columns
+        #
+        print(f"j1: {j1}")
+        print(f"j2: {j2}")
+        print(f"j3: {j3}")
+        print(f"j4: {j4}")
+        self.Slist = (np.array([j1, j2, j3, j4])).T
         self.M = np.array([[ 0, 0, -1, 0],
                     [-1, 0,  0, 0],
                     [ 0, 1,  0, l1+l2+l3+l4],
