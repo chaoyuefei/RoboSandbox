@@ -139,7 +139,23 @@ def VecToso3(omg):
                   [ 3,  0, -1],
                   [-2,  1,  0]])
     """
-    return np.array([[0, -omg[2], omg[1]], [omg[2], 0, -omg[0]], [-omg[1], omg[0], 0]])
+    print(omg)
+    # return np.array([[0, -omg[2], omg[1]], [omg[2], 0, -omg[0]], [-omg[1], omg[0], 0]])
+    if isinstance(omg, ca.MX) or isinstance(omg, ca.SX):
+        # CasADi implementation
+        print(omg)
+        return ca.MX([
+            [0, -omg[2], omg[1]],
+            [omg[2], 0, -omg[0]],
+            [-omg[1], omg[0], 0],
+        ])
+    else:
+        # NumPy implementation
+        return np.array([
+            [0, -omg[2], omg[1]],
+            [omg[2], 0, -omg[0]],
+            [-omg[1], omg[0], 0],
+        ])
 
 
 def so3ToVec(so3mat):
@@ -340,25 +356,46 @@ def VecTose3(V):
                   [-2,  1,  0, 6],
                   [ 0,  0,  0, 0]])
     """
-    # return np.r_[
-    #     np.c_[VecToso3([V[0], V[1], V[2]]), [V[3], V[4], V[5]]], np.zeros((1, 4))
-    # ]
-    # V = np.array([V[0], V[1], V[2], V[3], V[4], V[5]])
-
-    T = np.concatenate(
-        [VecToso3([V[0], V[1], V[2]]), np.array([V[3], V[4], V[5]]).reshape((3, 1))],
-        axis=1,
-    )
-    T = np.concatenate(
-        [T, np.zeros((1, 4))], axis=0
-    )  #         if axis == 0: return _cas.vertcat(*arrays) elif axis == 1: return _cas.horzcat(*arrays)
+    if isinstance(V, ca.MX) or isinstance(V, ca.SX):
+        # Handle CasADi symbolic variable
+        print(V)
+        print(V.shape)
+        T = ca.horzcat(
+            VecToso3(ca.vertcat(V[0], V[1], V[2])),  # Rotation part
+            ca.vertcat(V[3], V[4], V[5])  # Translation part
+        )
+        T = ca.vertcat(
+            T, ca.MX.zeros(1, 4)  # Homogeneous transformation
+        )
+    else:
+        # Handle NumPy array
+        T = np.concatenate(
+            [np.array(VecToso3([V[0], V[1], V[2]])), np.array([V[3], V[4], V[5]]).reshape((3, 1))],
+            axis=1,
+        )
+        T = np.concatenate(
+            [T, np.zeros((1, 4))], axis=0
+        )
     return T
-    # if isinstance(V, list):
-    #     V = ca.MX(V)  # Ensure it's a CasADi MX object
+    # # return np.r_[
+    # #     np.c_[VecToso3([V[0], V[1], V[2]]), [V[3], V[4], V[5]]], np.zeros((1, 4))
+    # # ]
+    # # V = np.array([V[0], V[1], V[2], V[3], V[4], V[5]])
 
-    # return ca.MX([[0, -V[2], V[1]],
-    #               [V[2], 0, -V[0]],
-    #               [-V[1], V[0], 0]])
+    # T = np.concatenate(
+    #     [np.array(VecToso3([V[0], V[1], V[2]])), np.array([V[3], V[4], V[5]]).reshape((3, 1))],
+    #     axis=1,
+    # )
+    # T = np.concatenate(
+    #     [T, np.zeros((1, 4))], axis=0
+    # )  #         if axis == 0: return _cas.vertcat(*arrays) elif axis == 1: return _cas.horzcat(*arrays)
+    # return T
+    # # if isinstance(V, list):
+    # #     V = ca.MX(V)  # Ensure it's a CasADi MX object
+
+    # # return ca.MX([[0, -V[2], V[1]],
+    # #               [V[2], 0, -V[0]],
+    # #               [-V[1], V[0], 0]])
 
 
 def se3ToVec(se3mat):
@@ -845,10 +882,13 @@ def FKinSpace(M, Slist, thetalist):
         # print(T.shape)
         # print(type(T))
         # T = np.dot(MatrixExp6(VecTose3(np.array(Slist)[:, i] * thetalist[i])), T)
+        print(np.array(Slist)[:, i])
+        print(np.array(Slist)[:, i] @ ca.vertcat(thetalist[i]))
+        print(ca.mtimes(np.array(Slist)[:, i], ca.vertcat(thetalist[i])))
+        print("======================")
         T = MatrixExp6(VecTose3(np.array(Slist)[:, i] * thetalist[i])) @ T
         # print(T.shape)
         # print(type(T))
-
     return T
 
 

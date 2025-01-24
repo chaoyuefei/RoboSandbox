@@ -20,17 +20,13 @@ class GenericFour:
         print(type(l1))
         # joints screw list
 
-
-
-        def make_row(contents: List):
-            try:
-                return ca.horzcat(*contents)
-            except (TypeError, Exception):
-                return contents
         if is_casadi_type(l1):
             j1 = ScrewToAxis(q=ca.vertcat([0, 0, 0]), s=ca.vertcat([0, 0, 1]), h=0)
-        if not is_casadi_type(l1):
+        elif not is_casadi_type(l1):
             j1 = ScrewToAxis(q=np.array([0, 0, 0]), s=np.array([0, 0, 1]), h=0)
+        else:
+            raise ValueError("Unexpected type for l1. Cannot determine how to create j1.")
+
         j2 = ScrewToAxis(q=np.array([0, 0, l1]), s=np.array([0, 1, 0]), h=0)
         j3 = ScrewToAxis(q=np.array([0, 0, l1+l2]), s=np.array([0, 1, 0]), h=0)
         j4 = ScrewToAxis(q=np.array([0, 0, l1+l2+l3]), s=np.array([0, 1, 0]), h=0)
@@ -41,7 +37,7 @@ class GenericFour:
         print(f"j2: {j2}")
         print(f"j3: {j3}")
         print(f"j4: {j4}")
-        self.Slist = (np.array([j1, j2, j3, j4])).T
+        self.Slist = np.transpose(np.array([j1, j2, j3, j4]))
         self.M = np.array([[ 0, 0, -1, 0],
                     [-1, 0,  0, 0],
                     [ 0, 1,  0, l1+l2+l3+l4],

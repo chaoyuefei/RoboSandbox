@@ -15,14 +15,14 @@ def test_opti():
     theta_list = np.array([0, 0, 0, 0])
 
     # f = np.power(rsb.models.MR.Generic.GenericFour(np.array([l1, l2, l3, l4])).M[2, -1] - 2, 2)
-    f = np.power(robot.fkine(theta_list)[2, -1]-2, 2)
+    f = np.power(rsb.models.MR.Generic.GenericFour(np.array([l1, l2, l3, l4])).fkine(theta_list)[2, -1] - 2, 2)
 
     # opti.subject_to(l1 <= 0.3)
     # opti.subject_to(l2 <= 0.6)
     # opti.subject_to(l3 <= 0.8)
     # opti.subject_to(l4 <= 1)
 
-    opti.subject_to(l3 - l2 >= 0.2)
+    # opti.subject_to(l3 - l2 >= 0.2)
 
     opti.minimize(f)
     sol = opti.solve()
