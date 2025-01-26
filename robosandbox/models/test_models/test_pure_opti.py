@@ -3,10 +3,21 @@ import casadi as ca
 from scipy.linalg import expm
 import aerosandbox as asb
 
+from robosandbox.models.MR.utils import so3ToVec
+
 
 def is_casadi_type(obj):
     """Checks if the object is of a CasADi type."""
     return isinstance(obj, (ca.MX, ca.DM))
+
+
+def NearZero(val):
+    """Checks if a value is near zero."""
+
+    if is_casadi_type(val):
+        return ca.fabs(val) < 1e-6
+    else:
+        return np.abs(val) < 1e-6
 
 
 def ScrewToAxis(q, s, h):
@@ -65,35 +76,80 @@ def VecToso3(V):
 
 def MatrixExp6(se3mat):
     """Compute the matrix exponential of a 4x4 se(3) matrix."""
+    se3mat = np.array(se3mat)
+    omgtheta = so3ToVec(se3mat[0:3, 0:3])
     if isinstance(se3mat, (ca.MX, ca.SX)):
-        omgmat = se3mat[0:3, 0:3]
-        pure_translation = ca.fabs(ca.norm_fro(omgmat)) < 1e-6
-
-        theta = ca.norm_fro(omgmat)
-        omgmat_normalized = omgmat / theta
-        exp_omgmat = (
-            ca.MX.eye(3)
-            + ca.sin(theta) * omgmat_normalized
-            + (1 - ca.cos(theta)) * ca.mtimes(omgmat_normalized, omgmat_normalized)
+        pure_translation = ca.norm_fro(omgtheta) < 1e-6
+        return ca.if_else(
+            pure_translation,
+            ca.vertcat(ca.horzcat(ca.MX.eye(3), se3mat[0:3, 3]), ca.MX([[0, 0, 0, 1]])),
+            lambda: (
+                ca.vertcat(
+                    ca.horzcat(
+                        MatrixExp3(se3mat[0:3, 0:3]),
+                        (
+                            (
+                                ca.MX.eye(3) * ca.norm_2(omgtheta)
+                                + (1 - ca.cos(ca.norm_2(omgtheta)))
+                                * (se3mat[0:3, 0:3] / ca.norm_2(omgtheta))
+                                + (ca.norm_2(omgtheta) - ca.sin(ca.norm_2(omgtheta)))
+                                * (
+                                    (se3mat[0:3, 0:3] / ca.norm_2(omgtheta))
+                                    @ (se3mat[0:3, 0:3] / ca.norm_2(omgtheta))
+                                )
+                            )
+                            @ se3mat[0:3, 3]
+                            / ca.norm_2(omgtheta)
+                        ),
+                    ),
+                    ca.MX([[0, 0, 0, 1]]),
+                )
+            ),
         )
-        v = ca.reshape(se3mat[0:3, 3], (3, 1)) / theta  # Ensure v is 3x1
-        exp_v = ca.mtimes((ca.MX.eye(3) - exp_omgmat), v) + ca.mtimes(
-            omgmat_normalized, v
-        )
 
-        result_translation = ca.vertcat(
-            ca.horzcat(ca.MX.eye(3), se3mat[0:3, 3]),
-            ca.horzcat(ca.MX.zeros(1, 3), ca.MX(1)),
-        )
+    # Worked but not sure if it is correct
+    # if isinstance(se3mat, (ca.MX, ca.SX)):
+    #     omgmat = se3mat[0:3, 0:3]
+    #     pure_translation = ca.fabs(ca.norm_fro(omgmat)) < 1e-6
 
-        result_rotation = ca.vertcat(
-            ca.horzcat(exp_omgmat, exp_v),
-            ca.horzcat(ca.MX.zeros(1, 3), ca.MX(1)),
-        )
+    #     theta = ca.norm_fro(omgmat)
+    #     omgmat_normalized = omgmat / theta
+    #     exp_omgmat = (
+    #         ca.MX.eye(3)
+    #         + ca.sin(theta) * omgmat_normalized
+    #         + (1 - ca.cos(theta)) * ca.mtimes(omgmat_normalized, omgmat_normalized)
+    #     )
+    #     v = ca.reshape(se3mat[0:3, 3], (3, 1)) / theta  # Ensure v is 3x1
+    #     exp_v = ca.mtimes((ca.MX.eye(3) - exp_omgmat), v) + ca.mtimes(
+    #         omgmat_normalized, v
+    #     )
 
-        return ca.if_else(pure_translation, result_translation, result_rotation)
-    else:
-        return expm(se3mat)
+    #     result_translation = ca.vertcat(
+    #         ca.horzcat(ca.MX.eye(3), se3mat[0:3, 3]),
+    #         ca.horzcat(ca.MX.zeros(1, 3), ca.MX(1)),
+    #     )
+
+    #     result_rotation = ca.vertcat(
+    #         ca.horzcat(exp_omgmat, exp_v),
+    #         ca.horzcat(ca.MX.zeros(1, 3), ca.MX(1)),
+    #     )
+
+    #     return ca.if_else(pure_translation, result_translation, result_rotation)
+    # else:
+    #     return expm(se3mat)
+
+
+def MatrixExp3(so3mat):
+    """Computes the matrix exponential of an so3 matrix."""
+    omgvec = so3ToVec(so3mat)
+    theta = ca.norm_2(omgvec)
+    return ca.if_else(
+        NearZero(theta),
+        ca.MX.eye(3),
+        ca.MX.eye(3)
+        + ca.sin(theta) * (so3mat / theta)
+        + (1 - ca.cos(theta)) * ((so3mat / theta) @ (so3mat / theta)),
+    )
 
 
 def FKinSpace(M, Slist, thetalist):
@@ -133,15 +189,15 @@ if __name__ == "__main__":
     Slist_ca = ca.horzcat(j1, j2, j3, j4)
 
     opti = asb.Opti()
-    q4 = opti.variable(init_guess=0.2, lower_bound=0, upper_bound=np.pi / 2)
-    q3 = opti.variable(init_guess=0.2, lower_bound=0, upper_bound=np.pi / 2)
+    q4 = opti.variable(init_guess=0.1, lower_bound=0, upper_bound=np.pi / 2)
+    q3 = opti.variable(init_guess=0.01, lower_bound=0, upper_bound=np.pi / 2)
     thetalist_ca = np.array([0, 0, q3, q4])
-    result_ca = np.power(FKinSpace(M_ca, Slist_ca, thetalist_ca)[2, -1] - 0.9, 2)
-    # result_ca = -FKinSpace(M_ca, Slist_ca, thetalist_ca)[2, -1]
+    # result_ca = np.power(FKinSpace(M_ca, Slist_ca, thetalist_ca)[2, -1] - 1.6, 2)
+    result_ca = -FKinSpace(M_ca, Slist_ca, thetalist_ca)[2, -1]
 
     print(result_ca.shape)
     opti.minimize(result_ca)
-    sol = opti.solve(max_iter=2000)
+    sol = opti.solve()
 
     print("+++++++++++++++++++++++=")
     q3_opt = sol.value(q3)
@@ -156,6 +212,6 @@ if __name__ == "__main__":
     print("+++++++++++++++++++++++=")
     print(
         np.power(
-            FKinSpace(M_ca, Slist_ca, np.array([0, 0, q3_opt, q4_opt]))[2, -1] - 0.9, 2
+            FKinSpace(M_ca, Slist_ca, np.array([0, 0, q3_opt, q4_opt]))[2, -1] - 1.6, 2
         )
     )
