@@ -1,6 +1,7 @@
-import numpy as np
+import aerosandbox.numpy as np
 import casadi as ca
 from scipy.linalg import expm
+
 
 def is_casadi_type(obj):
     """Checks if the object is of a CasADi type."""
@@ -16,10 +17,12 @@ def VecTose3(V):
             ca.horzcat(0, 0, 0, 0),
         )
     else:
-        return np.vstack([
-            np.hstack([so3_mat, V[3:6].reshape((3, 1))]),
-            [0, 0, 0, 0],
-        ])
+        return np.vstack(
+            [
+                np.hstack([so3_mat, V[3:6].reshape((3, 1))]),
+                [0, 0, 0, 0],
+            ]
+        )
 
 
 def VecToso3(V):
@@ -31,11 +34,7 @@ def VecToso3(V):
             ca.horzcat(-V[1], V[0], 0),
         )
     else:
-        return np.array([
-            [0, -V[2], V[1]],
-            [V[2], 0, -V[0]],
-            [-V[1], V[0], 0]
-        ])
+        return np.array([[0, -V[2], V[1]], [V[2], 0, -V[0]], [-V[1], V[0], 0]])
 
 
 def MatrixExp6(se3mat):
@@ -45,22 +44,26 @@ def MatrixExp6(se3mat):
         if ca.norm_fro(omgmat) < 1e-6:  # Pure translation
             return ca.vertcat(
                 ca.horzcat(ca.MX.eye(3), se3mat[0:3, 3]),
-                ca.horzcat(ca.MX.zeros(1, 3), ca.MX(1))
+                ca.horzcat(ca.MX.zeros(1, 3), ca.MX(1)),
             )
         else:
             theta = ca.norm_fro(omgmat)  # Angle of rotation
             omgmat_normalized = omgmat / theta
-            exp_omgmat = ca.MX.eye(3) + \
-                         ca.sin(theta) * omgmat_normalized + \
-                         (1 - ca.cos(theta)) * ca.mtimes(omgmat_normalized, omgmat_normalized)
+            exp_omgmat = (
+                ca.MX.eye(3)
+                + ca.sin(theta) * omgmat_normalized
+                + (1 - ca.cos(theta)) * ca.mtimes(omgmat_normalized, omgmat_normalized)
+            )
             v = se3mat[0:3, 3] / theta
-            exp_v = ca.mtimes((ca.MX.eye(3) - exp_omgmat), v) + ca.mtimes(v, ca.transpose(v))
+            exp_v = ca.mtimes((ca.MX.eye(3) - exp_omgmat), v) + ca.mtimes(
+                v, ca.transpose(v)
+            )
             return ca.vertcat(
-                ca.horzcat(exp_omgmat, exp_v),
-                ca.horzcat(ca.MX.zeros(1, 3), ca.MX(1))
+                ca.horzcat(exp_omgmat, exp_v), ca.horzcat(ca.MX.zeros(1, 3), ca.MX(1))
             )
     else:
         return expm(se3mat)
+
 
 def FKinSpace(M, Slist, thetalist):
     """Computes forward kinematics in the space frame for an open chain robot."""
@@ -74,13 +77,10 @@ def FKinSpace(M, Slist, thetalist):
 # Example Usage
 if __name__ == "__main__":
     # NumPy Example
-    M_np = np.array([[-1, 0,  0, 0],
-                     [ 0, 1,  0, 6],
-                     [ 0, 0, -1, 2],
-                     [ 0, 0,  0, 1]])
-    Slist_np = np.array([[0, 0,  1,  4, 0,    0],
-                         [0, 0,  0,  0, 1,    0],
-                         [0, 0, -1, -6, 0, -0.1]]).T
+    M_np = np.array([[-1, 0, 0, 0], [0, 1, 0, 6], [0, 0, -1, 2], [0, 0, 0, 1]])
+    Slist_np = np.array(
+        [[0, 0, 1, 4, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, -1, -6, 0, -0.1]]
+    ).T
     thetalist_np = np.array([np.pi / 2.0, 3, np.pi])
     result_np = FKinSpace(M_np, Slist_np, thetalist_np)
     print("NumPy Result:")
@@ -88,17 +88,19 @@ if __name__ == "__main__":
 
     # CasADi Example
     M_ca = ca.vertcat(
-        ca.horzcat(-1, 0,  0, 0),
-        ca.horzcat(0,  1,  0, 6),
-        ca.horzcat(0,  0, -1, 2),
-        ca.horzcat(0,  0,  0, 1)
+        ca.horzcat(-1, 0, 0, 0),
+        ca.horzcat(0, 1, 0, 6),
+        ca.horzcat(0, 0, -1, 2),
+        ca.horzcat(0, 0, 0, 1),
     )
     Slist_ca = ca.horzcat(
-        ca.vertcat(0, 0,  1,  4, 0,    0),
-        ca.vertcat(0, 0,  0,  0, 1,    0),
-        ca.vertcat(0, 0, -1, -6, 0, -0.1)
+        ca.vertcat(0, 0, 1, 4, 0, 0),
+        ca.vertcat(0, 0, 0, 0, 1, 0),
+        ca.vertcat(0, 0, -1, -6, 0, -0.1),
     )
     thetalist_ca = ca.vertcat(ca.pi / 2.0, 3, ca.pi)
+    # thetalist_ca = ca.vertcat(0, 0, 0, 2.14)
+
     result_ca = FKinSpace(M_ca, Slist_ca, thetalist_ca)
     print("CasADi Result:")
     print(result_ca)

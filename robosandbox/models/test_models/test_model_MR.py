@@ -3,8 +3,25 @@ import aerosandbox.numpy as np
 import aerosandbox as asb
 
 
+def test_main():
+    robot = rsb.models.MR.Generic.GenericFour()
+    opti = asb.Opti()
+    q4 = opti.variable(init_guess=0.5)
+    # q4 = 2.14
+    theta_list = np.array([0, 0, 0, q4])
+    T = robot.fkine(theta_list)
+    print(T)
+    print(T[2, -1])
+    obj = -np.power(T[2, -1], 2)
+    opti.minimize(obj)
+    sol = opti.solve()
+    q4_opt = sol(q4)
+    print(f"q4_opt: {q4_opt}")
+    print(sol(obj))
+
+
 def test_MR_GenericFour():
-    # robot = rsb.models.MR.Generic.GenericFour()
+    robot = rsb.models.MR.Generic.GenericFour()
     # theta_list = np.array([0, 0.2, 0, 0.2])
     opti = asb.Opti()
 
@@ -31,7 +48,7 @@ def test_MR_GenericFour():
     #     + robot.fkine([q1, q2, q3, q4])[1, -1] ** 2
     #     + robot.fkine([q1, q2, q3, q4])[2, -1] ** 2
     # )
-    f = -robot.fkine(theta_list)[2, -1]
+    f = np.power(robot.fkine(theta_list)[2, -1], 2)
 
     opti.minimize(f)
     sol = opti.solve()
@@ -51,4 +68,5 @@ def test_MR_GenericFour():
 
 
 if __name__ == "__main__":
-    test_MR_GenericFour()
+    # test_MR_GenericFour()
+    test_main()

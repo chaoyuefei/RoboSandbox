@@ -1,6 +1,8 @@
 from __future__ import print_function
 
 from matplotlib.pyplot import axis
+from scipy.linalg import expm
+
 
 # from numpy.linalg import norm
 from typing import List
@@ -144,18 +146,22 @@ def VecToso3(omg):
     if isinstance(omg, ca.MX) or isinstance(omg, ca.SX):
         # CasADi implementation
         print(omg)
-        return ca.MX([
-            [0, -omg[2], omg[1]],
-            [omg[2], 0, -omg[0]],
-            [-omg[1], omg[0], 0],
-        ])
+        return np.array(
+            [
+                [0, -omg[2], omg[1]],
+                [omg[2], 0, -omg[0]],
+                [-omg[1], omg[0], 0],
+            ]
+        )
     else:
         # NumPy implementation
-        return np.array([
-            [0, -omg[2], omg[1]],
-            [omg[2], 0, -omg[0]],
-            [-omg[1], omg[0], 0],
-        ])
+        return np.array(
+            [
+                [0, -omg[2], omg[1]],
+                [omg[2], 0, -omg[0]],
+                [-omg[1], omg[0], 0],
+            ]
+        )
 
 
 def so3ToVec(so3mat):
@@ -356,27 +362,42 @@ def VecTose3(V):
                   [-2,  1,  0, 6],
                   [ 0,  0,  0, 0]])
     """
-    if isinstance(V, ca.MX) or isinstance(V, ca.SX):
-        # Handle CasADi symbolic variable
-        print(V)
-        print(V.shape)
-        T = ca.horzcat(
-            VecToso3(ca.vertcat(V[0], V[1], V[2])),  # Rotation part
-            ca.vertcat(V[3], V[4], V[5])  # Translation part
-        )
-        T = ca.vertcat(
-            T, ca.MX.zeros(1, 4)  # Homogeneous transformation
+    so3_mat = VecToso3(V[0:3])
+    if is_casadi_type(V):
+        return ca.vertcat(
+            ca.horzcat(so3_mat, V[3:6]),
+            ca.horzcat(0, 0, 0, 0),
         )
     else:
-        # Handle NumPy array
-        T = np.concatenate(
-            [np.array(VecToso3([V[0], V[1], V[2]])), np.array([V[3], V[4], V[5]]).reshape((3, 1))],
-            axis=1,
+        return np.vstack(
+            [
+                np.hstack([so3_mat, V[3:6].reshape((3, 1))]),
+                [0, 0, 0, 0],
+            ]
         )
-        T = np.concatenate(
-            [T, np.zeros((1, 4))], axis=0
-        )
-    return T
+    # if isinstance(V, ca.MX) or isinstance(V, ca.SX):
+    #     # Handle CasADi symbolic variable
+    #     print(V)
+    #     print(V.shape)
+    #     T = ca.horzcat(
+    #         VecToso3(ca.vertcat(V[0], V[1], V[2])),  # Rotation part
+    #         ca.vertcat(V[3], V[4], V[5]),  # Translation part
+    #     )
+    #     T = ca.vertcat(
+    #         T,
+    #         ca.MX.zeros(1, 4),  # Homogeneous transformation
+    #     )
+    # else:
+    #     # Handle NumPy array
+    #     T = np.concatenate(
+    #         [
+    #             np.array(VecToso3([V[0], V[1], V[2]])),
+    #             np.array([V[3], V[4], V[5]]).reshape((3, 1)),
+    #         ],
+    #         axis=1,
+    #     )
+    #     T = np.concatenate([T, np.zeros((1, 4))], axis=0)
+    # return T
     # # return np.r_[
     # #     np.c_[VecToso3([V[0], V[1], V[2]]), [V[3], V[4], V[5]]], np.zeros((1, 4))
     # # ]
@@ -459,9 +480,7 @@ def ScrewToAxis(q, s, h):
         np.array([0, 0, 1, 0, -3, 2])
     """
     # return np.r_[s, np.cross(q, s) + np.dot(h, s)]
-    return np.concatenate(
-        [s, np.cross(q, s) + h * s], axis=0
-    )
+    return np.concatenate([s, np.cross(q, s) + h * s], axis=0)
 
 
 def AxisAng6(expc6):
@@ -502,96 +521,124 @@ def MatrixExp6(se3mat):
                   [0.0, 1.0,  0.0, 3.0],
                   [  0,   0,    0,   1]])
     """
-    se3mat = np.array(se3mat)
-    omgtheta = so3ToVec(se3mat[0:3, 0:3])
-    # norm_omgtheta = ca.norm_2(omgtheta)
-    # norm_is_small = ca.fabs(norm_omgtheta) < 1e-6
-    norm_is_small = np.abs(np.linalg.norm(omgtheta)) < 1e-6
+    if is_casadi_type(se3mat):
+        omgmat = se3mat[0:3, 0:3]
+        theta = ca.norm_fro(omgmat)  # Angle of rotation
 
-    def compute_small_theta(se3mat):
-        # np.r_[np.c_[np.eye(3), se3mat[0:3, 3]], [[0, 0, 0, 1]]]
+        # Conditional logic for pure translation or rotation
+        is_pure_translation = ca.fabs(theta) < 1e-6
 
-        # if se3mat[0:3, 3].shape == (3,):
-        #     se3mat[0:3, 3] = se3mat[0:3, 3].reshape((3, 1))
-        #     upper_part = np.concatenate([np.eye(3), se3mat[0:3, 3]], axis=1)
-        upper_part = np.concatenate([np.eye(3), se3mat[0:3, 3].reshape((3, 1))], axis=1)
-        return np.concatenate(
-            [upper_part, np.array([[0, 0, 0, 1]]).reshape((1, 4))], axis=0
+        exp_omgmat = ca.if_else(
+            is_pure_translation,
+            ca.MX.eye(3),  # No rotation
+            ca.MX.eye(3)
+            + (ca.sin(theta) / theta) * omgmat
+            + ((1 - ca.cos(theta)) / (theta**2)) * ca.mtimes(omgmat, omgmat),
         )
 
-    def compute_large_theta(omgtheta, se3mat):
-        theta = AxisAng3(omgtheta)[1]
-        omgmat = se3mat[0:3, 0:3] / theta
-        trans = (
-            np.eye(3) * theta
-            + (1 - np.cos(theta)) * omgmat
-            + (theta - np.sin(theta)) * np.dot(omgmat, omgmat)
-        ) @ se3mat[0:3, 3]
-        upper = np.concatenate([MatrixExp3(se3mat[0:3, 0:3]), trans / theta], axis=1)
-
-        # print(upper.shape)
-        res = np.concatenate([upper, np.array([[0, 0, 0, 1]])], axis=0)
-        # print(res.shape)
-        return res
-        # return np.concatenate(
-        #     np.concatenate(
-        #         MatrixExp3(se3mat[0:3, 0:3]),
-        #         (
-        #             np.eye(3) * theta
-        #             + (1 - np.cos(theta)) * omgmat
-        #             + (theta - np.sin(theta)) * np.dot(omgmat, omgmat) @
-        #             se3mat[0:3, 3]
-        #         )
-        #         / theta,
-        #         axis=1
-        #     ),
-        #     [[0, 0, 0, 1]],
-        #     axis=0
-        # )
-
-    # result = ca.if_else(
-    #     norm_is_small,
-    #     compute_small_theta(se3mat),
-    #     compute_large_theta(omgtheta, se3mat),
-    # )
-    if is_casadi_type([se3mat], recursive=True):
-        result = ca.if_else(
-            norm_is_small,
-            compute_small_theta(se3mat),
-            compute_large_theta(omgtheta, se3mat),
+        v = se3mat[0:3, 3]
+        exp_v = ca.if_else(
+            is_pure_translation,
+            v,  # Direct translation
+            ca.mtimes((ca.MX.eye(3) - exp_omgmat) @ ca.inv(omgmat), v)
+            + (1 / theta) * v,
         )
-        return result
-    if not is_casadi_type([se3mat], recursive=True):
-        if norm_is_small:
-            return compute_small_theta(se3mat)
-        if not norm_is_small:
-            return compute_large_theta(omgtheta, se3mat)
+        return ca.vertcat(
+            ca.horzcat(exp_omgmat, exp_v), ca.horzcat(ca.MX.zeros(1, 3), ca.MX(1))
+        )
+    else:
+        # NumPy version
+        return expm(se3mat)
+    # se3mat = np.array(se3mat)
+    # omgtheta = so3ToVec(se3mat[0:3, 0:3])
+    # # norm_omgtheta = ca.norm_2(omgtheta)
+    # # norm_is_small = ca.fabs(norm_omgtheta) < 1e-6
+    # norm_is_small = np.abs(np.linalg.norm(omgtheta)) < 1e-6
 
-    #     return compute_small_theta(se3mat)
-    # if not norm_is_small:
-    #     return compute_large_theta(omgtheta, se3mat)
-    # return None
+    # def compute_small_theta(se3mat):
+    #     # np.r_[np.c_[np.eye(3), se3mat[0:3, 3]], [[0, 0, 0, 1]]]
 
-    # (AxisAng3(omgtheta)[1])
-    # (se3mat[0:3, 0:3] / theta)
-    # if norm_is_small:
-    #     return np.r_[np.c_[np.eye(3), se3mat[0:3, 3]], [[0, 0, 0, 1]]]
-    # else:
+    #     # if se3mat[0:3, 3].shape == (3,):
+    #     #     se3mat[0:3, 3] = se3mat[0:3, 3].reshape((3, 1))
+    #     #     upper_part = np.concatenate([np.eye(3), se3mat[0:3, 3]], axis=1)
+    #     upper_part = np.concatenate([np.eye(3), se3mat[0:3, 3].reshape((3, 1))], axis=1)
+    #     return np.concatenate(
+    #         [upper_part, np.array([[0, 0, 0, 1]]).reshape((1, 4))], axis=0
+    #     )
+
+    # def compute_large_theta(omgtheta, se3mat):
     #     theta = AxisAng3(omgtheta)[1]
     #     omgmat = se3mat[0:3, 0:3] / theta
-    # return np.r_[
-    #     np.c_[
-    #         MatrixExp3(se3mat[0:3, 0:3]),
-    #         np.dot(
-    #             np.eye(3) * theta
-    #             + (1 - np.cos(theta)) * omgmat
-    #             + (theta - np.sin(theta)) * np.dot(omgmat, omgmat),
-    #             se3mat[0:3, 3],
-    #         )
-    #         / theta,
-    #     ],
-    #     [[0, 0, 0, 1]],
-    # ]
+    #     trans = (
+    #         np.eye(3) * theta
+    #         + (1 - np.cos(theta)) * omgmat
+    #         + (theta - np.sin(theta)) * np.dot(omgmat, omgmat)
+    #     ) @ se3mat[0:3, 3]
+    #     upper = np.concatenate([MatrixExp3(se3mat[0:3, 0:3]), trans / theta], axis=1)
+
+    #     # print(upper.shape)
+    #     res = np.concatenate([upper, np.array([[0, 0, 0, 1]])], axis=0)
+    #     # print(res.shape)
+    #     return res
+    #     # return np.concatenate(
+    #     #     np.concatenate(
+    #     #         MatrixExp3(se3mat[0:3, 0:3]),
+    #     #         (
+    #     #             np.eye(3) * theta
+    #     #             + (1 - np.cos(theta)) * omgmat
+    #     #             + (theta - np.sin(theta)) * np.dot(omgmat, omgmat) @
+    #     #             se3mat[0:3, 3]
+    #     #         )
+    #     #         / theta,
+    #     #         axis=1
+    #     #     ),
+    #     #     [[0, 0, 0, 1]],
+    #     #     axis=0
+    #     # )
+
+    # # result = ca.if_else(
+    # #     norm_is_small,
+    # #     compute_small_theta(se3mat),
+    # #     compute_large_theta(omgtheta, se3mat),
+    # # )
+    # if is_casadi_type([se3mat], recursive=True):
+    #     result = ca.if_else(
+    #         norm_is_small,
+    #         compute_small_theta(se3mat),
+    #         compute_large_theta(omgtheta, se3mat),
+    #     )
+    #     return result
+    # if not is_casadi_type([se3mat], recursive=True):
+    #     if norm_is_small:
+    #         return compute_small_theta(se3mat)
+    #     if not norm_is_small:
+    #         return compute_large_theta(omgtheta, se3mat)
+
+    # #     return compute_small_theta(se3mat)
+    # # if not norm_is_small:
+    # #     return compute_large_theta(omgtheta, se3mat)
+    # # return None
+
+    # # (AxisAng3(omgtheta)[1])
+    # # (se3mat[0:3, 0:3] / theta)
+    # # if norm_is_small:
+    # #     return np.r_[np.c_[np.eye(3), se3mat[0:3, 3]], [[0, 0, 0, 1]]]
+    # # else:
+    # #     theta = AxisAng3(omgtheta)[1]
+    # #     omgmat = se3mat[0:3, 0:3] / theta
+    # # return np.r_[
+    # #     np.c_[
+    # #         MatrixExp3(se3mat[0:3, 0:3]),
+    # #         np.dot(
+    # #             np.eye(3) * theta
+    # #             + (1 - np.cos(theta)) * omgmat
+    # #             + (theta - np.sin(theta)) * np.dot(omgmat, omgmat),
+    # #             se3mat[0:3, 3],
+    # #         )
+    # #         / theta,
+    # #     ],
+    # #     [[0, 0, 0, 1]],
+    # # ]
 
 
 def MatrixLog6(T):
