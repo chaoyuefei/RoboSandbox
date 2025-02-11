@@ -177,6 +177,8 @@ packages = [
     "robosandbox",
     "tutorial",
     "robosandbox.models.DH",
+    "robosandbox.models.DHLink",
+    "robosandbox.models.DHLink.Generic",
     "robosandbox.models.MR",
     "robosandbox.models.MR.Generic",
     "robosandbox.geometry.Link",
