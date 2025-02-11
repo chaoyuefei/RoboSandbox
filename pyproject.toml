@@ -179,4 +179,5 @@ packages = [
     "robosandbox.models.DH",
     "robosandbox.models.MR",
     "robosandbox.models.MR.Generic",
+    "robosandbox.geometry.Link",
 ]
