@@ -182,4 +182,5 @@ packages = [
     "robosandbox.models.MR",
     "robosandbox.models.MR.Generic",
     "robosandbox.geometry.Link",
+    "robosandbox.visualization",
 ]
