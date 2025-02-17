@@ -77,6 +77,61 @@ def test_RoutRin_plot():
                 points[f[2]],
                 points[f[3]],
             ),
+            intensity=count, # random give int
+            outline=False,
+        )
+
+    points, faces = l1.get_outer_mesh()
+    count = 0
+    for f in faces:
+        count += 1
+        fig.add_quad(
+            (
+                points[f[0]],
+                points[f[1]],
+                points[f[2]],
+                points[f[3]],
+            ),
+            intensity=count, # random give int
+            outline=False,
+        )
+    return fig.draw()
+
+def test_side_plot():
+    l1 = cl(length=0.4, E=70e6, rho=2700, Rout=25e-3, parameters=[20e-3, 20e-3], method='linear')
+    points, faces = l1.get_side_mesh()
+
+    fig = Figure3D()
+    count = 0
+    for f in faces:
+        count += 1
+        fig.add_quad(
+            (
+                points[f[0]],
+                points[f[1]],
+                points[f[2]],
+                points[f[3]],
+            ),
+            intensity=count, # random give int
+            outline=False,
+        )
+    return fig.draw()
+
+def test_link_mesh_plot():
+    l1 = cl(length=0.4, E=70e6, rho=2700, Rout=25e-3, parameters=[20e-3, 5e-3], method='linear')
+    points, faces = l1.get_inner_mesh()
+
+    fig = Figure3D()
+    count = 0
+    for f in faces:
+        count += 1
+        fig.add_quad(
+            (
+                points[f[0]],
+                points[f[1]],
+                points[f[2]],
+                points[f[3]],
+            ),
             intensity=1, # random give int
             outline=False,
         )
@@ -92,14 +147,49 @@ def test_RoutRin_plot():
                 points[f[2]],
                 points[f[3]],
             ),
-            intensity=2, # random give int
+            intensity=1, # random give int
             outline=False,
         )
+
+    points, faces = l1.get_side_mesh(side="start")
+    print(points[0], points[-1])
+    count = 0
+    for f in faces:
+        count += 1
+        fig.add_quad(
+            (
+                points[f[0]],
+                points[f[1]],
+                points[f[2]],
+                points[f[3]],
+            ),
+            intensity=0, # random give int
+            outline=True,
+        )
+
+    points, faces = l1.get_side_mesh(side="end")
+    count = 0
+    for f in faces:
+        count += 1
+        fig.add_quad(
+            (
+                points[f[0]],
+                points[f[1]],
+                points[f[2]],
+                points[f[3]],
+            ),
+            intensity=0, # random give int
+            outline=True,
+        )
+    print(points[0], points[-1])
     return fig.draw()
+
 
 if __name__ == "__main__":
     # test_DHLink()
     # test_customed_DHLink()
     # test_Rout_plot
     # test_Rin_plot()
-    test_RoutRin_plot()
+    # test_RoutRin_plot()
+    # test_side_plot()
+    test_link_mesh_plot()

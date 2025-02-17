@@ -93,6 +93,41 @@ class CylinderLink:
                 add_face(index_of(i, j), index_of(i+1, j), index_of(i+1, j+1), index_of(i, j+1))
         return points, faces
 
+    def get_side_mesh(self, method = "quad", side = "start"):
+        '''
+        Get the mesh of the outer surface
+        return: list of mesh [(x,y,z), (x,y,z), ...]
+        '''
+        resolution = 10
+        if side == "start":
+            idx = 0
+        if side == "end":
+            idx = -1
+        num_i = 360 - 1
+        def index_of(iloc, jloc):
+            return iloc + jloc * (num_i + 1)
+        points = []
+        for r in np.linspace(self.Rout - self.thickness_distribution[idx], self.Rout, resolution):
+            z = self.segments_location[idx]
+            for phi in np.linspace(0, 2*np.pi, 360):
+                x = r * np.cos(phi)
+                y = r * np.sin(phi)
+                points.append((x, y, z))
+
+        faces = []
+        def add_face(*indices):
+            entry = list(indices)
+            if method == "quad":
+                faces.append(entry)
+            elif method == "tri":
+                faces.append([entry[0], entry[1], entry[3]])
+                faces.append([entry[1], entry[2], entry[3]])
+
+        for j in range(resolution - 1):
+            for i in range(360 - 1):
+                add_face(index_of(i, j), index_of(i+1, j), index_of(i+1, j+1), index_of(i, j+1))
+        return points, faces
+
     def plot_discretized_points(self):
         '''
         Plot the discretized points
