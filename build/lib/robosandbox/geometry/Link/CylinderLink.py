@@ -2,9 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from numpy.random.mtrand import rand
+from robosandbox.visualization.plotly_Link3D import Link3D
 
 
-class CylinderLink:
+class CylinderLink(Link3D):
     def __init__(
         self,
         length=0.5,
@@ -15,7 +16,8 @@ class CylinderLink:
         resolutions={"axial": 80, "radial": 10, "angular": 360},
     ):
         self.len = length
-        self.segments_number = resolutions["axial"]  # segments number along z axis
+        self.resolutions = resolutions
+        self.segments_number = self.resolutions["axial"]  # segments number along z axis
         self.segement_length = self.len / self.segments_number
         self.segments_location = np.linspace(0, self.len, self.segments_number)
         self.E = E
@@ -36,7 +38,7 @@ class CylinderLink:
         points = []
         for idx in range(self.segments_number):
             z = self.segments_location[idx]
-            for phi in np.linspace(0, 2 * np.pi, 360):
+            for phi in np.linspace(0, 2 * np.pi, self.resolutions["angular"]):
                 for r in np.arange(
                     float(self.Rout - self.thickness_distribution[idx]),
                     float(self.Rout),
@@ -52,15 +54,15 @@ class CylinderLink:
         Get the mesh of the outer surface
         return: list of mesh [(x,y,z), (x,y,z), ...]
         """
-        num_i = 360 - 1
 
         def index_of(iloc, jloc):
+            num_i = self.resolutions["angular"] - 1
             return iloc + jloc * (num_i + 1)
 
         points = []
-        for idx in range(self.segments_number):
+        for idx in range(self.resolutions["axial"]):
             z = self.segments_location[idx]
-            for phi in np.linspace(0, 2 * np.pi, 360):
+            for phi in np.linspace(0, 2 * np.pi, self.resolutions["angular"]):
                 x = self.Rout * np.cos(phi)
                 y = self.Rout * np.sin(phi)
                 points.append((x, y, z))
@@ -75,8 +77,8 @@ class CylinderLink:
                 faces.append([entry[0], entry[1], entry[3]])
                 faces.append([entry[1], entry[2], entry[3]])
 
-        for j in range(self.segments_number - 1):
-            for i in range(360 - 1):
+        for j in range(self.resolutions["axial"] - 1):
+            for i in range(self.resolutions["angular"] - 1):
                 add_face(
                     index_of(i, j),
                     index_of(i + 1, j),
@@ -90,15 +92,15 @@ class CylinderLink:
         Get the mesh of the outer surface
         return: list of mesh [(x,y,z), (x,y,z), ...]
         """
-        num_i = 360 - 1
 
         def index_of(iloc, jloc):
+            num_i = self.resolutions["angular"] - 1
             return iloc + jloc * (num_i + 1)
 
         points = []
-        for idx in range(self.segments_number):
+        for idx in range(self.resolutions["axial"]):
             z = self.segments_location[idx]
-            for phi in np.linspace(0, 2 * np.pi, 360):
+            for phi in np.linspace(0, 2 * np.pi, self.resolutions["angular"]):
                 x = (self.Rout - self.thickness_distribution[idx]) * np.cos(phi)
                 y = (self.Rout - self.thickness_distribution[idx]) * np.sin(phi)
                 points.append((x, y, z))
@@ -113,8 +115,8 @@ class CylinderLink:
                 faces.append([entry[0], entry[1], entry[3]])
                 faces.append([entry[1], entry[2], entry[3]])
 
-        for j in range(self.segments_number - 1):
-            for i in range(360 - 1):
+        for j in range(self.resolutions["axial"] - 1):
+            for i in range(self.resolutions["angular"] - 1):
                 add_face(
                     index_of(i, j),
                     index_of(i + 1, j),
@@ -128,22 +130,23 @@ class CylinderLink:
         Get the mesh of the outer surface
         return: list of mesh [(x,y,z), (x,y,z), ...]
         """
-        resolution = 10
         if side == "start":
             idx = 0
         if side == "end":
             idx = -1
-        num_i = 360 - 1
 
         def index_of(iloc, jloc):
+            num_i = self.resolutions["angular"] - 1
             return iloc + jloc * (num_i + 1)
 
         points = []
         for r in np.linspace(
-            self.Rout - self.thickness_distribution[idx], self.Rout, resolution
+            self.Rout - self.thickness_distribution[idx],
+            self.Rout,
+            self.resolutions["radial"],
         ):
             z = self.segments_location[idx]
-            for phi in np.linspace(0, 2 * np.pi, 360):
+            for phi in np.linspace(0, 2 * np.pi, self.resolutions["angular"]):
                 x = r * np.cos(phi)
                 y = r * np.sin(phi)
                 points.append((x, y, z))
@@ -158,8 +161,8 @@ class CylinderLink:
                 faces.append([entry[0], entry[1], entry[3]])
                 faces.append([entry[1], entry[2], entry[3]])
 
-        for j in range(resolution - 1):
-            for i in range(360 - 1):
+        for j in range(self.resolutions["radial"] - 1):
+            for i in range(self.resolutions["angular"] - 1):
                 add_face(
                     index_of(i, j),
                     index_of(i + 1, j),

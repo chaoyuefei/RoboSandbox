@@ -3,6 +3,8 @@ import robosandbox.geometry.Link.CylinderLink as cl
 import numpy as np
 from robosandbox.visualization.plotly_Figure3D import Figure3D
 
+from robosandbox.geometry.Link.CylinderLink import CylinderLink
+
 
 def test_DHLink():
     GenericFourLink = rsb.models.DHLink.Generic.GenericFour()
@@ -258,6 +260,28 @@ def test_link_mesh_plot():
     return fig.draw()
 
 
+def test_link_plot():
+    # l1 = cl(
+    #     length=0.4,
+    #     E=70e6,
+    #     rho=2700,
+    #     Rout=25e-3,
+    #     inner_profile={"params": [20e-3, 5e-3], "method": "linear"},
+    #     resolutions={"axial": 80, "radial": 10, "angular": 360},
+    # )
+    # l1.plot()
+
+    l2 = CylinderLink(
+        length=0.4,
+        E=70e6,
+        rho=2700,
+        Rout=25e-3,
+        inner_profile={"params": [20e-3, 5e-3], "method": "linear"},
+        resolutions={"axial": 80, "radial": 10, "angular": 60},
+    )
+    l2.plot(outline=True)
+
+
 if __name__ == "__main__":
     # test_DHLink()
     # test_customed_DHLink()
@@ -265,4 +289,5 @@ if __name__ == "__main__":
     # test_Rin_plot()
     # test_RoutRin_plot()
     # test_side_plot()
-    test_link_mesh_plot()
+    # test_link_mesh_plot()
+    test_link_plot()
