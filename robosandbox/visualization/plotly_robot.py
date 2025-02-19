@@ -3,10 +3,6 @@ import plotly.graph_objects as go
 
 
 class PlotlyRobot:
-    # def __init__(self):
-    # self.tfs = tfs
-    # self.joint_positions = self.compute_joint_positions()
-
     def compute_joint_positions(self):
         positions = []
         for tf in self.tfs:
@@ -74,9 +70,6 @@ class PlotlyRobot:
                         name=f"{directions[i]} Axis",
                     )
                 )
-
-                # Calculate direction for the cone
-                # direction = [end_point[j] - pos[j] for j in range(3)]
 
                 # Add the cone (arrowhead)
                 fig.add_trace(
