@@ -3,7 +3,7 @@ import robosandbox as rsb
 
 def test_GenericFour():
     robot = rsb.models.DH.Generic.GenericFour()
-    robot.plot(robot.qz)
+    robot.plot(robot.qz, block=True)
     tfs = robot.fkine_all(robot.qz)
     print(tfs)
     assert robot is not None, "GenericFour robot not defined"
