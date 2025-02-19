@@ -7,9 +7,10 @@ from math import pi
 
 import numpy as np
 from roboticstoolbox import DHRobot, RevoluteDH
+from robosandbox.visualization.plotly_robot import PlotlyRobot
 
 
-class GenericFour(DHRobot):
+class GenericFour(DHRobot, PlotlyRobot):
     """
     A generic four-link robotic arm class using Denavit-Hartenberg parameters.
 

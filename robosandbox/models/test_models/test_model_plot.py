@@ -10,5 +10,11 @@ def test_GenericFour():
     assert robot.n == 4, "GenericFour robot has 4 joints"
 
 
+def test_plotly():
+    robot = rsb.models.DH.Generic.GenericFour()
+    robot.plotly(robot.qz)
+
+
 if __name__ == "__main__":
-    test_GenericFour()
+    # test_GenericFour()
+    test_plotly()
