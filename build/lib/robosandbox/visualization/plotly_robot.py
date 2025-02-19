@@ -23,7 +23,6 @@ class PlotlyRobot:
     def plotly(self, q):
         self.tfs = self.fkine_all(q)
         self.joint_positions = self.compute_joint_positions()
-
         fig = go.Figure()
 
         # Adding links between joints
@@ -34,19 +33,26 @@ class PlotlyRobot:
                     y=self.joint_positions[i - 1 : i + 1, 1],
                     z=self.joint_positions[i - 1 : i + 1, 2],
                     mode="lines",
-                    line=dict(color="#E1706E", width=16),
-                    name="Link",
+                    line=dict(color="#E1706E", width=20),
+                    name=f"Link{i}",
                 )
             )
 
-        axis_length = 0.1  # Uniform length for all axes
+        # find the distance from last tf to the origin
+        max_distance = np.linalg.norm(self.tfs[-1].t)
+        axis_length = round(max_distance / 15, 1)  # Uniform length for all axes
+        arrow_length = axis_length / 10  # Length of the arrowhead
 
         # Adding axes at each joint
-        for tf, pos in zip(self.tfs, self.joint_positions):
-            print(pos)
+        for index, (tf, pos) in enumerate(zip(self.tfs, self.joint_positions)):
             directions = ["X", "Y", "Z"]
             # colors = ["#fa8878", "#9bbf8a", "#8EC1E1"]
-            colors = ["#fa8878", "#9bbf8a", "#3480b8"]
+            # colors = ["#fa8878", "#9bbf8a", "#3480b8"]
+            colors = ["#F84752", "#BBDA55", "#8EC1E1"]
+
+            if index == len(self.tfs) - 1:
+                axis_length = axis_length / 2
+                arrow_length = arrow_length / 2
 
             for i in range(3):
                 if isinstance(tf, np.ndarray):
@@ -56,7 +62,6 @@ class PlotlyRobot:
                         direction = tf.A[:3, i] / np.linalg.norm(tf.A[:3, i])
                     except Exception as e:
                         print(f"data type is {type(direction)} and error is {e}")
-                # direction = tf[:3, i] / np.linalg.norm(tf[:3, i])
                 end_point = pos + direction * axis_length
 
                 fig.add_trace(
@@ -70,18 +75,39 @@ class PlotlyRobot:
                     )
                 )
 
+                # Calculate direction for the cone
+                # direction = [end_point[j] - pos[j] for j in range(3)]
+
+                # Add the cone (arrowhead)
+                fig.add_trace(
+                    go.Cone(
+                        x=[end_point[0]],
+                        y=[end_point[1]],
+                        z=[end_point[2]],
+                        u=[direction[0]],
+                        v=[direction[1]],
+                        w=[direction[2]],
+                        sizemode="absolute",
+                        sizeref=arrow_length,
+                        showscale=False,
+                        colorscale=[[0, colors[i]], [1, colors[i]]],
+                        cmin=0,
+                        cmax=1,
+                    )
+                )
+
         # Adjust the aspect ratio
         fig.update_layout(
             scene=dict(
                 aspectmode="cube",
-                xaxis=dict(nticks=10, range=[-1, 1]),
-                yaxis=dict(nticks=10, range=[-1, 1]),
-                zaxis=dict(nticks=10, range=[-1, 1]),
+                xaxis=dict(nticks=10, range=[-max_distance, max_distance]),
+                yaxis=dict(nticks=10, range=[-max_distance, max_distance]),
+                zaxis=dict(nticks=10, range=[-max_distance, max_distance]),
                 xaxis_title="X",
                 yaxis_title="Y",
                 zaxis_title="Z",
             ),
-            title="3D Robot Visualization with Joint Frames",
+            # title="3D Robot Visualization with Joint Frames",
             width=700,
             height=700,
         )
