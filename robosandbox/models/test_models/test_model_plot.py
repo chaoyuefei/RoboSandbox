@@ -12,8 +12,8 @@ def test_GenericFour():
 
 def test_plotly():
     robot = rsb.models.DH.Generic.GenericFour()
-    # robot.plotly(robot.qr)
-    robot.plotly([0, -1.57, -1, 0.5])
+    robot.plotly(robot.qr)
+    # robot.plotly([0, -1.57, -1, 0.5])
 
 
 if __name__ == "__main__":
