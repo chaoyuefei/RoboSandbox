@@ -29,14 +29,14 @@ class PlotlyRobot:
                     y=self.joint_positions[i - 1 : i + 1, 1],
                     z=self.joint_positions[i - 1 : i + 1, 2],
                     mode="lines",
-                    line=dict(color="#E1706E", width=20),
+                    line=dict(color="#E1706E", width=14),
                     name=f"Link{i}",
                 )
             )
 
         # find the distance from last tf to the origin
         max_distance = np.linalg.norm(self.tfs[-1].t)
-        axis_length = round(max_distance / 15, 1)  # Uniform length for all axes
+        axis_length = round(max_distance / 10, 1)  # Uniform length for all axes
         arrow_length = axis_length / 10  # Length of the arrowhead
 
         # Adding axes at each joint
@@ -93,6 +93,11 @@ class PlotlyRobot:
         fig.update_layout(
             scene=dict(
                 aspectmode="cube",
+                camera=dict(
+                    eye=dict(x=max_distance, y=-max_distance, z=max_distance),  # Position of the camera
+                    center=dict(x=0, y=0, z=0),      # Point the camera is looking at
+                    up=dict(x=0, y=0, z=1)            # Up vector direction
+                ),
                 xaxis=dict(nticks=10, range=[-max_distance, max_distance]),
                 yaxis=dict(nticks=10, range=[-max_distance, max_distance]),
                 zaxis=dict(nticks=10, range=[-max_distance, max_distance]),
