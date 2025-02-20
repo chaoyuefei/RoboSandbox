@@ -16,7 +16,7 @@ class PlotlyRobot:
             positions.append(position)
         return np.array(positions)
 
-    def plotly(self, q):
+    def plotly(self, q, save=False, path=''):
         self.tfs = self.fkine_all(q)
         self.joint_positions = self.compute_joint_positions()
         fig = go.Figure()
@@ -106,3 +106,5 @@ class PlotlyRobot:
         )
 
         fig.show()
+        if save:
+            fig.write_image(path)
