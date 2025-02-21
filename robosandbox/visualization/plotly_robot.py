@@ -16,7 +16,7 @@ class PlotlyRobot:
             positions.append(position)
         return np.array(positions)
 
-    def plotly(self, q, save=False, path=''):
+    def plotly(self, q, save=False, path=""):
         self.tfs = self.fkine_all(q)
         self.joint_positions = self.compute_joint_positions()
         fig = go.Figure()
@@ -35,7 +35,10 @@ class PlotlyRobot:
             )
 
         # find the distance from last tf to the origin
-        max_distance = np.linalg.norm(self.tfs[-1].t)
+        if isinstance(self.tfs[-1], np.ndarray):
+            max_distance = np.linalg.norm(self.tfs[-1][:3, 3])
+        else:
+            max_distance = np.linalg.norm(self.tfs[-1].t)
         axis_length = round(max_distance / 10, 1)  # Uniform length for all axes
         arrow_length = axis_length / 10  # Length of the arrowhead
 
@@ -50,7 +53,7 @@ class PlotlyRobot:
                 axis_length = axis_length / 2
                 arrow_length = arrow_length / 2
 
-            for i in range(3):
+            for i in range(3):  # three axes for each joint
                 if isinstance(tf, np.ndarray):
                     direction = tf[:3, i] / np.linalg.norm(tf[:3, i])
                 else:
@@ -94,9 +97,11 @@ class PlotlyRobot:
             scene=dict(
                 aspectmode="cube",
                 camera=dict(
-                    eye=dict(x=max_distance, y=-max_distance, z=max_distance),  # Position of the camera
-                    center=dict(x=0, y=0, z=0),      # Point the camera is looking at
-                    up=dict(x=0, y=0, z=1)            # Up vector direction
+                    eye=dict(
+                        x=max_distance, y=-max_distance, z=max_distance
+                    ),  # Position of the camera
+                    center=dict(x=0, y=0, z=0),  # Point the camera is looking at
+                    up=dict(x=0, y=0, z=1),  # Up vector direction
                 ),
                 xaxis=dict(nticks=10, range=[-max_distance, max_distance]),
                 yaxis=dict(nticks=10, range=[-max_distance, max_distance]),

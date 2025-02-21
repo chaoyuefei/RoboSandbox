@@ -18,9 +18,11 @@ robosandbox/models/DH/Generic/__init__.py
 robosandbox/models/DHLink/__init__.py
 robosandbox/models/DHLink/Generic/GenericFour.py
 robosandbox/models/DHLink/Generic/__init__.py
+robosandbox/models/MR/ModernRobotics.py
 robosandbox/models/MR/__init__.py
 robosandbox/models/MR/utils.py
 robosandbox/models/MR/Generic/GenericFour.py
+robosandbox/models/MR/Generic/GenericThree.py
 robosandbox/models/MR/Generic/__init__.py
 robosandbox/models/test_models/test_model_plot.py
 robosandbox/performance/WorkSpace.py
