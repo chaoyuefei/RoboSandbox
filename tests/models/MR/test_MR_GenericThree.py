@@ -22,4 +22,4 @@ def test_fkine_all():
 
 if __name__ == "__main__":
     test_plot()
-    # test_fkine_all()
+    test_fkine_all()
