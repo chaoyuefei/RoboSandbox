@@ -122,6 +122,7 @@ dependencies = [
     "nbformat>=4.2.0",
     "casadi>=3.6.5",
     "aerosandbox",
+    "numpy-stl",
 ]
 
 # This field lists other packages that your project depends on to run.
