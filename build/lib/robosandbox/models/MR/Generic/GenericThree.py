@@ -49,12 +49,6 @@ class GenericThree(PlotlyRobot):
         J2 = mr.RpToTrans(J_r2, np.array([0, 0, l1 + l2]))
         J3 = self.M
 
-        print("+===============+")
-        print(np.round(J1, 2))
-        print(np.round(J2, 2))
-        print(np.round(J3, 2))
-        print("+===============+")
-
         self.Jlist = np.array(
             [J1, J2, J3]
         )  # List of home configuration matrices Ji for the joints
@@ -124,7 +118,7 @@ class GenericThree(PlotlyRobot):
         tfs = mr.FKinSpace_all(self.Jlist, self.Slist, q)
         return tfs
 
-    def plot_frame(self, ax, T, scale=1.0, label=None):
+    def plot_frame(self, ax, T, arrow_length=1.0, label=None):
         """
         Plot a coordinate frame given by transformation matrix T
         """
@@ -133,7 +127,6 @@ class GenericThree(PlotlyRobot):
 
         # Axes vectors
         x_axis = T[0:3, 0]
-        print(f"x_axis: {x_axis}")
         y_axis = T[0:3, 1]
         z_axis = T[0:3, 2]
 
@@ -145,8 +138,8 @@ class GenericThree(PlotlyRobot):
             x_axis[0],
             x_axis[1],
             x_axis[2],
-            color="r",
-            length=scale,
+            color="#F84752",
+            length=arrow_length,
             normalize=True,
         )
         ax.quiver(
@@ -156,8 +149,8 @@ class GenericThree(PlotlyRobot):
             y_axis[0],
             y_axis[1],
             y_axis[2],
-            color="g",
-            length=scale,
+            color="#BBDA55",
+            length=arrow_length,
             normalize=True,
         )
         ax.quiver(
@@ -167,15 +160,15 @@ class GenericThree(PlotlyRobot):
             z_axis[0],
             z_axis[1],
             z_axis[2],
-            color="b",
-            length=scale,
+            color="#8EC1E1",
+            length=arrow_length,
             normalize=True,
         )
 
         if label:
             ax.text(origin[0], origin[1], origin[2], label)
 
-    def plot(self, q, scale=1.0):
+    def plot(self, q, arrow_length=1.0):
         """
         Plot all frames and connections between them
         """
@@ -183,13 +176,11 @@ class GenericThree(PlotlyRobot):
         ax = fig.add_subplot(111, projection="3d")
 
         tfs = self.fkine_all(q)
-        print("+++++++++")
-        print(np.round(tfs, 2))
 
         # Plot each frame
         for i, T in enumerate(tfs):
             if i != self.dofs:
-                self.plot_frame(ax, T, scale=scale, label=f"Joint {i}")
+                self.plot_frame(ax, T, arrow_length=arrow_length, label=f"Joint {i}")
 
             # Draw lines connecting consecutive frames
             if i > 0:
@@ -199,8 +190,9 @@ class GenericThree(PlotlyRobot):
                     [prev_origin[0], curr_origin[0]],
                     [prev_origin[1], curr_origin[1]],
                     [prev_origin[2], curr_origin[2]],
-                    "k-",
-                    alpha=0.5,
+                    # "k-",
+                    color="#E1706E",
+                    alpha=1,
                     linewidth=2,
                 )
 
