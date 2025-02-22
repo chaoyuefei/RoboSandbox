@@ -223,12 +223,3 @@ class GenericThree(PlotlyRobot):
 
         plt.title("Robot Frames Visualization")
         plt.show()
-
-
-# plot_robot(Tlist, scale=0.1)  # Adjust scale as needed
-# if __name__ == "__main__":
-#     robot = GenericThree()
-#     tfs = robot.fkine_all([0, 0, 0])
-#     robot.plot(tfs, scale=0.1)
-#     print(tfs)
-# robot.plotly([0, -1.57, -1, 0.5])
