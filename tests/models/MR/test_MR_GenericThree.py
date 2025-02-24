@@ -14,6 +14,13 @@ def test_plot():
     # robot.plotly([0, 0.2, 0.1])
 
 
+def test_plotly():
+    robot = rsb.models.MR.Generic.GenericThree(
+        joint_axis_list=[np.array([0, 0, 1]), np.array([0, 1, 0]), np.array([0, 1, 0])]
+    )
+    robot.plotly([0, 0.2, 0.1])
+
+
 def test_fkine_all():
     robot = rsb.models.DH.Generic.GenericFour()
     robot.tfs = robot.fkine_all(robot.qz)
@@ -21,5 +28,6 @@ def test_fkine_all():
 
 
 if __name__ == "__main__":
-    test_plot()
-    test_fkine_all()
+    # test_plot()
+    # test_fkine_all()
+    test_plotly()

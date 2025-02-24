@@ -221,5 +221,5 @@ class GenericThree(PlotlyRobot):
         ax.set_ylim(mid_y - max_range, mid_y + max_range)
         ax.set_zlim(mid_z - max_range, mid_z + max_range)
 
-        plt.title("Robot Frames Visualization")
+        # plt.title("Robot Frames Visualization")
         plt.show()
