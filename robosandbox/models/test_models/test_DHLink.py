@@ -279,7 +279,7 @@ def test_link_plot():
         inner_profile={"params": [20e-3, 5e-3], "method": "linear"},
         resolutions={"axial": 80, "radial": 10, "angular": 60},
     )
-    l2.plot(outline=True)
+    l2.plot(outline=False)
 
 
 if __name__ == "__main__":

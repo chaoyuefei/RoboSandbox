@@ -8,6 +8,7 @@ kaleido
 nbformat>=4.2.0
 casadi>=3.6.5
 aerosandbox
+numpy-stl
 
 [dev]
 check-manifest

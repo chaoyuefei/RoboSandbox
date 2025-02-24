@@ -7,6 +7,7 @@ robosandbox.egg-info/entry_points.txt
 robosandbox.egg-info/requires.txt
 robosandbox.egg-info/top_level.txt
 robosandbox/geometry/__init__.py
+robosandbox/geometry/mesh_utilities.py
 robosandbox/geometry/Link/CylinderLink.py
 robosandbox/geometry/Link/__init__.py
 robosandbox/models/__init__.py

@@ -182,6 +182,7 @@ packages = [
     "robosandbox.models.DHLink.Generic",
     "robosandbox.models.MR",
     "robosandbox.models.MR.Generic",
+    "robosandbox.geometry",
     "robosandbox.geometry.Link",
     "robosandbox.visualization",
 ]
