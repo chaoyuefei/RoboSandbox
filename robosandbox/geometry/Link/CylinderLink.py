@@ -1,8 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-# from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-# from numpy.random.mtrand import rand
 from robosandbox.visualization.plotly_Link3D import Link3D
 from robosandbox.geometry.mesh_utilities import add_face, index_of
 
@@ -113,10 +110,6 @@ class CylinderLink(Link3D):
         if side == "end":
             idx = -1
 
-        def index_of(iloc, jloc):
-            num_i = self.resolutions["angular"] - 1
-            return iloc + jloc * (num_i + 1)
-
         points = []
         for r in np.linspace(
             self.Rout - self.thickness_distribution[idx],
@@ -130,22 +123,15 @@ class CylinderLink(Link3D):
                 points.append((x, y, z))
 
         faces = []
-
-        def add_face(*indices):
-            entry = list(indices)
-            if method == "quad":
-                faces.append(entry)
-            elif method == "tri":
-                faces.append([entry[0], entry[1], entry[3]])
-                faces.append([entry[1], entry[2], entry[3]])
-
         for j in range(self.resolutions["radial"] - 1):
             for i in range(self.resolutions["angular"] - 1):
                 add_face(
-                    index_of(i, j),
-                    index_of(i + 1, j),
-                    index_of(i + 1, j + 1),
-                    index_of(i, j + 1),
+                    faces,
+                    index_of(i, j, self.resolutions["angular"]),
+                    index_of(i + 1, j, self.resolutions["angular"]),
+                    index_of(i + 1, j + 1, self.resolutions["angular"]),
+                    index_of(i, j + 1, self.resolutions["angular"]),
+                    method=method,
                 )
         return points, faces
 
