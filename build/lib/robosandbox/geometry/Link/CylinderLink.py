@@ -56,11 +56,6 @@ class CylinderLink(Link3D):
         Get the mesh of the outer surface
         return: list of mesh [(x,y,z), (x,y,z), ...]
         """
-
-        # def index_of(iloc, jloc):
-        #     num_i = self.resolutions["angular"] - 1
-        #     return iloc + jloc * (num_i + 1)
-
         points = []
         for idx in range(self.resolutions["axial"]):
             z = self.segments_location[idx]
@@ -69,15 +64,6 @@ class CylinderLink(Link3D):
                 y = self.Rout * np.sin(phi)
                 points.append((x, y, z))
 
-        # faces = []
-
-        # def add_face(*indices):
-        #     entry = list(indices)
-        #     if method == "quad":
-        #         faces.append(entry)
-        #     elif method == "tri":
-        #         faces.append([entry[0], entry[1], entry[3]])
-        #         faces.append([entry[1], entry[2], entry[3]])
         faces = []
         for j in range(self.resolutions["axial"] - 1):
             for i in range(self.resolutions["angular"] - 1):
@@ -96,11 +82,6 @@ class CylinderLink(Link3D):
         Get the mesh of the outer surface
         return: list of mesh [(x,y,z), (x,y,z), ...]
         """
-
-        def index_of(iloc, jloc):
-            num_i = self.resolutions["angular"] - 1
-            return iloc + jloc * (num_i + 1)
-
         points = []
         for idx in range(self.resolutions["axial"]):
             z = self.segments_location[idx]
@@ -110,22 +91,15 @@ class CylinderLink(Link3D):
                 points.append((x, y, z))
 
         faces = []
-
-        def add_face(*indices):
-            entry = list(indices)
-            if method == "quad":
-                faces.append(entry)
-            elif method == "tri":
-                faces.append([entry[0], entry[1], entry[3]])
-                faces.append([entry[1], entry[2], entry[3]])
-
         for j in range(self.resolutions["axial"] - 1):
             for i in range(self.resolutions["angular"] - 1):
-                add_face(
-                    index_of(i, j),
-                    index_of(i + 1, j),
-                    index_of(i + 1, j + 1),
-                    index_of(i, j + 1),
+                faces = add_face(
+                    faces,
+                    index_of(i, j, self.resolutions["angular"]),
+                    index_of(i + 1, j, self.resolutions["angular"]),
+                    index_of(i + 1, j + 1, self.resolutions["angular"]),
+                    index_of(i, j + 1, self.resolutions["angular"]),
+                    method=method,
                 )
         return points, faces
 
