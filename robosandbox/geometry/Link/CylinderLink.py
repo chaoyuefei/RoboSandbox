@@ -72,7 +72,7 @@ class CylinderLink(Link3D):
                     index_of(i, j + 1, self.resolutions["angular"]),
                     method=method,
                 )
-        return points, faces
+        return np.array(points), np.array(faces)
 
     def get_inner_mesh(self, method="quad"):
         """
@@ -98,7 +98,7 @@ class CylinderLink(Link3D):
                     index_of(i, j + 1, self.resolutions["angular"]),
                     method=method,
                 )
-        return points, faces
+        return np.array(points), np.array(faces)
 
     def get_side_mesh(self, method="quad", side="start"):
         """
@@ -125,7 +125,7 @@ class CylinderLink(Link3D):
         faces = []
         for j in range(self.resolutions["radial"] - 1):
             for i in range(self.resolutions["angular"] - 1):
-                add_face(
+                faces = add_face(
                     faces,
                     index_of(i, j, self.resolutions["angular"]),
                     index_of(i + 1, j, self.resolutions["angular"]),
@@ -133,7 +133,11 @@ class CylinderLink(Link3D):
                     index_of(i, j + 1, self.resolutions["angular"]),
                     method=method,
                 )
-        return points, faces
+        return np.array(points), np.array(faces)
+
+    # def get_outer_side_mesh_connected(self, stacked_mesh, method="quad"):
+    #     points = stacked_mesh[0]
+    #     faces = stacked_mesh[1]
 
     def plot_discretized_points(self):
         """
