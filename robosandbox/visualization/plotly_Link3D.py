@@ -1,5 +1,7 @@
 from robosandbox.visualization.plotly_Figure3D import Figure3D
 from robosandbox.geometry.mesh_utilities import stack_meshes
+from stl import mesh
+import numpy as np
 
 
 class Link3D(Figure3D):
@@ -53,6 +55,7 @@ class Link3D(Figure3D):
         super().__init__()
         outline = kwargs.get("outline", False)
         method = kwargs.get("method", "tri")
+        save_path = kwargs.get("save_path", None)
 
         fig = Figure3D()
         # outer profile mesh
@@ -66,6 +69,23 @@ class Link3D(Figure3D):
             (start_points, start_faces),
             (end_points, end_faces),
         )
+        print(f"len of points: {len(points)}")
+        print(f"len of faces: {len(faces)}")
+        print(points)
         fig = self.add_mesh(points, faces, method, fig, outline)
-
+        if save_path is not None:
+            self.get_stl_export(points, faces, save_path)
         return fig.draw()
+
+    def get_stl_export(self, points, faces, save_path):
+        link_mesh = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
+        for i, f in enumerate(faces):
+            for j in range(3):
+                link_mesh.vectors[i][j] = points[f[j], :]
+                # print(points[f[j], :])
+                # floatarrary = points[f[j], :].astype(float)
+                # print(points[f[j], :])
+                # print(floatarrary)
+                # print("+++++++++++")
+                # exit()
+        link_mesh.save(save_path)

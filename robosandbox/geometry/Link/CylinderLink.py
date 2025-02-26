@@ -59,6 +59,11 @@ class CylinderLink(Link3D):
             for phi in np.linspace(0, 2 * np.pi, self.resolutions["angular"]):
                 x = self.Rout * np.cos(phi)
                 y = self.Rout * np.sin(phi)
+                # if near 0, set to 0
+                if abs(x) < 1e-10:
+                    x = 0
+                if abs(y) < 1e-10:
+                    y = 0
                 points.append((x, y, z))
 
         faces = []
@@ -85,6 +90,11 @@ class CylinderLink(Link3D):
             for phi in np.linspace(0, 2 * np.pi, self.resolutions["angular"]):
                 x = (self.Rout - self.thickness_distribution[idx]) * np.cos(phi)
                 y = (self.Rout - self.thickness_distribution[idx]) * np.sin(phi)
+                # if near 0, set to 0
+                if abs(x) < 1e-10:
+                    x = 0
+                if abs(y) < 1e-10:
+                    y = 0
                 points.append((x, y, z))
 
         faces = []
@@ -120,6 +130,11 @@ class CylinderLink(Link3D):
             for phi in np.linspace(0, 2 * np.pi, self.resolutions["angular"]):
                 x = r * np.cos(phi)
                 y = r * np.sin(phi)
+                # if near 0, set to 0
+                if abs(x) < 1e-10:
+                    x = 0
+                if abs(y) < 1e-10:
+                    y = 0
                 points.append((x, y, z))
 
         faces = []

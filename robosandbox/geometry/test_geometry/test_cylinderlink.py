@@ -72,6 +72,11 @@ def test_get_side_mesh():
         resolutions={"axial": 80, "radial": 10, "angular": 360},
     )
     points, faces = link.get_side_mesh(side="start")
+    print(np.round(faces, 5))
+    print(points[-1])
+    print(points[3599])
+    print(points[3239])
+    # print(points[3597])
     print(f"len of side points: {len(points)}")
     print(f"len of side faces: {len(faces)}")
 
@@ -172,7 +177,11 @@ def test_cy_plot():
         inner_profile={"params": [20e-3, 5e-3], "method": "linear"},
         resolutions={"axial": 80, "radial": 10, "angular": 360},
     )
-    link.plot(outline=True)
+    link.plot(
+        outline=True,
+        method="tri",
+        save_path="robosandbox/geometry/test_geometry/cylinder_link.stl",
+    )
 
 
 if __name__ == "__main__":
