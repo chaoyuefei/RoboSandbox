@@ -170,9 +170,9 @@ def test_cy_plot():
         rho=2700,
         Rout=25e-3,
         inner_profile={"params": [20e-3, 5e-3], "method": "linear"},
-        resolutions={"axial": 80, "radial": 10, "angular": 60},
+        resolutions={"axial": 80, "radial": 10, "angular": 360},
     )
-    link.plot()
+    link.plot(outline=True)
 
 
 if __name__ == "__main__":
@@ -181,5 +181,5 @@ if __name__ == "__main__":
     # test_get_inner_mesh()
     # test_get_side_mesh()
     # test_stack_meshes()
-    test_mesh_export()
-    # test_cy_plot()
+    # test_mesh_export()
+    test_cy_plot()
