@@ -26,6 +26,9 @@ robosandbox/models/MR/Generic/GenericFour.py
 robosandbox/models/MR/Generic/GenericThree.py
 robosandbox/models/MR/Generic/__init__.py
 robosandbox/models/test_models/test_model_plot.py
+robosandbox/optimization/__init__.py
+robosandbox/optimization/opti.py
+robosandbox/optimization/opti_scipy.py
 robosandbox/performance/WorkSpace.py
 robosandbox/performance/__init__.py
 robosandbox/performance/test_performance/test_Workspace.py

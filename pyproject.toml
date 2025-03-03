@@ -185,4 +185,5 @@ packages = [
     "robosandbox.geometry",
     "robosandbox.geometry.Link",
     "robosandbox.visualization",
+    "robosandbox.optimization",
 ]
