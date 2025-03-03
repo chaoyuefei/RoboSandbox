@@ -2,6 +2,7 @@ import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
+import plotly.graph_objects as go
 
 app = dash.Dash(external_stylesheets=[dbc.themes.MINTY])
 
@@ -99,20 +100,47 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha):
     except ValueError:
         return {}, "Please enter valid numbers for link lengths and alpha angles."
 
-    # 这里可以添加绘制机械臂的逻辑
-    # 例如，使用 matplotlib、plotly、或者其他库绘制机器人信息
-    # 模拟返回的图：
-    fig = {
-        "data": [
-            # 示例数据；您将用实际计算的数据替代
-            {"x": [0, 1, 2], "y": [0, 1, 0], "type": "lines", "name": "Robot Arm"},
-        ],
-        "layout": {
-            "title": f"Robot Arm with {dofs} DOFs",
-            "xaxis": {"title": "X", "range": [-1, 3]},
-            "yaxis": {"title": "Y", "range": [-1, 2]},
-        },
-    }
+    # 根据 DOFs 绘制不同数量的圆
+    fig = go.Figure()
+
+    if dofs == 2:
+        # 绘制两个圆
+        for i in range(2):
+            fig.add_shape(
+                type="circle",
+                xref="x",
+                yref="y",
+                x0=i,
+                y0=0,
+                x1=i + 1,
+                y1=1,
+                fillcolor="skyblue",
+                line_color="blue",
+            )
+    elif dofs == 3:
+        # 绘制三个圆
+        for i in range(3):
+            fig.add_shape(
+                type="circle",
+                xref="x",
+                yref="y",
+                x0=i,
+                y0=0,
+                x1=i + 1,
+                y1=1,
+                fillcolor="skyblue",
+                line_color="blue",
+            )
+    else:
+        return {}, "Currently only supports DOFs of 2 or 3."
+
+    # 设置图形布局
+    fig.update_layout(
+        title=f"Robot Arm with {dofs} DOFs",
+        xaxis=dict(title="X", range=[-1, 4]),
+        yaxis=dict(title="Y", range=[-1, 2]),
+        showlegend=False,
+    )
 
     output_text = f"Generated a robotic arm with {dofs} DOFs, link lengths: {link_lengths}, alpha angles: {alpha}"
     return fig, output_text
