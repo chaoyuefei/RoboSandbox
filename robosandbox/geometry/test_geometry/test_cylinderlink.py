@@ -175,7 +175,7 @@ def test_cy_plot():
         rho=2700,
         Rout=25e-3,
         inner_profile={"params": [20e-3, 5e-3], "method": "linear"},
-        resolutions={"axial": 80, "radial": 10, "angular": 360},
+        resolutions={"axial": 80, "radial": 10, "angular": 60},
     )
     link.plot(
         outline=True,
