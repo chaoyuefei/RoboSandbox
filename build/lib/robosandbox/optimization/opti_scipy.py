@@ -267,6 +267,15 @@ class Opti:
         self.objective = objective_expr
         self.objective_sense = 'max'
 
+    def external_func(self, func, variables):
+            """
+            Create an ExternalFunctionExpression with a callable function.
+            :param func: A callable function.
+            :param variables: A list of Variable instances.
+            :return: An ExternalFunctionExpression instance.
+            """
+            return ExternalFunctionExpression(func, variables)
+
     def solve(self, method='SLSQP'):
         """
         Solve the optimization problem using scipy.optimize.minimize.
