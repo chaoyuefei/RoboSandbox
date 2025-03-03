@@ -34,6 +34,7 @@ robosandbox/performance/__init__.py
 robosandbox/performance/test_performance/test_Workspace.py
 robosandbox/visualization/__init__.py
 robosandbox/visualization/app.py
+robosandbox/visualization/app_list_choose.py
 robosandbox/visualization/plotly_Figure3D.py
 robosandbox/visualization/plotly_Link3D.py
 robosandbox/visualization/plotly_robot.py

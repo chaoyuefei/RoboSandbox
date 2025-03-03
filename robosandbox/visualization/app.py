@@ -3,6 +3,8 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
+import robosandbox as rsb
+import numpy as np
 
 app = dash.Dash(external_stylesheets=[dbc.themes.MINTY])
 
@@ -34,15 +36,20 @@ app.layout = dbc.Container(
                                     id="dofs_display", style={"margin": "10px 0"}
                                 ),  # 显示当前的 DOFs 值
                                 html.P(
-                                    "Link Lengths (comma-separated, e.g., 1, 1.5, 2):"
+                                    "Link Lengths [m](comma-separated, e.g., 1, 1.5, 2):"
                                 ),
-                                dcc.Input(id="link_lengths", value="1, 1", type="text"),
+                                dcc.Input(
+                                    id="link_lengths",
+                                    value="0.4, 0.4, 0.4, 0.4",
+                                    type="text",
+                                ),
                                 html.P(
-                                    "Alpha Angles (comma-separated, e.g., 0, 30, 45):"
+                                    "Alpha Angles [deg](comma-separated, e.g., 0, 30, 45):"
                                 ),
-                                dcc.Input(id="alpha", value="0, 30", type="text"),
+                                dcc.Input(id="alpha", value="90, 0, 0, 0", type="text"),
                             ]
                         ),
+                        html.Div(style={"height": "20px"}),
                         # Command 区域
                         html.Div(
                             [
@@ -131,8 +138,11 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha):
                 fillcolor="skyblue",
                 line_color="blue",
             )
-    else:
-        return {}, "Currently only supports DOFs of 2 or 3."
+    elif dofs == 4:
+        robot = rsb.models.DH.Generic.GenericFour(
+            linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+        )
+        robot.plotly(robot.qz, isShow=False, fig=fig)
 
     # 设置图形布局
     fig.update_layout(

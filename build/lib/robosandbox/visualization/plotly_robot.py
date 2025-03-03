@@ -16,10 +16,10 @@ class PlotlyRobot:
             positions.append(position)
         return np.array(positions)
 
-    def plotly(self, q, save=False, path=""):
+    def plotly(self, q, save=False, path="", fig=go.Figure(), isShow=True):
         self.tfs = self.fkine_all(q)
         self.joint_positions = self.compute_joint_positions()
-        fig = go.Figure()
+        # fig = go.Figure()
 
         # Adding links between joints
         for i in range(1, len(self.joint_positions)):
@@ -115,6 +115,8 @@ class PlotlyRobot:
             height=700,
         )
 
-        fig.show()
+        if isShow:
+            fig.show()
         if save:
             fig.write_image(path)
+        return fig
