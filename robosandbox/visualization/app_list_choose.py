@@ -12,26 +12,23 @@ app.layout = dbc.Container(
                 dbc.Col(
                     [
                         html.H2("Robot Arm Design App"),
-                        # Key Parameters 区域
+                        html.H5("Create your robotic arm configuration"),
                         html.Div(
                             [
                                 html.H5("Key Parameters"),
                                 html.P("Degrees of Freedom (DOFs):"),
-                                dcc.Slider(
-                                    id="dofs_slider",
-                                    min=2,
-                                    max=7,
-                                    step=1,
-                                    value=2,
-                                    marks={i: str(i) for i in range(2, 8)},
-                                    tooltip={
-                                        "always_visible": True,
-                                        "placement": "bottom",
-                                    },
+                                dcc.Dropdown(
+                                    id="dofs_dropdown",
+                                    options=[
+                                        {"label": "2 DOFs", "value": 2},
+                                        {"label": "3 DOFs", "value": 3},
+                                        {"label": "4 DOFs", "value": 4},
+                                        {"label": "5 DOFs", "value": 5},
+                                        {"label": "6 DOFs", "value": 6},
+                                        {"label": "7 DOFs", "value": 7},
+                                    ],
+                                    value=2,  # 默认值
                                 ),
-                                html.Div(
-                                    id="dofs_display", style={"margin": "10px 0"}
-                                ),  # 显示当前的 DOFs 值
                                 html.P(
                                     "Link Lengths (comma-separated, e.g., 1, 1.5, 2):"
                                 ),
@@ -40,12 +37,6 @@ app.layout = dbc.Container(
                                     "Alpha Angles (comma-separated, e.g., 0, 30, 45):"
                                 ),
                                 dcc.Input(id="alpha", value="0, 30", type="text"),
-                            ]
-                        ),
-                        # Command 区域
-                        html.Div(
-                            [
-                                html.H5("Command"),
                                 dbc.Button(
                                     "Generate Robot Arm",
                                     id="generate_button",
@@ -75,16 +66,11 @@ app.layout = dbc.Container(
 )
 
 
-@app.callback(Output("dofs_display", "children"), Input("dofs_slider", "value"))
-def update_dofs_display(selected_dofs):
-    return f"Selected DOFs: {selected_dofs}"
-
-
 @app.callback(
     Output("arm_display", "figure"),
     Output("output", "children"),
     Input("generate_button", "n_clicks"),
-    Input("dofs_slider", "value"),
+    Input("dofs_dropdown", "value"),
     Input("link_lengths", "value"),
     Input("alpha", "value"),
 )
@@ -93,11 +79,8 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha):
         return {}, "Please click the button to generate the robot arm"
 
     # 解析用户输入的连杆长度和攻角
-    try:
-        link_lengths = list(map(float, link_lengths.split(",")))
-        alpha = list(map(float, alpha.split(",")))
-    except ValueError:
-        return {}, "Please enter valid numbers for link lengths and alpha angles."
+    link_lengths = list(map(float, link_lengths.split(",")))
+    alpha = list(map(float, alpha.split(",")))
 
     # 这里可以添加绘制机械臂的逻辑
     # 例如，使用 matplotlib、plotly、或者其他库绘制机器人信息
