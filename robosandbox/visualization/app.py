@@ -13,50 +13,54 @@ app.layout = dbc.Container(
                     [
                         html.H2("Robot Arm Design App"),
                         html.H5("Create your robotic arm configuration"),
+                        html.Div(
+                            [
+                                html.H5("Key Parameters"),
+                                html.P("Degrees of Freedom (DOFs):"),
+                                dcc.Dropdown(
+                                    id="dofs_dropdown",
+                                    options=[
+                                        {"label": "2 DOFs", "value": 2},
+                                        {"label": "3 DOFs", "value": 3},
+                                        {"label": "4 DOFs", "value": 4},
+                                        {"label": "5 DOFs", "value": 5},
+                                        {"label": "6 DOFs", "value": 6},
+                                        {"label": "7 DOFs", "value": 7},
+                                    ],
+                                    value=2,  # 默认值
+                                ),
+                                html.P(
+                                    "Link Lengths (comma-separated, e.g., 1, 1.5, 2):"
+                                ),
+                                dcc.Input(id="link_lengths", value="1, 1", type="text"),
+                                html.P(
+                                    "Alpha Angles (comma-separated, e.g., 0, 30, 45):"
+                                ),
+                                dcc.Input(id="alpha", value="0, 30", type="text"),
+                                dbc.Button(
+                                    "Generate Robot Arm",
+                                    id="generate_button",
+                                    color="primary",
+                                    style={"margin": "5px"},
+                                ),
+                            ]
+                        ),
                     ],
-                    width=True,
+                    width=4,  # 左侧列占据4个网格
                 ),
-            ],
-            align="end",
-        ),
-        html.Div(
-            [
-                html.H5("Key Parameters"),
-                html.P("Degrees of Freedom (DOFs):"),
-                dcc.Dropdown(
-                    id="dofs_dropdown",
-                    options=[
-                        {"label": "2 DOFs", "value": 2},
-                        {"label": "3 DOFs", "value": 3},
-                        {"label": "4 DOFs", "value": 4},
-                        {"label": "5 DOFs", "value": 5},
-                        {"label": "6 DOFs", "value": 6},
-                        {"label": "7 DOFs", "value": 7},
+                dbc.Col(
+                    [
+                        html.H5("Robot Arm Configuration"),
+                        dbc.Spinner(
+                            dcc.Graph(id="arm_display", style={"height": "80vh"}),
+                            color="primary",
+                        ),
+                        html.Div(id="output", style={"margin-top": "20px"}),
                     ],
-                    value=2,  # 默认值
-                ),
-                html.P("Link Lengths (comma-separated, e.g., 1, 1.5, 2):"),
-                dcc.Input(id="link_lengths", value="1, 1", type="text"),
-                html.P("Alpha Angles (comma-separated, e.g., 0, 30, 45):"),
-                dcc.Input(id="alpha", value="0, 30", type="text"),
-                dbc.Button(
-                    "Generate Robot Arm",
-                    id="generate_button",
-                    color="primary",
-                    style={"margin": "5px"},
+                    width=8,  # 右侧列占据8个网格
                 ),
             ]
         ),
-        html.Div(
-            [
-                html.H5("Robot Arm Configuration"),
-                dbc.Spinner(
-                    dcc.Graph(id="arm_display", style={"height": "80vh"}),
-                    color="primary",
-                ),
-            ]
-        ),
-        html.Div(id="output", style={"margin-top": "20px"}),
     ],
     fluid=True,
 )
@@ -88,8 +92,8 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha):
         ],
         "layout": {
             "title": f"Robot Arm with {dofs} DOFs",
-            "xaxis": {"title": "X"},
-            "yaxis": {"title": "Y"},
+            "xaxis": {"title": "X", "range": [-1, 3]},
+            "yaxis": {"title": "Y", "range": [-1, 2]},
         },
     }
 
