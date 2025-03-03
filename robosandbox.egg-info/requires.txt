@@ -9,6 +9,8 @@ nbformat>=4.2.0
 casadi>=3.6.5
 aerosandbox
 numpy-stl
+dash
+dash-bootstrap-components
 
 [dev]
 check-manifest

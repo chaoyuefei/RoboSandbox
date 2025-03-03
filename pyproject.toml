@@ -123,6 +123,8 @@ dependencies = [
     "casadi>=3.6.5",
     "aerosandbox",
     "numpy-stl",
+    "dash",
+    "dash-bootstrap-components",
 ]
 
 # This field lists other packages that your project depends on to run.
