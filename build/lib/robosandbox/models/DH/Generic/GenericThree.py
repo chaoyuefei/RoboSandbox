@@ -7,26 +7,16 @@ from math import pi
 
 import numpy as np
 from roboticstoolbox import DHRobot, RevoluteDH
+from robosandbox.visualization.plotly_robot import PlotlyRobot
 
 
-class GenericThree(DHRobot):
+class GenericThree(DHRobot, PlotlyRobot):
     """
-    A generic four-link robotic arm class using Denavit-Hartenberg parameters.
-
-    The class represents a four-jointed robot arm with revolute joints and specified link lengths l1-l4.
-    It inherits from DHRobot and uses standard DH parameters to define the kinematics.
-
-    The robot has the following key features:
-    - 4 revolute joints with joint limits of ±180 degrees
-    - Link lengths l1=0.4, l2=0.3, l3=0.2, l4=0.1 meters
-    - First joint rotates around vertical axis (alpha=pi/2)
-    - Other joints rotate in parallel planes (alpha=0)
-    - Ready-poses defined for:
-        - qr: "ready" position [0, -pi/2, 0, 0]
-        - qz: "zero" position [0, 0, 0, 0]
+    A generic three-link robotic arm class using Denavit-Hartenberg parameters.
     """
 
     def __init__(self, dofs=3, linklengths=[0.4] * 3, alpha=[pi / 2, 0, 0]):
+        self.dofs = dofs
         deg = pi / 180
         d = [linklengths[0], 0, 0]  # Link offset along previous z to the common normal
         a = [
@@ -66,7 +56,7 @@ class GenericThree(DHRobot):
 
         super().__init__(
             links,
-            name="GenericFourDH",
+            name="GenericThreeDH",
             keywords=("dynamics", "symbolic", "mesh"),
             manufacturer="chaoyue",
         )
