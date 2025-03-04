@@ -133,6 +133,7 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
             linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
         )
         robot.plotly(np.deg2rad(qs), isShow=False, fig=fig)
+
     elif dofs == 4:
         robot = rsb.models.DH.Generic.GenericFour(
             linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]

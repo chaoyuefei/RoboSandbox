@@ -129,19 +129,11 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
                 line_color="blue",
             )
     elif dofs == 3:
-        # 绘制三个圆
-        for i in range(3):
-            fig.add_shape(
-                type="circle",
-                xref="x",
-                yref="y",
-                x0=i,
-                y0=0,
-                x1=i + 1,
-                y1=1,
-                fillcolor="skyblue",
-                line_color="blue",
-            )
+        robot = rsb.models.DH.Generic.GenericThree(
+            linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+        )
+        robot.plotly(np.deg2rad(qs), isShow=False, fig=fig)
+
     elif dofs == 4:
         robot = rsb.models.DH.Generic.GenericFour(
             linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
