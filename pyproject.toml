@@ -180,6 +180,7 @@ packages = [
     "robosandbox",
     "tutorial",
     "robosandbox.models.DH",
+    "robosandbox.models.DH.Generic",
     "robosandbox.models.DHLink",
     "robosandbox.models.DHLink.Generic",
     "robosandbox.models.MR",

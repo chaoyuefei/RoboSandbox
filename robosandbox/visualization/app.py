@@ -115,19 +115,11 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
     fig = go.Figure()
 
     if dofs == 2:
-        # 绘制两个圆
-        for i in range(2):
-            fig.add_shape(
-                type="circle",
-                xref="x",
-                yref="y",
-                x0=i,
-                y0=0,
-                x1=i + 1,
-                y1=1,
-                fillcolor="skyblue",
-                line_color="blue",
-            )
+        robot = rsb.models.DH.Generic.GenericTwo(
+            linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+        )
+        robot.plotly(np.deg2rad(qs), isShow=False, fig=fig)
+
     elif dofs == 3:
         robot = rsb.models.DH.Generic.GenericThree(
             linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
@@ -138,15 +130,14 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
         robot = rsb.models.DH.Generic.GenericFour(
             linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
         )
-        # robot.plotly(robot.qz, isShow=False, fig=fig)
         robot.plotly(np.deg2rad(qs), isShow=False, fig=fig)
 
     # 设置图形布局
     fig.update_layout(
-        title=f"Robot Arm with {dofs} DOFs",
+        # title=f"Robot Arm with {dofs} DOFs",
         xaxis=dict(title="X", range=[-1, 4]),
         yaxis=dict(title="Y", range=[-1, 2]),
-        showlegend=False,
+        showlegend=True,
     )
 
     output_text = f"Generated a robotic arm with {dofs} DOFs, link lengths: {link_lengths}, alpha angles: {alpha}"

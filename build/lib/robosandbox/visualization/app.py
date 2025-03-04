@@ -138,15 +138,14 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
         robot = rsb.models.DH.Generic.GenericFour(
             linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
         )
-        # robot.plotly(robot.qz, isShow=False, fig=fig)
         robot.plotly(np.deg2rad(qs), isShow=False, fig=fig)
 
     # 设置图形布局
     fig.update_layout(
-        title=f"Robot Arm with {dofs} DOFs",
+        # title=f"Robot Arm with {dofs} DOFs",
         xaxis=dict(title="X", range=[-1, 4]),
         yaxis=dict(title="Y", range=[-1, 2]),
-        showlegend=False,
+        showlegend=True,
     )
 
     output_text = f"Generated a robotic arm with {dofs} DOFs, link lengths: {link_lengths}, alpha angles: {alpha}"

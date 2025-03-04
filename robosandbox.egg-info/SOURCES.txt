@@ -11,10 +11,10 @@ robosandbox/geometry/mesh_utilities.py
 robosandbox/geometry/Link/CylinderLink.py
 robosandbox/geometry/Link/__init__.py
 robosandbox/models/__init__.py
-robosandbox/models/DH/GenericTwo.py
 robosandbox/models/DH/__init__.py
 robosandbox/models/DH/Generic/GenericFour.py
 robosandbox/models/DH/Generic/GenericThree.py
+robosandbox/models/DH/Generic/GenericTwo.py
 robosandbox/models/DH/Generic/__init__.py
 robosandbox/models/DHLink/__init__.py
 robosandbox/models/DHLink/Generic/GenericFour.py
