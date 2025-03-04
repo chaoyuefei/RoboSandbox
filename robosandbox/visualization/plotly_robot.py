@@ -16,7 +16,9 @@ class PlotlyRobot:
             positions.append(position)
         return np.array(positions)
 
-    def plotly(self, q, save=False, path="", fig=go.Figure(), isShow=True):
+    def plotly(
+        self, q, save=False, path="", fig=go.Figure(), isShow=True, isUpdate=True
+    ):
         self.tfs = self.fkine_all(q)
         self.joint_positions = self.compute_joint_positions()
         # fig = go.Figure()
@@ -93,27 +95,28 @@ class PlotlyRobot:
                 )
 
         # Adjust the aspect ratio
-        fig.update_layout(
-            scene=dict(
-                aspectmode="cube",
-                camera=dict(
-                    eye=dict(
-                        x=max_distance, y=-max_distance, z=max_distance
-                    ),  # Position of the camera
-                    center=dict(x=0, y=0, z=0),  # Point the camera is looking at
-                    up=dict(x=0, y=0, z=1),  # Up vector direction
+        if isUpdate:
+            fig.update_layout(
+                scene=dict(
+                    aspectmode="cube",
+                    camera=dict(
+                        eye=dict(
+                            x=max_distance, y=-max_distance, z=max_distance
+                        ),  # Position of the camera
+                        center=dict(x=0, y=0, z=0),  # Point the camera is looking at
+                        up=dict(x=0, y=0, z=1),  # Up vector direction
+                    ),
+                    xaxis=dict(nticks=10, range=[-max_distance, max_distance]),
+                    yaxis=dict(nticks=10, range=[-max_distance, max_distance]),
+                    zaxis=dict(nticks=10, range=[-max_distance, max_distance]),
+                    xaxis_title="X",
+                    yaxis_title="Y",
+                    zaxis_title="Z",
                 ),
-                xaxis=dict(nticks=10, range=[-max_distance, max_distance]),
-                yaxis=dict(nticks=10, range=[-max_distance, max_distance]),
-                zaxis=dict(nticks=10, range=[-max_distance, max_distance]),
-                xaxis_title="X",
-                yaxis_title="Y",
-                zaxis_title="Z",
-            ),
-            # title="3D Robot Visualization with Joint Frames",
-            width=700,
-            height=700,
-        )
+                # title="3D Robot Visualization with Joint Frames",
+                width=700,
+                height=700,
+            )
 
         if isShow:
             fig.show()

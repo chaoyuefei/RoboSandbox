@@ -134,14 +134,15 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
         )
         robot.plotly(np.deg2rad(qs), isShow=False, fig=fig)
 
-    fig.update_layout(
-        # title=f"Robot Arm with {dofs} DOFs",
-        # xaxis=dict(title="X", range=[-1, 4]),
-        # yaxis=dict(title="Y", range=[-1, 2]),
-        showlegend=True,
-    )
+    # fig.update_layout(
+    #     # title=f"Robot Arm with {dofs} DOFs",
+    #     # xaxis=dict(title="X", range=[-1, 4]),
+    #     # yaxis=dict(title="Y", range=[-1, 2]),
+    #     showlegend=True,
+    # )
 
-    output_text = f"Generated a robotic arm with {dofs} DOFs, link lengths: {link_lengths}, alpha angles: {alpha}"
+    output_text = ""  # , "Generated a robotic arm with {dofs} DOFs, link lengths: {link_lengths}, alpha angles: {alpha}"
+    # output_text = f"Generated a robotic arm with {dofs} DOFs, link lengths: {link_lengths}, alpha angles: {alpha}"
     return fig, output_text
 
 
