@@ -114,8 +114,8 @@ class PlotlyRobot:
                     zaxis_title="Z",
                 ),
                 # title="3D Robot Visualization with Joint Frames",
-                width=700,
-                height=700,
+                width=800,
+                height=600,
             )
 
         if isShow:

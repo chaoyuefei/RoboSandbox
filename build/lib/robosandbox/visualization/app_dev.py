@@ -157,16 +157,29 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
             robot = rsb.models.DH.Generic.GenericFour(
                 linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
             )
+        elif dofs == 5:
+            robot = rsb.models.DH.Generic.GenericFive(
+                linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+            )
+        elif dofs == 6:
+            robot = rsb.models.DH.Generic.GenericSix(
+                linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+            )
+        elif dofs == 7:
+            robot = rsb.models.DH.Generic.GenericSeven(
+                linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+            )
         else:
             return dash.no_update, f"DOFs of {dofs} not supported."
 
         # Plot the robot arm on the existing figure
-        robot.plotly(np.deg2rad(qs), isShow=False, fig=fig, isUpdate=False)
+        robot.plotly(np.deg2rad(qs), isShow=False, fig=fig, isUpdate=True)
 
     except Exception as e:
         return dash.no_update, f"Error generating robot arm: {e}"
 
     output_text = f"Generated a robotic arm with {dofs} DOFs."
+
     return fig, output_text
 
 
