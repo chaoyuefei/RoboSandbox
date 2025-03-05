@@ -12,6 +12,7 @@ robosandbox/geometry/Link/CylinderLink.py
 robosandbox/geometry/Link/__init__.py
 robosandbox/models/__init__.py
 robosandbox/models/DH/__init__.py
+robosandbox/models/DH/Generic/GenericFive.py
 robosandbox/models/DH/Generic/GenericFour.py
 robosandbox/models/DH/Generic/GenericThree.py
 robosandbox/models/DH/Generic/GenericTwo.py
