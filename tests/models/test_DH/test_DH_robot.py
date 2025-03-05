@@ -1,6 +1,19 @@
 import robosandbox as rsb
 
 
+def test_GenericSeven_define():
+    robot = rsb.models.DH.Generic.GenericSeven()
+    # robot.plot(robot.qz, block=True)
+    assert robot is not None, "GenericSeven robot not defined"
+    assert robot.n == 7, "GenericSeven robot has 7 joints"
+
+
+def test_GenericSeven_plotly():
+    robot = rsb.models.DH.Generic.GenericSeven()
+    fig = robot.plotly(robot.qr)
+    assert fig is not None, "plotly return fig is not None"
+
+
 def test_GenericSix_define():
     robot = rsb.models.DH.Generic.GenericSix()
     # robot.plot(robot.qz, block=True)
