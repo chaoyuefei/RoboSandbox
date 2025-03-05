@@ -14,6 +14,7 @@ robosandbox/models/__init__.py
 robosandbox/models/DH/__init__.py
 robosandbox/models/DH/Generic/GenericFive.py
 robosandbox/models/DH/Generic/GenericFour.py
+robosandbox/models/DH/Generic/GenericSix.py
 robosandbox/models/DH/Generic/GenericThree.py
 robosandbox/models/DH/Generic/GenericTwo.py
 robosandbox/models/DH/Generic/__init__.py
