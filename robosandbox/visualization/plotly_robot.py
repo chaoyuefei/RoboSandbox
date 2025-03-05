@@ -72,7 +72,7 @@ class PlotlyRobot:
                         z=[pos[2], end_point[2]],
                         mode="lines",
                         line=dict(color=colors[i], width=5),
-                        name=f"{directions[i]} Axis",
+                        name=f"{directions[i]}{index} Axis",
                     )
                 )
 
@@ -101,7 +101,9 @@ class PlotlyRobot:
                     aspectmode="cube",
                     camera=dict(
                         eye=dict(
-                            x=max_distance, y=-max_distance, z=max_distance
+                            x=1.5 * max_distance,
+                            y=-1.5 * max_distance,
+                            z=1.5 * max_distance,
                         ),  # Position of the camera
                         center=dict(x=0, y=0, z=0),  # Point the camera is looking at
                         up=dict(x=0, y=0, z=1),  # Up vector direction
