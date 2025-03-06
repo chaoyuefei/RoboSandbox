@@ -22,7 +22,7 @@ class PlotlyWorkSpace:
                     ],  # set color to an array/list of desired values
                     # colorscale="Viridis"  # choose a colorscale
                     colorbar=dict(title=color),
-                    opacity=0.8,
+                    opacity=0.5,
                 ),
             )
         )

@@ -133,16 +133,15 @@ def test_workspace_plotly():
     robot = rsb.models.DH.Generic.GenericFour()
     ws = WorkSpace(robot)
     G = ws.iter_calc_global_indice(
-        initial_samples=5000,
+        initial_samples=8000,
         batch_ratio=0.1,
         error_tolerance_percentage=1e-3,
         method="invcondition",
         axes="trans",
         max_samples=50000,
     )
-    # print(G)
-    print(ws.df)
-    ws.plot(color="invcondition")
+    fig = robot.plotly(robot.qr, isShow=False, isUpdate=False)
+    ws.plot(color="invcondition", fig=fig, isShow=True)
 
     # print(robot.manipulability([0.3, 0.2, 0.3, 0.4], method="yoshikawa", axes="trans"))
     # print(robot.manipulability([0.2, 0.2, 0.3, 0.4], method="invcondition", axes="all"))
