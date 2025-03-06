@@ -9,16 +9,16 @@ import numpy as np
 app = dash.Dash(external_stylesheets=[dbc.themes.MINTY])
 
 # Initialize the figure with a fixed layout
-fig_init = go.Figure()
-fig_init.update_layout(
-    title="Robot Arm Configuration",
-    scene=dict(
-        xaxis=dict(title="X", range=[-2, 2]),
-        yaxis=dict(title="Y", range=[-2, 2]),
-        zaxis=dict(title="Z", range=[-2, 2]),
-    ),
-    margin=dict(l=0, r=0, b=0, t=30),
-)
+# fig_init = go.Figure()
+# fig_init.update_layout(
+#     title="Robot Arm Configuration",
+#     scene=dict(
+#         xaxis=dict(title="X", range=[-2, 2]),
+#         yaxis=dict(title="Y", range=[-2, 2]),
+#         zaxis=dict(title="Z", range=[-2, 2]),
+#     ),
+#     margin=dict(l=0, r=0, b=0, t=30),
+# )
 
 app.layout = dbc.Container(
     [
@@ -86,6 +86,12 @@ app.layout = dbc.Container(
                                     color="primary",
                                     style={"margin": "5px"},
                                 ),
+                                dbc.Button(
+                                    "Workspace Analysis",
+                                    id="workspace_button",
+                                    color="primary",
+                                    style={"margin": "5px"},
+                                ),
                             ]
                         ),
                     ],
@@ -97,7 +103,7 @@ app.layout = dbc.Container(
                         dbc.Spinner(
                             dcc.Graph(
                                 id="arm_display",
-                                figure=fig_init,  # Set the initialized figure
+                                # figure=fig_init,  # Set the initialized figure
                                 style={"height": "75vh"},
                             ),
                             color="primary",
@@ -125,14 +131,15 @@ def update_dofs_display(selected_dofs):
     Output("arm_display", "figure"),
     Output("output", "children"),
     Input("generate_button", "n_clicks"),
-    State("dofs_slider", "value"),
-    State("link_lengths", "value"),
-    State("alpha", "value"),
-    State("qs", "value"),
+    Input("dofs_slider", "value"),
+    Input("link_lengths", "value"),
+    Input("alpha", "value"),
+    Input("qs", "value"),
 )
 def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
     if n_clicks is None:
-        return dash.no_update, "Please click the 'Generate Robot Arm' button."
+        # return dash.no_update, "Please click the 'Generate Robot Arm' button."
+        return {}, "Please click the 'Generate Robot Arm' button."
 
     try:
         link_lengths = [float(length.strip()) for length in link_lengths.split(",")]
@@ -142,7 +149,7 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
         return dash.no_update, "Please enter valid numbers for link lengths and angles."
 
     # Initialize a new figure with the existing layout
-    fig = go.Figure(fig_init)
+    fig = go.Figure()
 
     try:
         if dofs == 2:
