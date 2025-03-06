@@ -247,6 +247,8 @@ class CylinderLink(Link3D):
         Get the center of mass
         return: center of mass (x, y, z)
         """
+        if self.inner_profile["params"][0] == self.inner_profile["params"][1]:
+            return np.array([0, 0, self.len / 2])
         points, points_number = self.get_discretized_points()
         x, y, z = 0, 0, 0
         points_mass = self.mass / points_number
