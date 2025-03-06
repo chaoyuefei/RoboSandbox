@@ -41,6 +41,7 @@ robosandbox/visualization/app_dev.py
 robosandbox/visualization/app_list_choose.py
 robosandbox/visualization/plotly_Figure3D.py
 robosandbox/visualization/plotly_Link3D.py
+robosandbox/visualization/plotly_WorkSpace.py
 robosandbox/visualization/plotly_robot.py
 tests/test_models.py
 tests/test_rtb.py

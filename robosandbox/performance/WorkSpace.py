@@ -1,15 +1,17 @@
 from typing import Union
 import numpy as np
 import pandas as pd
+from robosandbox.visualization.plotly_WorkSpace import PlotlyWorkSpace
 
 
-class WorkSpace:
+class WorkSpace(PlotlyWorkSpace):
     def __init__(self, robot=None):
         columns = ["x", "y", "z"]
         self.metrics = ["yoshikawa", "invcondition", "asada"]
         columns = columns + self.metrics
         self.df = pd.DataFrame(columns=columns)
         self.robot = robot
+        super().__init__(df=self.df)
 
     def add_samples(self, points, metric_values=None, metric: Union[str, None] = None):
         """

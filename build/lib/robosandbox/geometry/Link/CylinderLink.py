@@ -209,7 +209,6 @@ class CylinderLink(Link3D):
         return: mass of the link
         """
         if self.inner_profile["params"][0] == self.inner_profile["params"][1]:
-            print(sum(self.get_segments_mass()))
             return (
                 np.pi
                 * (self.Rout**2 - (self.Rout - self.inner_profile["params"][0]) ** 2)
