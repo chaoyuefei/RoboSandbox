@@ -26,7 +26,6 @@ class GenericFour(DHRobot, PlotlyRobot):
                 inner_profile={"params": [20e-3, 20e-3], "method": "linear"},
                 resolutions={"axial": 80, "radial": 10, "angular": 360},
             )
-            print(l1.mass)
             l2 = cl(
                 length=0.4,
                 E=70e6,
@@ -69,7 +68,7 @@ class GenericFour(DHRobot, PlotlyRobot):
         ]  # Link length along common normal
         # r = [[0] * 3 for _ in range(dofs)]  # Position of COM with respect to link frame
         r = [
-            [0, links[0].COM[-1], 0],
+            [0, -links[0].COM[-1], 0],
             [links[1].COM[-1], 0, 0],
             [links[2].COM[-1], 0, 0],
             [links[3].COM[-1], 0, 0],
@@ -82,7 +81,7 @@ class GenericFour(DHRobot, PlotlyRobot):
                 0,
                 0,
                 0,
-            ],
+            ],  # around y axis
             [
                 links[1].I_tensor[-1, -1],
                 links[1].I_tensor[0, 0],
@@ -90,7 +89,7 @@ class GenericFour(DHRobot, PlotlyRobot):
                 0,
                 0,
                 0,
-            ],
+            ],  # around x axis
             [
                 links[2].I_tensor[-1, -1],
                 links[2].I_tensor[0, 0],

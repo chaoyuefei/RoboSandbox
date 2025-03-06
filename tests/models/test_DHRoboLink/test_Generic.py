@@ -8,5 +8,11 @@ def test_GenericFour():
     print(robot.links[-1].I)
 
 
+def test_GenericFour_plot():
+    robot = rsb.models.DHRoboLink.Generic.GenericFour()
+    robot.plotly(robot.qr)
+
+
 if __name__ == "__main__":
     test_GenericFour()
+    # test_GenericFour_plot()
