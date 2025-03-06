@@ -5,6 +5,7 @@ from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import robosandbox as rsb
 import numpy as np
+from robosandbox.performance.WorkSpace import WorkSpace
 
 app = dash.Dash(external_stylesheets=[dbc.themes.MINTY])
 
@@ -112,6 +113,21 @@ app.layout = dbc.Container(
                     ],
                     width=8,
                 ),
+                dbc.Col(
+                    [
+                        html.H5("Workspace Analysis"),
+                        dbc.Spinner(
+                            dcc.Graph(
+                                id="workspace_display",
+                                # figure=fig_init,  # Set the initialized figure
+                                style={"height": "75vh"},
+                            ),
+                            color="primary",
+                        ),
+                        html.Div(id="ws-output", style={"margin-top": "20px"}),
+                    ],
+                    width=8,
+                ),
             ]
         ),
     ],
@@ -188,6 +204,73 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
     output_text = f"Generated a robotic arm with {dofs} DOFs."
 
     return fig, output_text
+
+
+@app.callback(
+    Output("workspace_display", "figure"),
+    Input("workspace_button", "n_clicks"),
+    State("dofs_slider", "value"),
+    State("link_lengths", "value"),
+    State("alpha", "value"),
+    State("qs", "value"),
+)
+def update_workspace_analysis(n_clicks, dofs, link_lengths, alpha, qs):
+    # if n_clicks is None:
+    #     return dash.no_update, "Please click the 'Workspace Analysis' button."
+
+    try:
+        link_lengths = [float(length.strip()) for length in link_lengths.split(",")]
+        alpha = [float(angle.strip()) for angle in alpha.split(",")]
+        qs = [float(q.strip()) for q in qs.split(",")]
+    except ValueError:
+        return {}, "Please enter valid numbers for link lengths and angles."
+
+    fig = go.Figure()
+
+    try:
+        if dofs == 2:
+            robot = rsb.models.DH.Generic.GenericTwo(
+                linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+            )
+        elif dofs == 3:
+            robot = rsb.models.DH.Generic.GenericThree(
+                linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+            )
+        elif dofs == 4:
+            robot = rsb.models.DH.Generic.GenericFour(
+                linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+            )
+        elif dofs == 5:
+            robot = rsb.models.DH.Generic.GenericFive(
+                linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+            )
+        elif dofs == 6:
+            robot = rsb.models.DH.Generic.GenericSix(
+                linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+            )
+        elif dofs == 7:
+            robot = rsb.models.DH.Generic.GenericSeven(
+                linklengths=link_lengths, alpha=[np.deg2rad(a) for a in alpha]
+            )
+        else:
+            return dash.no_update, f"DOFs of {dofs} not supported."
+
+        fig = robot.plotly(np.deg2rad(qs), isShow=False, fig=fig, isUpdate=True)
+
+        ws = WorkSpace(robot)
+        G = ws.iter_calc_global_indice(
+            initial_samples=5000,
+            batch_ratio=0.1,
+            error_tolerance_percentage=1e-3,
+            method="invcondition",
+            axes="trans",
+            max_samples=50000,
+        )
+        ws.plot(color="invcondition", fig=fig, isShow=False)
+    except Exception as e:
+        return dash.no_update, f"Error generating robot arm: {e}"
+
+    return fig
 
 
 if __name__ == "__main__":
