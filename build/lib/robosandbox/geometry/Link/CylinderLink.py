@@ -225,6 +225,14 @@ class CylinderLink(Link3D):
         origin: origin of the frame
         return: inertia tensor, shape = (3, 3)
         """
+        if self.inner_profile["params"][0] == self.inner_profile["params"][1]:
+            return self.inertia_vector_hollow_cylinder(
+                M=self.mass,
+                R1=self.inner_profile["params"][0],
+                R2=self.Rout,
+                h=self.len,
+            )
+
         points, points_number = self.get_discretized_points()
         Ixx, Iyy, Izz, Ixy, Ixz, Iyz = 0, 0, 0, 0, 0, 0
         points_mass = self.mass / points_number
@@ -247,6 +255,8 @@ class CylinderLink(Link3D):
         Get the center of mass
         return: center of mass (x, y, z)
         """
+        if self.inner_profile["params"][0] == self.inner_profile["params"][1]:
+            return np.array([0, 0, self.len / 2])
         points, points_number = self.get_discretized_points()
         x, y, z = 0, 0, 0
         points_mass = self.mass / points_number
@@ -257,3 +267,26 @@ class CylinderLink(Link3D):
         COM = np.array([x, y, z]) / self.mass
         # COM = np.mean(np.array(points), axis=0) # another way to calculate the center of mass since the points are equivalent
         return COM
+
+    @staticmethod
+    def inertia_vector_hollow_cylinder(M, R1, R2, h) -> np.ndarray:
+        """
+        Calculate the inertia vector of a hollow cylinder.
+
+        Parameters:
+        M  -- Mass of the cylinder (kg)
+        R1 -- Inner radius (m)
+        R2 -- Outer radius (m)
+        h  -- Height of the cylinder (m)
+
+        Returns:
+        inertia_tensor
+        """
+        # Calculate the moments of inertia around each principal axis
+        Ixx = (1 / 4) * M * (R1**2 + R2**2) + (1 / 12) * M * h**2
+        Iyy = Ixx  # Due to symmetry
+        Izz = (1 / 2) * M * (R1**2 + R2**2)
+
+        inertia_tensor = np.array([[Ixx, 0, 0], [0, Iyy, 0], [0, 0, Izz]])
+
+        return inertia_tensor
