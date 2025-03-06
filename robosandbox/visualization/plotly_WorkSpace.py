@@ -6,7 +6,9 @@ class PlotlyWorkSpace:
     def __init__(self, df: pd.DataFrame):
         self.df = df
 
-    def plot(self, path="", fig=go.Figure(), isShow=True, isUpdate=True):
+    def plot(
+        self, color="invcondition", path="", fig=go.Figure(), isShow=True, isUpdate=True
+    ):
         fig.add_trace(
             go.Scatter3d(
                 x=self.df["x"],
@@ -16,9 +18,10 @@ class PlotlyWorkSpace:
                 marker=dict(
                     size=5,
                     color=self.df[
-                        "invcondition"
+                        color
                     ],  # set color to an array/list of desired values
                     # colorscale="Viridis"  # choose a colorscale
+                    colorbar=dict(title=color),
                     opacity=0.8,
                 ),
             )
@@ -29,7 +32,7 @@ class PlotlyWorkSpace:
                     xaxis_title="X",
                     yaxis_title="Y",
                     zaxis_title="Z",
-                )
+                ),
             )
         if isShow:
             fig.show()

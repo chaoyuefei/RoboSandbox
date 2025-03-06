@@ -137,10 +137,15 @@ def test_workspace_plotly():
         batch_ratio=0.1,
         error_tolerance_percentage=1e-3,
         method="invcondition",
-        axes="all",
+        axes="trans",
         max_samples=50000,
     )
-    ws.plot()
+    # print(G)
+    print(ws.df)
+    ws.plot(color="invcondition")
+
+    # print(robot.manipulability([0.3, 0.2, 0.3, 0.4], method="yoshikawa", axes="trans"))
+    # print(robot.manipulability([0.2, 0.2, 0.3, 0.4], method="invcondition", axes="all"))
 
 
 if __name__ == "__main__":
