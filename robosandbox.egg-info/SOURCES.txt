@@ -19,9 +19,9 @@ robosandbox/models/DH/Generic/GenericSix.py
 robosandbox/models/DH/Generic/GenericThree.py
 robosandbox/models/DH/Generic/GenericTwo.py
 robosandbox/models/DH/Generic/__init__.py
-robosandbox/models/DHLink/__init__.py
-robosandbox/models/DHLink/Generic/GenericFour.py
-robosandbox/models/DHLink/Generic/__init__.py
+robosandbox/models/DHRoboLink/__init__.py
+robosandbox/models/DHRoboLink/Generic/GenericFour.py
+robosandbox/models/DHRoboLink/Generic/__init__.py
 robosandbox/models/MR/ModernRobotics.py
 robosandbox/models/MR/__init__.py
 robosandbox/models/MR/utils.py

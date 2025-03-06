@@ -1,5 +1,5 @@
 from robosandbox.models import DH
 from robosandbox.models import MR
-from robosandbox.models import DHLink
+from robosandbox.models import DHRoboLink
 
-__all__ = ["DH", "MR", "DHLink"]
+__all__ = ["DH", "MR", "DHRoboLink"]

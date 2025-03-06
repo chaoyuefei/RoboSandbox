@@ -21,6 +21,7 @@ class CylinderLink(Link3D):
         self.segments_location = np.linspace(0, self.len, self.segments_number)
         self.E = E
         self.rho = rho
+        self.inner_profile = inner_profile
         self.thickness_distribution = self.get_thickness_distribution(
             inner_profile["params"], inner_profile["method"]
         )
@@ -207,7 +208,16 @@ class CylinderLink(Link3D):
         Get the mass of the link
         return: mass of the link
         """
-        return sum(self.get_segments_mass())
+        if self.inner_profile["params"][0] == self.inner_profile["params"][1]:
+            print("The inner profile is uniform")
+            return (
+                np.pi
+                * (self.Rout**2 - (self.Rout - self.inner_profile["params"][0]) ** 2)
+                * self.len
+                * self.rho
+            )
+        else:
+            return sum(self.get_segments_mass())
 
     def get_inertia_tensor(self, origin=(0, 0, 0)):
         """

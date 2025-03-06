@@ -7,7 +7,9 @@ from math import pi
 
 import numpy as np
 from roboticstoolbox import DHRobot, RevoluteDH
-import robosandbox.geometry.Link.CylinderLink as cl
+
+# import robosandbox.geometry.Link.CylinderLink as cl
+from robosandbox.geometry.Link.CylinderLink import CylinderLink as cl
 
 
 class GenericFour(DHRobot):
@@ -29,10 +31,39 @@ class GenericFour(DHRobot):
 
     def __init__(self, dofs=4, links=None, alpha=[pi / 2, 0, 0, 0]):
         if links is None:
-            l1 = cl(length=0.4, E=70e6, rho=2700, Rout=25e-3, parameters=[20e-3, 20e-3], method='linear')
-            l2 = cl(length=0.4, E=70e6, rho=2700, Rout=25e-3, parameters=[20e-3, 20e-3], method='linear')
-            l3 = cl(length=0.4, E=70e6, rho=2700, Rout=25e-3, parameters=[20e-3, 20e-3], method='linear')
-            l4 = cl(length=0.4, E=70e6, rho=2700, Rout=25e-3, parameters=[20e-3, 20e-3], method='linear')
+            l1 = cl(
+                length=0.4,
+                E=70e6,
+                rho=2700,
+                Rout=25e-3,
+                inner_profile={"params": [20e-3, 20e-3], "method": "linear"},
+                resolutions={"axial": 80, "radial": 10, "angular": 360},
+            )
+            print(l1.mass)
+            l2 = cl(
+                length=0.4,
+                E=70e6,
+                rho=2700,
+                Rout=25e-3,
+                inner_profile={"params": [20e-3, 20e-3], "method": "linear"},
+                resolutions={"axial": 80, "radial": 10, "angular": 360},
+            )
+            l3 = cl(
+                length=0.4,
+                E=70e6,
+                rho=2700,
+                Rout=25e-3,
+                inner_profile={"params": [20e-3, 20e-3], "method": "linear"},
+                resolutions={"axial": 80, "radial": 10, "angular": 360},
+            )
+            l4 = cl(
+                length=0.4,
+                E=70e6,
+                rho=2700,
+                Rout=25e-3,
+                inner_profile={"params": [20e-3, 20e-3], "method": "linear"},
+                resolutions={"axial": 80, "radial": 10, "angular": 360},
+            )
             links = [l1, l2, l3, l4]
 
         self.dofs = dofs
@@ -50,14 +81,45 @@ class GenericFour(DHRobot):
             -links[3].len,
         ]  # Link length along common normal
         # r = [[0] * 3 for _ in range(dofs)]  # Position of COM with respect to link frame
-        r = [[0, links[0].COM[-1], 0],
+        r = [
+            [0, links[0].COM[-1], 0],
             [links[1].COM[-1], 0, 0],
             [links[2].COM[-1], 0, 0],
-            [links[3].COM[-1], 0, 0]]
-        I = [[links[0].I_tensor[0,0], links[0].I_tensor[-1,-1], links[0].I_tensor[1,1], 0, 0, 0],
-            [links[1].I_tensor[-1,-1], links[1].I_tensor[0,0], links[1].I_tensor[1,1], 0, 0, 0],
-            [links[2].I_tensor[-1,-1], links[2].I_tensor[0,0], links[2].I_tensor[1,1], 0, 0, 0],
-            [links[3].I_tensor[-1,-1], links[3].I_tensor[0,0], links[3].I_tensor[1,1], 0, 0, 0],
+            [links[3].COM[-1], 0, 0],
+        ]
+        I = [
+            [
+                links[0].I_tensor[0, 0],
+                links[0].I_tensor[-1, -1],
+                links[0].I_tensor[1, 1],
+                0,
+                0,
+                0,
+            ],
+            [
+                links[1].I_tensor[-1, -1],
+                links[1].I_tensor[0, 0],
+                links[1].I_tensor[1, 1],
+                0,
+                0,
+                0,
+            ],
+            [
+                links[2].I_tensor[-1, -1],
+                links[2].I_tensor[0, 0],
+                links[2].I_tensor[1, 1],
+                0,
+                0,
+                0,
+            ],
+            [
+                links[3].I_tensor[-1, -1],
+                links[3].I_tensor[0, 0],
+                links[3].I_tensor[1, 1],
+                0,
+                0,
+                0,
+            ],
         ]
 
         m = [links[0].mass, links[1].mass, links[2].mass, links[3].mass]  # mass of link
