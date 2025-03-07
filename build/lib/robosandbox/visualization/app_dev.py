@@ -96,7 +96,7 @@ app.layout = dbc.Container(
                             ]
                         ),
                     ],
-                    width=4,
+                    width=2,
                 ),
                 dbc.Col(
                     [
@@ -111,7 +111,7 @@ app.layout = dbc.Container(
                         ),
                         html.Div(id="output", style={"margin-top": "20px"}),
                     ],
-                    width=8,
+                    width=4,
                 ),
                 dbc.Col(
                     [
@@ -126,7 +126,7 @@ app.layout = dbc.Container(
                         ),
                         html.Div(id="ws-output", style={"margin-top": "20px"}),
                     ],
-                    width=8,
+                    width=4,
                 ),
             ]
         ),
@@ -215,8 +215,8 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
     State("qs", "value"),
 )
 def update_workspace_analysis(n_clicks, dofs, link_lengths, alpha, qs):
-    # if n_clicks is None:
-    #     return dash.no_update, "Please click the 'Workspace Analysis' button."
+    if n_clicks is None:
+        return dash.no_update
 
     try:
         link_lengths = [float(length.strip()) for length in link_lengths.split(",")]
