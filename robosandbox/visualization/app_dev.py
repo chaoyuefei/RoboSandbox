@@ -215,8 +215,8 @@ def update_robot_arm(n_clicks, dofs, link_lengths, alpha, qs):
     State("qs", "value"),
 )
 def update_workspace_analysis(n_clicks, dofs, link_lengths, alpha, qs):
-    if n_clicks is None:
-        return dash.no_update
+    # if n_clicks is None:
+    #     return dash.no_update
 
     try:
         link_lengths = [float(length.strip()) for length in link_lengths.split(",")]
