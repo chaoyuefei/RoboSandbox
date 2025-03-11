@@ -104,7 +104,33 @@ def test_Panda_workspace():
         max_samples=50000,
     )
     ws.plot(color="invcondition", isShow=True)
-    # assert fig is not None, "plotly return fig is not None"
+
+
+def test_Puma560_define():
+    robot = rsb.models.DH.Puma560()
+    assert robot is not None, "Puma560 robot not defined"
+    assert robot.n == 6, "Puma560 robot has 6 joints"
+
+
+def test_Puma560_plotly():
+    robot = rsb.models.DH.Puma560()
+    fig = robot.plotly(robot.qr)
+    assert fig is not None, "plotly return fig is not None"
+
+
+def test_Puma560_workspace():
+    robot = rsb.models.DH.Puma560()
+    ws = rsb.performance.WorkSpace.WorkSpace(robot)
+    # ws = WorkSpace(robot)
+    G = ws.iter_calc_global_indice(
+        initial_samples=5000,
+        batch_ratio=0.1,
+        error_tolerance_percentage=1e-3,
+        method="invcondition",
+        axes="all",
+        max_samples=50000,
+    )
+    ws.plot(color="invcondition", isShow=True)
 
 
 if __name__ == "__main__":
@@ -116,3 +142,6 @@ if __name__ == "__main__":
     # test_Panda_define()
     # test_Panda_plotly()
     # test_Panda_workspace()
+    # test_Puma560_define()
+    # test_Puma560_plotly()
+    # test_Puma560_workspace()
