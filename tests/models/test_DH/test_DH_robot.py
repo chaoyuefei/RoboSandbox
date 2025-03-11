@@ -133,6 +133,12 @@ def test_Puma560_workspace():
     ws.plot(color="invcondition", isShow=True)
 
 
+def test_Stanford_define():
+    robot = rsb.models.DH.Stanford()
+    assert robot is not None, "Stanford robot not defined"
+    assert robot.n == 6, "Stanford robot has 6 joints"
+
+
 if __name__ == "__main__":
     pass
     # test_GenericThree_define()
@@ -145,3 +151,4 @@ if __name__ == "__main__":
     # test_Puma560_define()
     # test_Puma560_plotly()
     # test_Puma560_workspace()
+    test_GenericFour_define()
