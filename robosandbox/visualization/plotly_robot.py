@@ -109,9 +109,15 @@ class PlotlyRobot:
                         center=dict(x=0, y=0, z=0),  # Point the camera is looking at
                         up=dict(x=0, y=0, z=1),  # Up vector direction
                     ),
-                    xaxis=dict(nticks=10, range=[-max_distance, max_distance]),
-                    yaxis=dict(nticks=10, range=[-max_distance, max_distance]),
-                    zaxis=dict(nticks=10, range=[-max_distance, max_distance]),
+                    xaxis=dict(
+                        nticks=10, range=[-1.1 * max_distance, 1.1 * max_distance]
+                    ),
+                    yaxis=dict(
+                        nticks=10, range=[-1.1 * max_distance, 1.1 * max_distance]
+                    ),
+                    zaxis=dict(
+                        nticks=10, range=[-1.1 * max_distance, 1.1 * max_distance]
+                    ),
                     xaxis_title="X",
                     yaxis_title="Y",
                     zaxis_title="Z",

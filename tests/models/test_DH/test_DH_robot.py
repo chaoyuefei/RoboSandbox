@@ -172,5 +172,6 @@ if __name__ == "__main__":
     # test_Puma560_define()
     # test_Puma560_plotly()
     # test_Puma560_workspace()
+    # TO FIX
     # test_Stanford_define()
-    test_Stanford_plotly()
+    # test_Stanford_plotly()
