@@ -187,15 +187,16 @@ def update_visualization(
                 batch_ratio=0.1,
                 error_tolerance_percentage=1e-3,
                 method="invcondition",
-                axes="trans",
+                axes="all",
                 max_samples=50000,
             )
             ws.plot(color="invcondition", fig=fig, isShow=False)
+            fig.update_layout(showlegend=False)
             message = f"Performed workspace analysis for a {dofs} DOF robot."
 
         # Update layout if necessary
         fig.update_layout(
-            title="Robot Visualization",
+            # title="Robot Visualization",
             scene=dict(
                 xaxis=dict(title="X", range=[-2, 2]),
                 yaxis=dict(title="Y", range=[-2, 2]),

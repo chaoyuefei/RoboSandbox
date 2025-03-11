@@ -187,7 +187,7 @@ def update_visualization(
                 batch_ratio=0.1,
                 error_tolerance_percentage=1e-3,
                 method="invcondition",
-                axes="trans",
+                axes="all",
                 max_samples=50000,
             )
             ws.plot(color="invcondition", fig=fig, isShow=False)

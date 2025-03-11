@@ -79,9 +79,40 @@ def test_GenericTwo_plotly():
     assert fig is not None, "plotly return fig is not None"
 
 
+def test_Panda_define():
+    robot = rsb.models.DH.Panda()
+    assert robot is not None, "Panda robot not defined"
+    assert robot.n == 7, "Panda robot has 7 joints"
+
+
+def test_Panda_plotly():
+    robot = rsb.models.DH.Panda()
+    fig = robot.plotly(robot.qr)
+    assert fig is not None, "plotly return fig is not None"
+
+
+def test_Panda_workspace():
+    robot = rsb.models.DH.Panda()
+    ws = rsb.performance.WorkSpace.WorkSpace(robot)
+    # ws = WorkSpace(robot)
+    G = ws.iter_calc_global_indice(
+        initial_samples=5000,
+        batch_ratio=0.1,
+        error_tolerance_percentage=1e-3,
+        method="invcondition",
+        axes="all",
+        max_samples=50000,
+    )
+    ws.plot(color="invcondition", isShow=True)
+    # assert fig is not None, "plotly return fig is not None"
+
+
 if __name__ == "__main__":
     pass
     # test_GenericThree_define()
     # test_GenericThree_plotly()
     # test_GenericTwo_define()
     # test_GenericTwo_plotly()
+    # test_Panda_define()
+    # test_Panda_plotly()
+    test_Panda_workspace()
