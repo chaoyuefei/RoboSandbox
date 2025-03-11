@@ -139,6 +139,27 @@ def test_Stanford_define():
     assert robot.n == 6, "Stanford robot has 6 joints"
 
 
+def test_Stanford_plotly():
+    robot = rsb.models.DH.Stanford()
+    fig = robot.plotly(robot.qr)
+    assert fig is not None, "plotly return fig is not None"
+
+
+def test_Stanford_workspace():
+    robot = rsb.models.DH.Stanford()
+    ws = rsb.performance.WorkSpace.WorkSpace(robot)
+    # ws = WorkSpace(robot)
+    G = ws.iter_calc_global_indice(
+        initial_samples=5000,
+        batch_ratio=0.1,
+        error_tolerance_percentage=1e-3,
+        method="invcondition",
+        axes="all",
+        max_samples=50000,
+    )
+    ws.plot(color="invcondition", isShow=True)
+
+
 if __name__ == "__main__":
     pass
     # test_GenericThree_define()
@@ -151,4 +172,5 @@ if __name__ == "__main__":
     # test_Puma560_define()
     # test_Puma560_plotly()
     # test_Puma560_workspace()
-    test_GenericFour_define()
+    # test_Stanford_define()
+    test_Stanford_plotly()

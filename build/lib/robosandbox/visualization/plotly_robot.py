@@ -41,7 +41,8 @@ class PlotlyRobot:
             max_distance = np.linalg.norm(self.tfs[-1][:3, 3])
         else:
             max_distance = np.linalg.norm(self.tfs[-1].t)
-        axis_length = round(max_distance / 10, 1)  # Uniform length for all axes
+        axis_length = round(max_distance / 10, 2)  # Uniform length for all axes
+        # print(f"max_distance is {max_distance} and axis_length is {axis_length}")
         arrow_length = axis_length / 10  # Length of the arrowhead
 
         # Adding axes at each joint
