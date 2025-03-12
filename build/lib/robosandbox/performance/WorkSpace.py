@@ -106,12 +106,16 @@ class WorkSpace(PlotlyWorkSpace):
     def calc_global_indice(
         self,
         method="yoshikawa",
+        isNormalized=False,
     ):
         v = self.get_volume()
         S_max = self.df[method].max()
         S_sum = self.df[method].sum(skipna=True)
-        S_sum_div = S_sum / (len(self.df) * S_max)
-        G = S_sum_div / v
+        if isNormalized:
+            S_sum_div = S_sum / (len(self.df) * S_max)
+            G = S_sum_div / v
+        else:
+            G = S_sum / len(self.df)
         return G
 
     def iter_calc_global_indice(
@@ -122,6 +126,7 @@ class WorkSpace(PlotlyWorkSpace):
         method="yoshikawa",
         axes="all",
         max_samples=20000,
+        is_normalized=False,
     ):
         """
         Computes the global indices for a given robotic manipulator.
@@ -142,7 +147,7 @@ class WorkSpace(PlotlyWorkSpace):
             metric=method,
         )
         prev_G = 0
-        current_G = self.calc_global_indice(method=method)
+        current_G = self.calc_global_indice(method=method, isNormalized=is_normalized)
         err_relative = np.abs(prev_G - current_G) / current_G
         iteration = 1
         while err_relative > error_tolerance_percentage and len(self.df) < max_samples:
@@ -154,7 +159,9 @@ class WorkSpace(PlotlyWorkSpace):
                 metric=method,
             )
             prev_G = current_G
-            current_G = self.calc_global_indice(method=method)
+            current_G = self.calc_global_indice(
+                method=method, isNormalized=is_normalized
+            )
             err_relative = np.abs(prev_G - current_G) / current_G
             iteration += 1
             # if len(self.df) % 10 == 0:
