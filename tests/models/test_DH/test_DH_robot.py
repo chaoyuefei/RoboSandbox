@@ -167,7 +167,7 @@ if __name__ == "__main__":
     # test_GenericTwo_define()
     # test_GenericTwo_plotly()
     # test_Panda_define()
-    # test_Panda_plotly()
+    test_Panda_plotly()
     # test_Panda_workspace()
     # test_Puma560_define()
     # test_Puma560_plotly()

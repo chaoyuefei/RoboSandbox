@@ -20,51 +20,103 @@ app.layout = dbc.Container(
                 dbc.Col(
                     [
                         # Key Parameters Section
-                        html.Div(
-                            [
-                                html.H5("Key Parameters"),
-                                html.P("Degrees of Freedom (DOFs):"),
-                                dcc.Slider(
-                                    id="dofs_slider",
-                                    min=2,
-                                    max=7,
-                                    step=1,
-                                    value=2,
-                                    marks={i: str(i) for i in range(2, 8)},
-                                    tooltip={
-                                        "always_visible": True,
-                                        "placement": "bottom",
-                                    },
-                                ),
-                                html.Div(id="dofs_display", style={"margin": "10px 0"}),
-                                html.P(
-                                    "Link Lengths [m] (comma-separated, e.g., 1,1.5,2):"
-                                ),
-                                dcc.Input(
-                                    id="link_lengths",
-                                    value="0.4,0.4,0.4,0.4",
-                                    type="text",
-                                    style={"width": "100%"},
-                                ),
-                                html.P(
-                                    "Alpha Angles [deg] (comma-separated, e.g., 0,30,45):"
-                                ),
-                                dcc.Input(
-                                    id="alpha",
-                                    value="90,0,0,0",
-                                    type="text",
-                                    style={"width": "100%"},
-                                ),
-                                html.P("qs [deg] (comma-separated, e.g., 0,30,45):"),
-                                dcc.Input(
-                                    id="qs",
-                                    value="90,0,0,0",
-                                    type="text",
-                                    style={"width": "100%"},
-                                ),
-                            ]
+                        dbc.Button(
+                            "Key Parameters", id="parameters_button", className="mb-3"
                         ),
-                        html.Div(style={"height": "20px"}),
+                        dbc.Collapse(
+                            dbc.Card(
+                                dbc.CardBody(
+                                    [
+                                        html.P("Degrees of Freedom (DOFs):"),
+                                        dcc.Slider(
+                                            id="dofs_slider",
+                                            min=2,
+                                            max=7,
+                                            step=1,
+                                            value=2,
+                                            marks={i: str(i) for i in range(2, 8)},
+                                            tooltip={
+                                                "always_visible": True,
+                                                "placement": "bottom",
+                                            },
+                                        ),
+                                        html.Div(
+                                            id="dofs_display",
+                                            style={"margin": "10px 0"},
+                                        ),
+                                        html.P(
+                                            "Link Lengths [m] (comma-separated, e.g., 1,1.5,2):"
+                                        ),
+                                        dcc.Input(
+                                            id="link_lengths",
+                                            value="0.4,0.4,0.4,0.4",
+                                            type="text",
+                                            style={"width": "100%"},
+                                        ),
+                                        html.P(
+                                            "Alpha Angles [deg] (comma-separated, e.g., 0,30,45):"
+                                        ),
+                                        dcc.Input(
+                                            id="alpha",
+                                            value="90,0,0,0",
+                                            type="text",
+                                            style={"width": "100%"},
+                                        ),
+                                        html.P(
+                                            "qs [deg] (comma-separated, e.g., 0,30,45):"
+                                        ),
+                                        dcc.Input(
+                                            id="qs",
+                                            value="90,0,0,0",
+                                            type="text",
+                                            style={"width": "100%"},
+                                        ),
+                                    ]
+                                )
+                            ),
+                            id="parameters_collapse",
+                            is_open=False,
+                        ),
+                        html.Hr(),
+                        # Advanced Settings Section (if needed)
+                        dbc.Button(
+                            "Advanced Settings", id="advanced_button", className="mb-3"
+                        ),
+                        dbc.Collapse(
+                            dbc.Card(
+                                dbc.CardBody(
+                                    [
+                                        html.P("Workspace Settings:"),
+                                        html.P("Initial Samples:"),
+                                        dcc.Input(
+                                            id="initial_samples",
+                                            value="5000",
+                                            type="number",
+                                            style={"width": "100%"},
+                                        ),
+                                        html.P("Batch Ratio:"),
+                                        dcc.Input(
+                                            id="batch_ratio",
+                                            value="0.1",
+                                            type="number",
+                                            step=0.01,
+                                            style={"width": "100%"},
+                                        ),
+                                        html.P("Error Tolerance (%):"),
+                                        dcc.Input(
+                                            id="error_tolerance",
+                                            value="0.001",
+                                            type="number",
+                                            step=0.0001,
+                                            style={"width": "100%"},
+                                        ),
+                                    ]
+                                )
+                            ),
+                            id="advanced_collapse",
+                            is_open=False,
+                        ),
+                        html.Hr(),
                         # Command Section
                         html.Div(
                             [
@@ -125,6 +177,28 @@ def initialize_robot(dofs, link_lengths, alpha):
 
 
 @app.callback(
+    Output("parameters_collapse", "is_open"),
+    [Input("parameters_button", "n_clicks")],
+    [State("parameters_collapse", "is_open")],
+)
+def toggle_parameters_collapse(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("advanced_collapse", "is_open"),
+    [Input("advanced_button", "n_clicks")],
+    [State("advanced_collapse", "is_open")],
+)
+def toggle_advanced_collapse(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+
+@app.callback(
     Output("dofs_display", "children"),
     Input("dofs_slider", "value"),
 )
@@ -141,9 +215,20 @@ def update_dofs_display(selected_dofs):
     State("link_lengths", "value"),
     State("alpha", "value"),
     State("qs", "value"),
+    State("initial_samples", "value"),
+    State("batch_ratio", "value"),
+    State("error_tolerance", "value"),
 )
 def update_visualization(
-    generate_clicks, workspace_clicks, dofs, link_lengths, alpha, qs
+    generate_clicks,
+    workspace_clicks,
+    dofs,
+    link_lengths,
+    alpha,
+    qs,
+    initial_samples,
+    batch_ratio,
+    error_tolerance,
 ):
     ctx = dash.callback_context
 
@@ -164,8 +249,14 @@ def update_visualization(
         link_lengths = [float(length.strip()) for length in link_lengths.split(",")]
         alpha = [float(angle.strip()) for angle in alpha.split(",")]
         qs = [float(q.strip()) for q in qs.split(",")]
+
+        # Parse advanced settings
+        initial_samples = int(initial_samples) if initial_samples else 5000
+        batch_ratio = float(batch_ratio) if batch_ratio else 0.1
+        error_tolerance = float(error_tolerance) if error_tolerance else 0.001
+
     except ValueError:
-        return fig, "Please enter valid numbers for link lengths, alpha angles, and qs."
+        return fig, "Please enter valid numbers for input parameters."
 
     try:
         # Initialize robot
@@ -183,9 +274,9 @@ def update_visualization(
 
             ws = WorkSpace(robot)
             G = ws.iter_calc_global_indice(
-                initial_samples=5000,
-                batch_ratio=0.1,
-                error_tolerance_percentage=1e-3,
+                initial_samples=initial_samples,
+                batch_ratio=batch_ratio,
+                error_tolerance_percentage=error_tolerance,
                 method="invcondition",
                 axes="all",
                 max_samples=50000,
@@ -196,7 +287,6 @@ def update_visualization(
 
         # Update layout if necessary
         fig.update_layout(
-            # title="Robot Visualization",
             scene=dict(
                 xaxis=dict(title="X", range=[-2, 2]),
                 yaxis=dict(title="Y", range=[-2, 2]),
