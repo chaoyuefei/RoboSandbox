@@ -33,49 +33,101 @@ app.layout = dbc.Container(
                             dbc.Card(
                                 dbc.CardBody(
                                     [
-                                        html.P("Degrees of Freedom (DOFs):"),
-                                        dcc.Slider(
-                                            id="dofs_slider",
-                                            min=2,
-                                            max=7,
-                                            step=1,
-                                            value=2,
-                                            marks={i: str(i) for i in range(2, 8)},
-                                            tooltip={
-                                                "always_visible": True,
-                                                "placement": "bottom",
-                                            },
+                                        html.P("Select Robot:"),
+                                        # Simplified dropdown with all robots in a single list
+                                        dcc.Dropdown(
+                                            id="robot_selection",
+                                            options=[
+                                                {
+                                                    "label": "Franka Emika Panda",
+                                                    "value": "panda",
+                                                },
+                                                {
+                                                    "label": "Puma 560",
+                                                    "value": "puma560",
+                                                },
+                                                {
+                                                    "label": "Generic 2 DOFs",
+                                                    "value": "generic_2",
+                                                },
+                                                {
+                                                    "label": "Generic 3 DOFs",
+                                                    "value": "generic_3",
+                                                },
+                                                {
+                                                    "label": "Generic 4 DOFs",
+                                                    "value": "generic_4",
+                                                },
+                                                {
+                                                    "label": "Generic 5 DOFs",
+                                                    "value": "generic_5",
+                                                },
+                                                {
+                                                    "label": "Generic 6 DOFs",
+                                                    "value": "generic_6",
+                                                },
+                                                {
+                                                    "label": "Generic 7 DOFs",
+                                                    "value": "generic_7",
+                                                },
+                                            ],
+                                            value="generic_2",
+                                            clearable=False,
+                                            style={"width": "100%"},
                                         ),
                                         html.Div(
-                                            id="dofs_display",
+                                            id="robot_info_display",
                                             style={"margin": "10px 0"},
                                         ),
-                                        html.P(
-                                            "Link Lengths [m] (comma-separated, e.g., 1,1.5,2):"
+                                        # Parameters section (shown only for generic robots)
+                                        html.Div(
+                                            id="generic_robot_params",
+                                            children=[
+                                                html.P(
+                                                    "Link Lengths [m] (comma-separated, e.g., 1,1.5,2):"
+                                                ),
+                                                dcc.Input(
+                                                    id="link_lengths",
+                                                    value="0.4,0.4,0.4,0.4",
+                                                    type="text",
+                                                    style={"width": "100%"},
+                                                ),
+                                                html.P(
+                                                    "Alpha Angles [deg] (comma-separated, e.g., 0,30,45):"
+                                                ),
+                                                dcc.Input(
+                                                    id="alpha",
+                                                    value="90,0,0,0",
+                                                    type="text",
+                                                    style={"width": "100%"},
+                                                ),
+                                                html.P(
+                                                    "qs [deg] (comma-separated, e.g., 0,30,45):"
+                                                ),
+                                                dcc.Input(
+                                                    id="qs",
+                                                    value="90,0,0,0",
+                                                    type="text",
+                                                    style={"width": "100%"},
+                                                ),
+                                            ],
+                                            style={"display": "block"},
                                         ),
-                                        dcc.Input(
-                                            id="link_lengths",
-                                            value="0.4,0.4,0.4,0.4",
-                                            type="text",
-                                            style={"width": "100%"},
-                                        ),
-                                        html.P(
-                                            "Alpha Angles [deg] (comma-separated, e.g., 0,30,45):"
-                                        ),
-                                        dcc.Input(
-                                            id="alpha",
-                                            value="90,0,0,0",
-                                            type="text",
-                                            style={"width": "100%"},
-                                        ),
-                                        html.P(
-                                            "qs [deg] (comma-separated, e.g., 0,30,45):"
-                                        ),
-                                        dcc.Input(
-                                            id="qs",
-                                            value="90,0,0,0",
-                                            type="text",
-                                            style={"width": "100%"},
+                                        # Joint configuration for commercial robots
+                                        html.Div(
+                                            id="commercial_robot_params",
+                                            children=[
+                                                html.P(
+                                                    "Joint configuration [deg] (comma-separated):"
+                                                ),
+                                                dcc.Input(
+                                                    id="commercial_qs",
+                                                    value="0,0,0,0,0,0,0",
+                                                    type="text",
+                                                    style={"width": "100%"},
+                                                ),
+                                            ],
+                                            style={"display": "none"},
                                         ),
                                     ]
                                 )
@@ -166,7 +218,7 @@ app.layout = dbc.Container(
                                 html.H5("Command"),
                                 html.Div(style={"height": "10px"}),
                                 dbc.Button(
-                                    "Generate Robot Arm",
+                                    "Display Robot Arm",
                                     id="generate_button",
                                     color="primary",
                                     style={"width": "40%"},
@@ -204,21 +256,71 @@ app.layout = dbc.Container(
 )
 
 
-def initialize_robot(dofs, link_lengths, alpha):
-    """Helper function to initialize the robot based on DOFs."""
-    alpha_rad = [np.deg2rad(a) for a in alpha]
-    robot_classes = {
-        2: rsb.models.DH.Generic.GenericTwo,
-        3: rsb.models.DH.Generic.GenericThree,
-        4: rsb.models.DH.Generic.GenericFour,
-        5: rsb.models.DH.Generic.GenericFive,
-        6: rsb.models.DH.Generic.GenericSix,
-        7: rsb.models.DH.Generic.GenericSeven,
-    }
-    robot_class = robot_classes.get(dofs)
-    if not robot_class:
-        raise ValueError(f"DOFs of {dofs} not supported.")
-    return robot_class(linklengths=link_lengths, alpha=alpha_rad)
+def get_robot(robot_selection, link_lengths=None, alpha=None):
+    """Helper function to initialize the robot based on selection."""
+    # Commercial robots
+    if robot_selection == "panda":
+        return rsb.models.DH.Panda()
+    elif robot_selection == "puma560":
+        return rsb.models.DH.Puma560()
+
+    # Generic robots
+    elif robot_selection.startswith("generic_"):
+        dofs = int(robot_selection.split("_")[1])
+        alpha_rad = [np.deg2rad(a) for a in alpha]
+
+        robot_classes = {
+            2: rsb.models.DH.Generic.GenericTwo,
+            3: rsb.models.DH.Generic.GenericThree,
+            4: rsb.models.DH.Generic.GenericFour,
+            5: rsb.models.DH.Generic.GenericFive,
+            6: rsb.models.DH.Generic.GenericSix,
+            7: rsb.models.DH.Generic.GenericSeven,
+        }
+        robot_class = robot_classes.get(dofs)
+        if not robot_class:
+            raise ValueError(f"DOFs of {dofs} not supported.")
+        return robot_class(linklengths=link_lengths, alpha=alpha_rad)
+
+    else:
+        raise ValueError(f"Robot selection '{robot_selection}' not recognized.")
+
+
+@app.callback(
+    [
+        Output("robot_info_display", "children"),
+        Output("generic_robot_params", "style"),
+        Output("commercial_robot_params", "style"),
+        Output("commercial_qs", "value"),
+    ],
+    Input("robot_selection", "value"),
+)
+def update_robot_info(robot_selection):
+    """Update the display based on robot selection."""
+    if robot_selection.startswith("generic_"):
+        dofs = int(robot_selection.split("_")[1])
+        return (
+            f"Selected Generic Robot with {dofs} DOFs",
+            {"display": "block"},  # Show generic robot parameters
+            {"display": "none"},  # Hide commercial robot parameters
+            "0,0,0,0,0,0,0",  # Default joint values
+        )
+    elif robot_selection == "panda":
+        return (
+            "Selected Franka Emika Panda (7 DOFs)",
+            {"display": "none"},  # Hide generic robot parameters
+            {"display": "block"},  # Show commercial robot parameters
+            "0,0,0,0,0,0,0",  # Default joint values for Panda
+        )
+    elif robot_selection == "puma560":
+        return (
+            "Selected Puma 560 (6 DOFs)",
+            {"display": "none"},  # Hide generic robot parameters
+            {"display": "block"},  # Show commercial robot parameters
+            "0,0,0,0,0,0",  # Default joint values for Puma 560
+        )
+    else:
+        return ("Invalid robot selection", {"display": "none"}, {"display": "none"}, "")
 
 
 @app.callback(
@@ -244,22 +346,15 @@ def toggle_advanced_collapse(n_clicks, is_open):
 
 
 @app.callback(
-    Output("dofs_display", "children"),
-    Input("dofs_slider", "value"),
-)
-def update_dofs_display(selected_dofs):
-    return f"Selected DOFs: {selected_dofs}"
-
-
-@app.callback(
     Output("main_display", "figure"),
     Output("output", "children"),
     Input("generate_button", "n_clicks"),
     Input("workspace_button", "n_clicks"),
-    State("dofs_slider", "value"),
+    State("robot_selection", "value"),
     State("link_lengths", "value"),
     State("alpha", "value"),
     State("qs", "value"),
+    State("commercial_qs", "value"),
     State("initial_samples", "value"),
     State("batch_ratio", "value"),
     State("error_tolerance", "value"),
@@ -269,10 +364,11 @@ def update_dofs_display(selected_dofs):
 def update_visualization(
     generate_clicks,
     workspace_clicks,
-    dofs,
+    robot_selection,
     link_lengths,
     alpha,
-    qs,
+    generic_qs,
+    commercial_qs,
     initial_samples,
     batch_ratio,
     error_tolerance,
@@ -294,10 +390,19 @@ def update_visualization(
         return fig, message
 
     try:
+        # Determine if we're using a commercial or generic robot
+        is_commercial = not robot_selection.startswith("generic_")
+
         # Parse input values
-        link_lengths = [float(length.strip()) for length in link_lengths.split(",")]
-        alpha = [float(angle.strip()) for angle in alpha.split(",")]
-        qs = [float(q.strip()) for q in qs.split(",")]
+        if is_commercial:
+            qs = [float(q.strip()) for q in commercial_qs.split(",")]
+            # Commercial robots have pre-defined parameters
+            link_lengths = None
+            alpha = None
+        else:
+            qs = [float(q.strip()) for q in generic_qs.split(",")]
+            link_lengths = [float(length.strip()) for length in link_lengths.split(",")]
+            alpha = [float(angle.strip()) for angle in alpha.split(",")]
 
         # Parse advanced settings
         initial_samples = int(initial_samples) if initial_samples else 5000
@@ -309,13 +414,22 @@ def update_visualization(
 
     try:
         # Initialize robot
-        robot = initialize_robot(dofs, link_lengths, alpha)
+        robot = get_robot(robot_selection, link_lengths, alpha)
+
+        # Generate descriptive robot name for feedback messages
+        if robot_selection == "panda":
+            robot_name = "Franka Emika Panda"
+        elif robot_selection == "puma560":
+            robot_name = "Puma 560"
+        else:
+            dofs = robot_selection.split("_")[1]
+            robot_name = f"Generic {dofs} DOF Robot"
 
         # Plot the robot arm
         if button_id == "generate_button":
             fig = go.Figure()
             robot.plotly(np.deg2rad(qs), isShow=False, fig=fig, isUpdate=True)
-            message = f"Generated a robotic arm with {dofs} DOFs."
+            message = f"Generated {robot_name}."
 
         elif button_id == "workspace_button":
             fig = go.Figure()
@@ -326,8 +440,8 @@ def update_visualization(
                 initial_samples=initial_samples,
                 batch_ratio=batch_ratio,
                 error_tolerance_percentage=error_tolerance,
-                method=method,  # Use the method from dropdown
-                axes=axes,  # Use the axes setting from dropdown
+                method=method,
+                axes=axes,
                 max_samples=50000,
             )
             ws.plot(color=method, fig=fig, isShow=False)
@@ -340,7 +454,7 @@ def update_visualization(
                 else "translation axes only"
             )
             message = (
-                f"Performed workspace analysis for a {dofs} DOF robot using:\n"
+                f"Performed workspace analysis for {robot_name} using:\n"
                 f"• Method: {method}\n"
                 f"• Axes: {axes_desc}\n"
                 f"• Initial samples: {initial_samples}\n"
