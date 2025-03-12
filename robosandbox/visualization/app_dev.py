@@ -19,9 +19,15 @@ app.layout = dbc.Container(
                 html.Hr(),
                 dbc.Col(
                     [
+                        html.H5("Parameters"),
+                        html.Div(style={"height": "10px"}),
                         # Key Parameters Section
                         dbc.Button(
-                            "Key Parameters", id="parameters_button", className="mb-3"
+                            "Kinematic Configuration",
+                            id="parameters_button",
+                            color="info",
+                            className="mb-3",
+                            style={"width": "40%"},
                         ),
                         dbc.Collapse(
                             dbc.Card(
@@ -77,10 +83,15 @@ app.layout = dbc.Container(
                             id="parameters_collapse",
                             is_open=False,
                         ),
-                        html.Hr(),
+                        # html.Hr(),
+                        html.Div(style={"height": "5px"}),
                         # Advanced Settings Section
                         dbc.Button(
-                            "Advanced Settings", id="advanced_button", className="mb-3"
+                            "Workspace Settings",
+                            id="advanced_button",
+                            color="info",
+                            className="mb-3",
+                            style={"width": "40%"},
                         ),
                         dbc.Collapse(
                             dbc.Card(
@@ -153,17 +164,19 @@ app.layout = dbc.Container(
                         html.Div(
                             [
                                 html.H5("Command"),
+                                html.Div(style={"height": "10px"}),
                                 dbc.Button(
                                     "Generate Robot Arm",
                                     id="generate_button",
                                     color="primary",
-                                    style={"margin": "5px"},
+                                    style={"width": "40%"},
                                 ),
+                                html.Div(style={"height": "20px"}),
                                 dbc.Button(
                                     "Workspace Analysis",
                                     id="workspace_button",
                                     color="primary",
-                                    style={"margin": "5px"},
+                                    style={"width": "40%"},
                                 ),
                             ]
                         ),
