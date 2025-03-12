@@ -253,6 +253,17 @@ app.layout = dbc.Container(
                     [
                         html.H5("Results"),
                         html.Div(style={"height": "10px"}),
+                        # Add table to display results
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    # html.H5("Robot Metrics", className="card-title"),
+                                    html.Div(
+                                        id="results_table"
+                                    ),  # This will contain the table
+                                ]
+                            )
+                        ),
                     ],
                     width=3,
                 ),
@@ -385,8 +396,11 @@ def toggle_advanced_collapse(n_clicks, is_open):
 
 
 @app.callback(
-    Output("main_display", "figure"),
-    Output("output", "children"),
+    [
+        Output("main_display", "figure"),
+        Output("output", "children"),
+        Output("results_table", "children"),  # Add new output for the results table
+    ],
     Input("generate_button", "n_clicks"),
     Input("workspace_button", "n_clicks"),
     State("robot_selection", "value"),
@@ -424,9 +438,10 @@ def update_visualization(
     # Initialize empty figure and default message
     fig = go.Figure()
     message = "Please click a button to generate visualization."
+    results_table = html.P("No data available. Run workspace analysis to see results.")
 
     if button_id is None:
-        return fig, message
+        return fig, message, results_table
 
     try:
         # Determine if we're using a commercial or generic robot
@@ -449,7 +464,7 @@ def update_visualization(
         error_tolerance = float(error_tolerance) if error_tolerance else 0.001
 
     except ValueError:
-        return fig, "Please enter valid numbers for input parameters."
+        return fig, "Please enter valid numbers for input parameters.", results_table
 
     try:
         # Initialize robot
@@ -464,11 +479,55 @@ def update_visualization(
             dofs = robot_selection.split("_")[1]
             robot_name = f"Generic {dofs} DOF Robot"
 
+        # Calculate total arm length
+        total_length = 0
+        if is_commercial:
+            # For commercial robots, sum the a values from DH parameters
+            # total_length = sum([abs(dh[0]) for dh in robot.dh_params])
+            # if robot_selection == "panda":
+            #     total_length =
+            total_length = "N/A"
+        else:
+            # For generic robots, use the provided link lengths
+            total_length = sum(link_lengths)
+
+        # Create table with only length for now
+        if total_length == "N/A":
+            text_length = "N/A"
+        else:
+            text_length = f"{total_length:.3f}"
+
         # Plot the robot arm
         if button_id == "generate_button":
             fig = go.Figure()
             robot.plotly(np.deg2rad(qs), isShow=False, fig=fig, isUpdate=True)
             message = f"Generated {robot_name}."
+
+            results_table = dbc.Table(
+                [
+                    html.Thead(html.Tr([html.Th("Metric"), html.Th("Value")])),
+                    html.Tbody(
+                        [
+                            html.Tr(
+                                [
+                                    html.Td("Total Arm Length [m]"),
+                                    html.Td(text_length),
+                                ]
+                            ),
+                            html.Tr(
+                                [
+                                    html.Td("Global Manipulability (G)"),
+                                    html.Td("Run workspace analysis"),
+                                ]
+                            ),
+                        ]
+                    ),
+                ],
+                bordered=True,
+                hover=True,
+                striped=True,
+                size="sm",
+            )
 
         elif button_id == "workspace_button":
             fig = go.Figure()
@@ -501,6 +560,35 @@ def update_visualization(
                 f"• Error tolerance: {error_tolerance}"
             )
 
+            # Create updated table with both length and global manipulability
+            results_table = dbc.Table(
+                [
+                    html.Thead(html.Tr([html.Th("Metric"), html.Th("Value")])),
+                    html.Tbody(
+                        [
+                            html.Tr(
+                                [
+                                    html.Td("Total Arm Length [m]"),
+                                    html.Td(text_length),
+                                ]
+                            ),
+                            html.Tr(
+                                [
+                                    html.Td("Global Manipulability (G)"),
+                                    html.Td(f"{G:.6f}"),
+                                ]
+                            ),
+                            html.Tr([html.Td("Method"), html.Td(f"{method}")]),
+                            html.Tr([html.Td("Axes"), html.Td(f"{axes_desc}")]),
+                        ]
+                    ),
+                ],
+                bordered=True,
+                hover=True,
+                striped=True,
+                size="sm",
+            )
+
         # Update layout if necessary
         fig.update_layout(
             scene=dict(
@@ -512,9 +600,9 @@ def update_visualization(
         )
 
     except Exception as e:
-        return dash.no_update, f"Error: {e}"
+        return fig, f"Error: {e}", results_table
 
-    return fig, message
+    return fig, message, results_table
 
 
 if __name__ == "__main__":
