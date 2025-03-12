@@ -78,7 +78,7 @@ app.layout = dbc.Container(
                             is_open=False,
                         ),
                         html.Hr(),
-                        # Advanced Settings Section (if needed)
+                        # Advanced Settings Section
                         dbc.Button(
                             "Advanced Settings", id="advanced_button", className="mb-3"
                         ),
@@ -108,6 +108,38 @@ app.layout = dbc.Container(
                                             value="0.001",
                                             type="number",
                                             step=0.0001,
+                                            style={"width": "100%"},
+                                        ),
+                                        html.P("Method:"),
+                                        dcc.Dropdown(
+                                            id="method_dropdown",
+                                            options=[
+                                                {
+                                                    "label": "Inverse Condition",
+                                                    "value": "invcondition",
+                                                },
+                                                {
+                                                    "label": "Yoshikawa",
+                                                    "value": "yoshikawa",
+                                                },
+                                            ],
+                                            value="invcondition",
+                                            style={"width": "100%"},
+                                        ),
+                                        html.P("Axes:"),
+                                        dcc.Dropdown(
+                                            id="axes_dropdown",
+                                            options=[
+                                                {
+                                                    "label": "All (Translation + Rotation)",
+                                                    "value": "all",
+                                                },
+                                                {
+                                                    "label": "Translation Only",
+                                                    "value": "trans",
+                                                },
+                                            ],
+                                            value="all",
                                             style={"width": "100%"},
                                         ),
                                     ]
@@ -218,6 +250,8 @@ def update_dofs_display(selected_dofs):
     State("initial_samples", "value"),
     State("batch_ratio", "value"),
     State("error_tolerance", "value"),
+    State("method_dropdown", "value"),
+    State("axes_dropdown", "value"),
 )
 def update_visualization(
     generate_clicks,
@@ -229,6 +263,8 @@ def update_visualization(
     initial_samples,
     batch_ratio,
     error_tolerance,
+    method,
+    axes,
 ):
     ctx = dash.callback_context
 
@@ -277,13 +313,27 @@ def update_visualization(
                 initial_samples=initial_samples,
                 batch_ratio=batch_ratio,
                 error_tolerance_percentage=error_tolerance,
-                method="invcondition",
-                axes="all",
+                method=method,  # Use the method from dropdown
+                axes=axes,  # Use the axes setting from dropdown
                 max_samples=50000,
             )
-            ws.plot(color="invcondition", fig=fig, isShow=False)
+            ws.plot(color=method, fig=fig, isShow=False)
             fig.update_layout(showlegend=False)
-            message = f"Performed workspace analysis for a {dofs} DOF robot."
+
+            # Create detailed message with all settings
+            axes_desc = (
+                "all axes (translation + rotation)"
+                if axes == "all"
+                else "translation axes only"
+            )
+            message = (
+                f"Performed workspace analysis for a {dofs} DOF robot using:\n"
+                f"• Method: {method}\n"
+                f"• Axes: {axes_desc}\n"
+                f"• Initial samples: {initial_samples}\n"
+                f"• Batch ratio: {batch_ratio}\n"
+                f"• Error tolerance: {error_tolerance}"
+            )
 
         # Update layout if necessary
         fig.update_layout(
