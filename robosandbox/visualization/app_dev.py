@@ -88,7 +88,7 @@ app.layout = dbc.Container(
                                                 ),
                                                 dcc.Input(
                                                     id="link_lengths",
-                                                    value="0.4,0.4,0.4,0.4",
+                                                    value="0.4,0.4",
                                                     type="text",
                                                     style={"width": "100%"},
                                                 ),
@@ -97,7 +97,7 @@ app.layout = dbc.Container(
                                                 ),
                                                 dcc.Input(
                                                     id="alpha",
-                                                    value="90,0,0,0",
+                                                    value="90,0",
                                                     type="text",
                                                     style={"width": "100%"},
                                                 ),
@@ -106,7 +106,7 @@ app.layout = dbc.Container(
                                                 ),
                                                 dcc.Input(
                                                     id="qs",
-                                                    value="90,0,0,0",
+                                                    value="0,0",
                                                     type="text",
                                                     style={"width": "100%"},
                                                 ),
@@ -292,18 +292,36 @@ def get_robot(robot_selection, link_lengths=None, alpha=None):
         Output("generic_robot_params", "style"),
         Output("commercial_robot_params", "style"),
         Output("commercial_qs", "value"),
+        # Add these new outputs
+        Output("link_lengths", "value"),
+        Output("alpha", "value"),
+        Output("qs", "value"),
     ],
     Input("robot_selection", "value"),
 )
 def update_robot_info(robot_selection):
-    """Update the display based on robot selection."""
+    """Update the display and parameter fields based on robot selection."""
     if robot_selection.startswith("generic_"):
         dofs = int(robot_selection.split("_")[1])
+
+        # Create default values based on the number of DOFs
+        default_link_lengths = ",".join(["0.4"] * dofs)
+
+        # For alpha angles, typically first joint is 90 degrees, rest are 0
+        default_alpha = ["90"] + ["0"] * (dofs - 1)
+        default_alpha_str = ",".join(default_alpha)
+
+        # Default joint angles all set to 0
+        default_qs = ",".join(["0"] * dofs)
+
         return (
             f"Selected Generic Robot with {dofs} DOFs",
             {"display": "block"},  # Show generic robot parameters
             {"display": "none"},  # Hide commercial robot parameters
-            "0,0,0,0,0,0,0",  # Default joint values
+            "0,0,0,0,0,0,0",  # Default joint values for commercial (not used)
+            default_link_lengths,  # Update link lengths based on DOFs
+            default_alpha_str,  # Update alpha angles based on DOFs
+            default_qs,  # Update qs values based on DOFs
         )
     elif robot_selection == "panda":
         return (
@@ -311,6 +329,9 @@ def update_robot_info(robot_selection):
             {"display": "none"},  # Hide generic robot parameters
             {"display": "block"},  # Show commercial robot parameters
             "0,0,0,0,0,0,0",  # Default joint values for Panda
+            "0.4,0.4,0.4,0.4,0.4,0.4,0.4",  # Not used but needed for output
+            "90,0,0,0,0,0,0",  # Not used but needed for output
+            "0,0,0,0,0,0,0",  # Not used but needed for output
         )
     elif robot_selection == "puma560":
         return (
@@ -318,9 +339,20 @@ def update_robot_info(robot_selection):
             {"display": "none"},  # Hide generic robot parameters
             {"display": "block"},  # Show commercial robot parameters
             "0,0,0,0,0,0",  # Default joint values for Puma 560
+            "0.4,0.4,0.4,0.4,0.4,0.4",  # Not used but needed for output
+            "90,0,0,0,0,0",  # Not used but needed for output
+            "0,0,0,0,0,0",  # Not used but needed for output
         )
     else:
-        return ("Invalid robot selection", {"display": "none"}, {"display": "none"}, "")
+        return (
+            "Invalid robot selection",
+            {"display": "none"},
+            {"display": "none"},
+            "",
+            "",
+            "",
+            "",
+        )
 
 
 @app.callback(
