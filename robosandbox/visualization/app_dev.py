@@ -205,6 +205,24 @@ app.layout = dbc.Container(
                                             value="all",
                                             style={"width": "100%"},
                                         ),
+                                        html.P("Normalization:"),
+                                        dcc.Slider(
+                                            id="ws_normalization_slider",
+                                            min=0,
+                                            max=1,
+                                            step=1,
+                                            marks={
+                                                0: {
+                                                    "label": "False",
+                                                    "style": {"color": "#77b0b1"},
+                                                },
+                                                1: {
+                                                    "label": "True",
+                                                    "style": {"color": "#77b0b1"},
+                                                },
+                                            },
+                                            value=0,
+                                        ),
                                     ]
                                 )
                             ),
@@ -413,6 +431,7 @@ def toggle_advanced_collapse(n_clicks, is_open):
     State("error_tolerance", "value"),
     State("method_dropdown", "value"),
     State("axes_dropdown", "value"),
+    State("ws_normalization_slider", "value"),  # Added normalization slider state
 )
 def update_visualization(
     generate_clicks,
@@ -427,6 +446,7 @@ def update_visualization(
     error_tolerance,
     method,
     axes,
+    is_normalized_value,  # New parameter
 ):
     ctx = dash.callback_context
 
@@ -462,6 +482,9 @@ def update_visualization(
         initial_samples = int(initial_samples) if initial_samples else 5000
         batch_ratio = float(batch_ratio) if batch_ratio else 0.1
         error_tolerance = float(error_tolerance) if error_tolerance else 0.001
+
+        # Convert slider value to boolean
+        is_normalized = bool(is_normalized_value)
 
     except ValueError:
         return fig, "Please enter valid numbers for input parameters.", results_table
@@ -541,6 +564,7 @@ def update_visualization(
                 method=method,
                 axes=axes,
                 max_samples=50000,
+                is_normalized=is_normalized,  # Use the slider value here
             )
             ws.plot(color=method, fig=fig, isShow=False)
             fig.update_layout(showlegend=False)
@@ -557,7 +581,8 @@ def update_visualization(
                 f"• Axes: {axes_desc}\n"
                 f"• Initial samples: {initial_samples}\n"
                 f"• Batch ratio: {batch_ratio}\n"
-                f"• Error tolerance: {error_tolerance}"
+                f"• Error tolerance: {error_tolerance}\n"
+                f"• Normalization: {is_normalized}"
             )
 
             # Create updated table with both length and global manipulability
@@ -580,6 +605,9 @@ def update_visualization(
                             ),
                             html.Tr([html.Td("Method"), html.Td(f"{method}")]),
                             html.Tr([html.Td("Axes"), html.Td(f"{axes_desc}")]),
+                            html.Tr(
+                                [html.Td("Normalization"), html.Td(f"{is_normalized}")]
+                            ),
                         ]
                     ),
                 ],
