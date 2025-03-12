@@ -27,7 +27,7 @@ app.layout = dbc.Container(
                             id="parameters_button",
                             color="info",
                             className="mb-3",
-                            style={"width": "40%"},
+                            style={"width": "80%"},
                         ),
                         dbc.Collapse(
                             dbc.Card(
@@ -143,7 +143,7 @@ app.layout = dbc.Container(
                             id="advanced_button",
                             color="info",
                             className="mb-3",
-                            style={"width": "40%"},
+                            style={"width": "80%"},
                         ),
                         dbc.Collapse(
                             dbc.Card(
@@ -221,19 +221,19 @@ app.layout = dbc.Container(
                                     "Display Robot Arm",
                                     id="generate_button",
                                     color="primary",
-                                    style={"width": "40%"},
+                                    style={"width": "80%"},
                                 ),
                                 html.Div(style={"height": "20px"}),
                                 dbc.Button(
                                     "Workspace Analysis",
                                     id="workspace_button",
                                     color="primary",
-                                    style={"width": "40%"},
+                                    style={"width": "80%"},
                                 ),
                             ]
                         ),
                     ],
-                    width=4,
+                    width=3,
                 ),
                 dbc.Col(
                     [
@@ -247,7 +247,14 @@ app.layout = dbc.Container(
                         ),
                         html.Div(id="output", style={"margin-top": "20px"}),
                     ],
-                    width=8,
+                    width=6,
+                ),
+                dbc.Col(
+                    [
+                        html.H5("Results"),
+                        html.Div(style={"height": "10px"}),
+                    ],
+                    width=3,
                 ),
             ]
         ),
