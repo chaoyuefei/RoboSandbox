@@ -139,6 +139,8 @@ class GenericFour(DHRobot, PlotlyRobot):
             name="GenericFourDHRoboLink",
             keywords=("dynamics", "symbolic", "mesh"),
             manufacturer="chaoyue",
+            # TODO: add the meshdir
+            # meshdir="meshes/Generic/GenericFour",
         )
 
         # Ready pose: joint angles [rad]
