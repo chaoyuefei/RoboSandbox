@@ -6,6 +6,8 @@ import plotly.graph_objects as go
 import robosandbox as rsb
 import numpy as np
 from robosandbox.performance.WorkSpace import WorkSpace
+from threading import Thread
+import webview
 
 app = dash.Dash(external_stylesheets=[dbc.themes.MINTY])
 
@@ -633,5 +635,26 @@ def update_visualization(
     return fig, message, results_table
 
 
+def run_dash():
+    app.run(debug=True, use_reloader=False)
+
+
+def create_window():
+    webview.create_window(
+        "Plotly Dash App", "http://127.0.0.1:8050/", width=800, height=600
+    )
+    webview.start()
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    try:
+        run_dash_thread = Thread(target=run_dash, daemon=True)
+        run_dash_thread.start()
+
+        # Give some time for the server to start
+        import time
+
+        time.sleep(1)  # Adjust based on how long the server takes to start
+        create_window()
+    except Exception as e:
+        print(f"An error occurred: {e}")
