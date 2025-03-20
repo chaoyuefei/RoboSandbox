@@ -1,3 +1,6 @@
 build
 robosandbox.egg-info
 .DS_Store
+robosandbox/__pycache__
+robosandbox/.DS_Store
+robosandbox/geometry/.DS_Store
