@@ -136,6 +136,7 @@ app.layout = dbc.Container(
                             ),
                             id="parameters_collapse",
                             is_open=False,
+                            style={"width": "80%"},
                         ),
                         # html.Hr(),
                         html.Div(style={"height": "5px"}),
