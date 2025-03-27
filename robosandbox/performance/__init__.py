@@ -1,3 +1,3 @@
-from robosandbox.performance import WorkSpace
+from robosandbox.performance import workspace
 
-__all__ = ["WorkSpace"]
+__all__ = ["workspace"]

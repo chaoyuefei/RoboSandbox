@@ -182,6 +182,7 @@ packages = [
     "robosandbox",
     "tutorial",
     "robosandbox.performance",
+    "robosandbox.performance.workspace",
     "robosandbox.models",
     "robosandbox.models.DH",
     "robosandbox.models.DH.Generic",
