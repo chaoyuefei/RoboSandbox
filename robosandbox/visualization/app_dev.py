@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import robosandbox as rsb
 import numpy as np
-from robosandbox.performance.WorkSpace import WorkSpace
+from robosandbox.performance.workspace import WorkSpace
 from threading import Thread
 import webview
 
@@ -560,7 +560,7 @@ def update_visualization(
             robot.plotly(np.deg2rad(qs), isShow=False, fig=fig, isUpdate=True)
 
             ws = WorkSpace(robot)
-            G = ws.iter_calc_global_indice(
+            G = ws.global_indice(
                 initial_samples=initial_samples,
                 batch_ratio=batch_ratio,
                 error_tolerance_percentage=error_tolerance,
