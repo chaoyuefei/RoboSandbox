@@ -570,6 +570,16 @@ def update_visualization(
                 is_normalized=is_normalized,  # Use the slider value here
             )
             ws.plot(color=method, fig=fig, isShow=False)
+
+            # Get reach for all axes
+            reach = ws.reach(axes="all")
+            reach_x = reach[0]
+            reach_y = reach[1]
+            reach_z = reach[2]
+            text_reach_x = f"[{reach_x[0]:.3f}, {reach_x[1]:.3f}]"
+            text_reach_y = f"[{reach_y[0]:.3f}, {reach_y[1]:.3f}]"
+            text_reach_z = f"[{reach_z[0]:.3f}, {reach_z[1]:.3f}]"
+
             fig.update_layout(showlegend=False)
 
             # Create detailed message with all settings
@@ -598,6 +608,24 @@ def update_visualization(
                                 [
                                     html.Td("Total Arm Length [m]"),
                                     html.Td(text_length),
+                                ]
+                            ),
+                            html.Tr(
+                                [
+                                    html.Td("x Reach [m]"),
+                                    html.Td(text_reach_x),
+                                ]
+                            ),
+                            html.Tr(
+                                [
+                                    html.Td("y Reach [m]"),
+                                    html.Td(text_reach_y),
+                                ]
+                            ),
+                            html.Tr(
+                                [
+                                    html.Td("z Reach [m]"),
+                                    html.Td(text_reach_z),
                                 ]
                             ),
                             html.Tr(
