@@ -57,6 +57,22 @@ class BaseWorkSpace:
         max_distance = np.max(distances)
         return max_distance
 
+    def reach(self, axes="all"):
+        """
+        return the workspace reach in axis x, y, z or all axis
+        """
+        x_range = [self.df["x"].min(), self.df["x"].max()]
+        y_range = [self.df["y"].min(), self.df["y"].max()]
+        z_range = [self.df["z"].min(), self.df["z"].max()]
+        if axes == "x":
+            return x_range
+        elif axes == "y":
+            return y_range
+        elif axes == "z":
+            return z_range
+        elif axes == "all":
+            return [x_range, y_range, z_range]
+
     def get_volume(self, origin=[0, 0, 0], method="sphere"):
         if method == "sphere":
             r = self.get_max_distance(origin)
