@@ -1,7 +1,7 @@
 import marimo
 
 __generated_with = "0.11.30"
-app = marimo.App()
+app = marimo.App(width="full")
 
 
 @app.cell
@@ -9,7 +9,6 @@ def _():
     import robosandbox as rsb
     import numpy as np
     import plotly.graph_objects as go # import new fig env
-
     return go, np, rsb
 
 
@@ -23,11 +22,11 @@ def _():
 def _(mo):
     mo.md(
         r"""
-        # Models
+        # Robot Definition and Analysis
 
         The "models" subpackage offers a variety of robotic manipulator models that use different description methodologies, such as DH parameters and screw theory. Currently, all the models can be classified into three categories:
 
-        - DH: created using Denavit-Hartenberg Parameters, for example: ro⊥=rsb.⊨.DH.Ge≠ric.Ge≠ricFour()robot = rsb.models.DH.Generic.GenericFour(), powered by (roboticstoolbox-python)[https://github.com/petercorke/robotics-toolbox-python]
+        - DH: created using Denavit-Hartenberg Parameters, for example: `robot = rsb.models.DH.Generic.GenericFour()`, powered by (roboticstoolbox-python)[https://github.com/petercorke/robotics-toolbox-python]
         - DHLink: created using Denavit-Hartenberg Parameters, taking into consideration the design of the links.
         - MR: created using screw theory, based on (Modern Robotics)[https://hades.mech.northwestern.edu/index.php/Modern_Robotics] and (code)[https://github.com/NxRLab/ModernRobotics]
         """
@@ -42,7 +41,7 @@ def _(mo):
         ## DH Models
 
         ### Generic Models
-        We can easily define a robotic manipulate using DH parameters in RoboSandbox. To give a quick start, several pre-defined models are offered from 2 Dofs to 7 Dofs:
+        We can easily define a robotic manipulate using DH parameters in RoboSandbox. To give a quick start, several pre-defined models are offered **from 2 Dofs to 7 Dofs**:
         """
     )
     return
@@ -69,7 +68,7 @@ def _(mo):
         """
         ### Commercial Models
 
-        In addition to generic models, several commercial robots are available, such as Panda, Puma 560, and UR5.
+        In addition to generic models, several commercial robots are available, such as **Panda, Puma 560, and UR5**.
         """
     )
     return
@@ -122,6 +121,33 @@ def _(generic, go, np):
 
     new_robot.plotly(new_robot.qz, save=False, fig=go.Figure())
     return (new_robot,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""## Workspace Analysis""")
+    return
+
+
+@app.cell
+def _(mo, rsb):
+    import threading
+
+    # Create your Dash app but don't run the server
+    design_app = rsb.visualization.app.RobotArmDesignApp()
+
+    # Start the Dash server in background
+    dash_thread = threading.Thread(target=design_app.run_server, daemon=True)
+    dash_thread.start()
+
+    # Create iframe using HTML
+    dash_frame = mo.md("""
+    <iframe src="http://127.0.0.1:8050" width="100%" height="800px" frameborder="0"></iframe>
+    """)
+
+    # Display the iframe
+    mo.output.append(dash_frame)
+    return dash_frame, dash_thread, design_app, threading
 
 
 if __name__ == "__main__":

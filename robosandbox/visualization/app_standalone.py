@@ -6,9 +6,11 @@ import plotly.graph_objects as go
 import robosandbox as rsb
 import numpy as np
 from robosandbox.performance.workspace import WorkSpace
+from threading import Thread
+import webview
 
 
-class RobotArmDesignApp:
+class RobotArmDesignAppStandalone:
     """A Dash application for designing and analyzing robot arms."""
 
     def __init__(self):
@@ -395,6 +397,25 @@ class RobotArmDesignApp:
     def run_server(self, debug=True):
         """Run the Dash server."""
         self.app.run(debug=debug, use_reloader=False)
+
+    def create_window(self):
+        webview.create_window(
+            "Plotly Dash App", "http://127.0.0.1:8050/", width=800, height=600
+        )
+        webview.start()
+
+    def run_app(self):
+        try:
+            run_dash_thread = Thread(target=self.run_server, daemon=True)
+            run_dash_thread.start()
+
+            # Give some time for the server to start
+            import time
+
+            time.sleep(1)  # Adjust based on how long the server takes to start
+            self.create_window()
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
 
 class RobotHelper:
@@ -823,5 +844,17 @@ class VisualizationManager:
 
 # Run the application
 if __name__ == "__main__":
-    app = RobotArmDesignApp()
-    app.run_server(debug=True)
+    app = RobotArmDesignAppStandalone()
+    # app.run_server(debug=True)
+
+    try:
+        run_dash_thread = Thread(target=app.run_server, daemon=True)
+        run_dash_thread.start()
+
+        # Give some time for the server to start
+        import time
+
+        time.sleep(1)  # Adjust based on how long the server takes to start
+        app.create_window()
+    except Exception as e:
+        print(f"An error occurred: {e}")
