@@ -127,6 +127,7 @@ dependencies = [
     "dash",
     "dash-bootstrap-components",
     "pywebview",
+    "marimo",
 ]
 
 # This field lists other packages that your project depends on to run.
