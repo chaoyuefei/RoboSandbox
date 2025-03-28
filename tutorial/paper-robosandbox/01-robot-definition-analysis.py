@@ -26,7 +26,7 @@ def _(mo):
 
         The "models" subpackage offers a variety of robotic manipulator models that use different description methodologies, such as DH parameters and screw theory. Currently, all the models can be classified into three categories:
 
-        - DH: created using Denavit-Hartenberg Parameters, for example: `robot = rsb.models.DH.Generic.GenericFour()`, powered by (roboticstoolbox-python)[https://github.com/petercorke/robotics-toolbox-python]
+        - DH: created using Denavit-Hartenberg Parameters, for example: ro⊥=rsb.⊨.DH.Ge≠ric.Ge≠ricFour()robot = rsb.models.DH.Generic.GenericFour(), powered by (roboticstoolbox-python)[https://github.com/petercorke/robotics-toolbox-python]
         - DHLink: created using Denavit-Hartenberg Parameters, taking into consideration the design of the links.
         - MR: created using screw theory, based on (Modern Robotics)[https://hades.mech.northwestern.edu/index.php/Modern_Robotics] and (code)[https://github.com/NxRLab/ModernRobotics]
         """
