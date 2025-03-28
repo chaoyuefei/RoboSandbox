@@ -19,6 +19,11 @@ def _():
 
 
 @app.cell
+def _():
+    return
+
+
+@app.cell
 def _(mo):
     mo.md(
         r"""
@@ -130,24 +135,59 @@ def _(mo):
 
 
 @app.cell
-def _(mo, rsb):
-    import threading
+def _(np, robot4):
+    from robosandbox.performance.workspace import WorkSpace
+    np.random.seed(42)
 
-    # Create your Dash app but don't run the server
-    design_app = rsb.visualization.app.RobotArmDesignApp()
+    ws = WorkSpace(robot4)
+    method = "yoshikawa"
+    axes = "trans"
 
-    # Start the Dash server in background
-    dash_thread = threading.Thread(target=design_app.run_server, daemon=True)
-    dash_thread.start()
+    G = ws.global_indice(
+        initial_samples=3000,
+        batch_ratio=0.1,
+        error_tolerance_percentage=1e-2,
+        method="yoshikawa", 
+        axes=axes,
+        max_samples=20000, 
+        is_normalized=False
+    )
 
-    # Create iframe using HTML
-    dash_frame = mo.md("""
-    <iframe src="http://127.0.0.1:8050" width="100%" height="800px" frameborder="0"></iframe>
-    """)
+    return G, WorkSpace, axes, method, ws
 
-    # Display the iframe
-    mo.output.append(dash_frame)
-    return dash_frame, dash_thread, design_app, threading
+
+@app.cell
+def _(mo):
+    mo.md(r"""### GUI""")
+    return
+
+
+@app.cell
+def _():
+    # import threading
+
+    # # Create your Dash app but don't run the server
+    # design_app = rsb.visualization.app.RobotArmDesignApp()
+
+    # # Start the Dash server in background
+    # dash_thread = threading.Thread(target=design_app.run_server, daemon=True)
+    # dash_thread.start()
+
+    # # Create iframe using HTML
+    # dash_frame = mo.md("""
+    # <iframe src="http://127.0.0.1:8050" width="100%" height="800px" frameborder="0"></iframe>
+    # """)
+
+    # # Display the iframe
+    # mo.output.append(dash_frame)
+    return
+
+
+@app.cell
+def _():
+    # app = rsb.visualization.app_standalone.RobotArmDesignAppStandalone()
+    # app.run_app()
+    return
 
 
 if __name__ == "__main__":
