@@ -1,7 +1,7 @@
 import marimo
 
 __generated_with = "0.11.30"
-app = marimo.App(width="full")
+app = marimo.App(width="full", auto_download=["ipynb"])
 
 
 @app.cell
