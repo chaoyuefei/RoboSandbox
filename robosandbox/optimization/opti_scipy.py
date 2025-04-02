@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import minimize
-from .sweep import solve_sweep, SweepResults
+from .sweep import solve_sweep
 
 
 class Variable:
@@ -254,7 +254,7 @@ class Opti:
         self.objective_sense = "min"  # 'min' or 'max'
         self.parameters = {}  # For additional parameters if needed
 
-    def variable(self, init_guess, name=None, bounds=(None, None)):
+    def variable(self, init_guess=None, name=None, bounds=(None, None)):
         """
         Create and add a new variable to the environment.
 
@@ -350,23 +350,41 @@ class Opti:
 
         return Solution(result, self.variables)
 
-    def sweep(self, objective_expr):
-        """
-        Set up an objective function to be used for parameter sweeping.
+    # def sweep(self, objective_expr):
+    #     """
+    #     Set up an objective function to be used for parameter sweeping.
 
-        :param objective_expr: An Expression or function to evaluate during sweeping.
-        :return: self for method chaining
-        """
-        self.sweep_objective = objective_expr
-        return self
+    #     :param objective_expr: An Expression or function to evaluate during sweeping.
+    #     :return: self for method chaining
+    #     """
+    #     self.sweep_objective = objective_expr
+    #     return self
 
-    def solve_sweep(self, variables_dict, save_path=None, **kwargs):
-        """
-        Perform a parameter sweep by solving the optimization problem for different variable values.
+    # def solve_sweep(self, variables_dict, save_path=None, **kwargs):
+    #     """
+    #     Perform a parameter sweep by solving the optimization problem for different variable values.
 
-        :param variables_dict: Dictionary mapping Variables to lists of values or (start, stop, num_steps) tuples
-        :param save_path: Optional path to save results to CSV file
-        :param kwargs: Additional arguments to pass to solve() method
-        :return: SweepResults object containing the results of the sweep
-        """
-        return solve_sweep(self, variables_dict, save_path, **kwargs)
+    #     :param variables_dict: Dictionary mapping Variables to lists of values or (start, stop, num_steps) tuples
+    #     :param save_path: Optional path to save results to CSV file
+    #     :param kwargs: Additional arguments to pass to solve() method
+    #     :return: SweepResults object containing the results of the sweep
+    #     """
+    #     return solve_sweep(self, variables_dict, save_path, **kwargs)
+
+    # def variable_by_name(self, name):
+    #     """Get a variable by its name."""
+    #     for var in self.variables:
+    #         if var.name == name:
+    #             return var
+    #     raise ValueError(f"No variable found with name '{name}'")
+
+    # def get_sweep_objective_value(self, solution):
+    #     """Get the value of the sweep objective for a solution."""
+    #     if self._sweep_objective is None:
+    #         raise ValueError("No sweep objective set")
+
+    #     # Evaluate the sweep objective at the solution point
+    #     var_values = [solution(var) for var in self.variables]
+    #     constraint_values = []  # If needed for your Expression implementation
+
+    #     return self._sweep_objective.evaluate(var_values, constraint_values)

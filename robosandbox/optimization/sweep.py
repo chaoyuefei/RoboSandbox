@@ -1,219 +1,191 @@
 # sweep.py
 import numpy as np
+import pandas as pd
+import itertools
+import os
+from tqdm import tqdm
+
 
 class SweepResults:
     """
-    Class to store and analyze the results of a parameter sweep.
+    Class to store and analyze results from parameter sweeps.
     """
-    def __init__(self, sweep_var_names):
-        """
-        Initialize the sweep results object.
-        
-        :param sweep_var_names: List of variable names that were swept
-        """
-        self.sweep_var_names = sweep_var_names
-        self.results = []
-        self.df = None  # Will be converted to pandas DataFrame for analysis
-        
-    def add_result(self, result_dict):
-        """
-        Add a single result to the collection.
-        
-        :param result_dict: Dictionary containing variable values and objective
-        """
-        self.results.append(result_dict)
-        
-    def to_dataframe(self):
-        """
-        Convert results to a pandas DataFrame for easier analysis.
-        
-        :return: pandas DataFrame of results
-        """
-        try:
-            import pandas as pd
-            self.df = pd.DataFrame(self.results)
-            return self.df
-        except ImportError:
-            print("pandas not installed. Install with: pip install pandas")
-            return None
-            
-    def save(self, path):
-        """
-        Save results to a CSV file.
-        
-        :param path: Path to save the CSV file
-        """
-        df = self.to_dataframe()
-        if df is not None:
-            df.to_csv(path, index=False)
-            print(f"Results saved to {path}")
-        
-    def get_best_result(self, minimize=True):
-        """
-        Get the best result from the sweep.
-        
-        :param minimize: Whether to minimize or maximize the objective
-        :return: Dictionary containing the best result
-        """
-        if not self.results:
-            return None
-            
-        df = self.to_dataframe()
-        if df is None:
-            # Manual search if pandas isn't available
-            valid_results = [r for r in self.results if r['success'] and not np.isnan(r['objective'])]
-            if not valid_results:
-                return None
-                
-            if minimize:
-                return min(valid_results, key=lambda x: x['objective'])
-            else:
-                return max(valid_results, key=lambda x: x['objective'])
-        else:
-            # Use pandas for more efficient filtering and selection
-            valid_df = df[df['success'] & ~df['objective'].isna()]
-            if valid_df.empty:
-                return None
-                
-            if minimize:
-                idx = valid_df['objective'].idxmin()
-            else:
-                idx = valid_df['objective'].idxmax()
-                
-            return valid_df.loc[idx].to_dict()
-            
-    def plot(self, x_var, y_var='objective', groupby=None, **kwargs):
-        """
-        Plot sweep results.
-        
-        :param x_var: Variable name for x-axis
-        :param y_var: Variable name for y-axis (default: 'objective')
-        :param groupby: Optional variable name to group by
-        :param kwargs: Additional arguments to pass to plotting function
-        :return: matplotlib Figure and Axes objects
-        """
-        try:
-            import matplotlib.pyplot as plt
-            df = self.to_dataframe()
-            
-            if df is None:
-                return None, None
-                
-            fig, ax = plt.subplots(figsize=(10, 6))
-            
-            if groupby:
-                for name, group in df.groupby(groupby):
-                    ax.plot(group[x_var], group[y_var], marker='o', linestyle='-', 
-                            label=f"{groupby}={name}", **kwargs)
-                ax.legend()
-            else:
-                ax.plot(df[x_var], df[y_var], marker='o', linestyle='-', **kwargs)
-                
-            ax.set_xlabel(x_var)
-            ax.set_ylabel(y_var)
-            ax.set_title(f"{y_var} vs {x_var}")
-            ax.grid(True)
-            
-            return fig, ax
-            
-        except ImportError:
-            print("matplotlib not installed. Install with: pip install matplotlib")
-            return None, None
 
-def solve_sweep(opti, variables_dict, save_path=None, **kwargs):
+    def __init__(self, sweep_data, variables, objective_values):
+        """
+        Initialize sweep results.
+
+        :param sweep_data: Dictionary with variable names as keys and their values as lists
+        :param variables: List of Variable objects involved in the sweep
+        :param objective_values: List of objective function values for each parameter combination
+        """
+        self.sweep_data = sweep_data
+        self.variables = variables
+        self.objective_values = objective_values
+        self.dataframe = self._create_dataframe()
+
+    def _create_dataframe(self):
+        """Create a pandas DataFrame from the sweep results."""
+        data = {**self.sweep_data, "objective": self.objective_values}
+        return pd.DataFrame(data)
+
+    def get_optimal_point(self, minimize=True):
+        """
+        Get the parameter combination that results in the optimal objective value.
+
+        :param minimize: If True, find minimum objective value; if False, find maximum
+        :return: Dictionary with variable names and their optimal values
+        """
+        idx = (
+            self.dataframe["objective"].idxmin()
+            if minimize
+            else self.dataframe["objective"].idxmax()
+        )
+        row = self.dataframe.iloc[idx]
+
+        # Create a dictionary of variable names and their optimal values
+        result = {}
+        for var in self.variables:
+            result[var.name] = row[var.name]
+        result["objective"] = row["objective"]
+
+        return result
+
+    def save_to_csv(self, filepath):
+        """Save the sweep results to a CSV file."""
+        self.dataframe.to_csv(filepath, index=False)
+        print(f"Results saved to {filepath}")
+
+    def __str__(self):
+        """String representation of sweep results."""
+        return str(self.dataframe)
+
+
+def solve_sweep(opti, variables_dict, save_path=None, **solve_kwargs):
     """
-    Perform a parameter sweep by solving the optimization problem for different variable values.
-    
-    :param opti: The Opti optimization object
-    :param variables_dict: Dictionary mapping Variables to lists of values to sweep through
-                          or tuples of (start, stop, num_steps) for linear spacing
+    Perform a parameter sweep by evaluating the objective function for different variable values.
+
+    :param opti: The Opti instance
+    :param variables_dict: Dictionary mapping Variables to lists of values or (start, stop, num_steps) tuples
     :param save_path: Optional path to save results to CSV file
-    :param kwargs: Additional arguments to pass to solve() method
+    :param solve_kwargs: Additional arguments to pass to evaluate the objective
     :return: SweepResults object containing the results of the sweep
     """
-    if not hasattr(opti, 'sweep_objective') or opti.sweep_objective is None:
-        raise ValueError("Sweep objective not set. Call opti.sweep(obj) first.")
-    
-    # Process the variables_dict to create the grid of points to evaluate
+    # Process input parameters
     processed_vars = {}
+    var_objects = []
+
     for var, values in variables_dict.items():
-        if not hasattr(var, 'index'):  # Check if it's a Variable-like object
-            raise TypeError(f"Keys in variables_dict must be Variable objects, got {type(var)}")
-        
-        if isinstance(values, tuple) and len(values) == 3:
-            # Handle (start, stop, num_steps) format
-            start, stop, num = values
-            processed_vars[var] = np.linspace(start, stop, num)
-        elif isinstance(values, (list, np.ndarray)):
-            # Handle direct list of values
-            processed_vars[var] = np.array(values)
-        else:
-            raise ValueError(f"Values must be a list, array, or (start, stop, num) tuple, got {type(values)}")
-    
-    # Create grid of all combinations
-    var_names = [var.name for var in processed_vars.keys()]
-    var_values = list(processed_vars.values())
-    
-    # Initialize results storage
-    results = SweepResults(var_names)
-    
-    # Store the original state of the optimization problem
-    original_objective = opti.objective
-    original_sense = opti.objective_sense
-    original_constraints = opti.constraints.copy()
-    
-    # Iterate through all combinations of variable values
-    total_iterations = np.prod([len(vals) for vals in var_values])
-    print(f"Running sweep with {total_iterations} iterations...")
-    
-    # Get flat indices for iteration
-    if var_values:  # Check if there are any values to sweep through
-        flat_indices = np.ndindex(tuple(len(vals) for vals in var_values))
-    else:
-        flat_indices = []  # Empty list if no values to sweep
-    
-    for idx in flat_indices:
-        # Create a dictionary of current sweep variable values
-        current_values = {var: var_values[i][idx[i]] for i, var in enumerate(processed_vars.keys())}
-        
-        # Set fixed values for the sweep variables by adding equality constraints
-        opti.constraints = original_constraints.copy()
-        for var, val in current_values.items():
-            opti.subject_to(var == val)
-        
-        # Set the objective function based on the sweep objective
-        if opti.objective_sense == 'min':
-            opti.minimize(opti.sweep_objective)
-        else:
-            opti.maximize(opti.sweep_objective)
-            
-        # Solve the optimization problem
+        if not isinstance(var, opti.Variable):
+            if isinstance(var, str):
+                # Try to find the variable by name
+                var = opti.variable_by_name(var)
+            else:
+                raise TypeError(f"Expected Variable object or string, got {type(var)}")
+
+        var_objects.append(var)
+
+        # Check if the values is a tuple representing a range
+        if isinstance(values, tuple) and len(values) in [3, 4]:
+            if len(values) == 3:
+                start, stop, num = values
+                step_type = "linear"
+            else:
+                start, stop, num, step_type = values
+
+            if step_type == "linear":
+                values = np.linspace(start, stop, num)
+            elif step_type == "log":
+                values = np.logspace(np.log10(start), np.log10(stop), num)
+            else:
+                raise ValueError(
+                    f"Unknown step type: {step_type}. Use 'linear' or 'log'."
+                )
+
+        processed_vars[var.name] = values
+
+    # Create all combinations of parameter values
+    param_names = list(processed_vars.keys())
+    param_values = list(processed_vars.values())
+    combinations = list(itertools.product(*param_values))
+
+    # Prepare data structures for results
+    sweep_data = {name: [] for name in param_names}
+    objective_values = []
+
+    # Setup progress bar
+    print(f"Running sweep with {len(combinations)} combinations...")
+
+    # Perform the sweep
+    for params in tqdm(combinations, desc="Sweeping parameters"):
+        # Update the parameters for this iteration
+        for i, var_name in enumerate(param_names):
+            sweep_data[var_name].append(params[i])
+
+            # Set the initial guess for the variable to the current sweep value
+            var = opti.variable_by_name(var_name)
+            var.init_guess = params[i]
+
+        # Evaluate the objective function
         try:
-            solution = opti.solve(**kwargs)
-            success = solution.success()
-            obj_value = opti.sweep_objective.evaluate([solution(var) for var in opti.variables], opti.parameters) if success else np.nan
+            # If we're using a set objective function for optimization
+            if opti.objective is not None:
+                # Solve the optimization problem with updated initial guesses
+                solution = opti.solve(**solve_kwargs)
+
+                # Use the provided sweep objective if available, otherwise use the optimization objective
+                if (
+                    hasattr(opti, "sweep_objective")
+                    and opti.sweep_objective is not None
+                ):
+                    if callable(opti.sweep_objective):
+                        # If it's a callable function, call it with the solution
+                        obj_value = opti.sweep_objective(solution)
+                    else:
+                        # Otherwise, treat it as an Expression and evaluate it
+                        x = [solution(var) for var in opti.variables]
+                        obj_value = opti.sweep_objective.evaluate(x, opti.parameters)
+                else:
+                    # Use the optimization result
+                    obj_value = solution.result.fun
+            else:
+                # If no optimization objective, evaluate the sweep objective directly
+                # This is for direct evaluation without optimization
+                if (
+                    hasattr(opti, "sweep_objective")
+                    and opti.sweep_objective is not None
+                ):
+                    if callable(opti.sweep_objective):
+                        # Create a dictionary of variable values for this iteration
+                        var_values = {
+                            var.name: params[i] for i, var in enumerate(var_objects)
+                        }
+                        obj_value = opti.sweep_objective(**var_values)
+                    else:
+                        # Evaluate the expression with the current parameter values
+                        var_values = [0] * len(opti.variables)
+                        for i, name in enumerate(param_names):
+                            var = opti.variable_by_name(name)
+                            var_values[var.index] = params[i]
+                        obj_value = opti.sweep_objective.evaluate(
+                            var_values, opti.parameters
+                        )
+                else:
+                    raise ValueError(
+                        "No objective function or sweep objective provided"
+                    )
+
+            objective_values.append(obj_value)
+
         except Exception as e:
-            success = False
-            obj_value = np.nan
-            print(f"Error in iteration {idx}: {str(e)}")
-            
-        # Extract all variable values
-        var_vals = {var.name: (solution(var) if success else np.nan) for var in opti.variables}
-        
-        # Add the sweep variable values and result
-        sweep_vals = {var.name: current_values[var] for var in processed_vars.keys()}
-        result_dict = {**sweep_vals, **var_vals, 'objective': obj_value, 'success': success}
-        
-        # Store the results
-        results.add_result(result_dict)
-        
-    # Restore the original state
-    opti.objective = original_objective
-    opti.objective_sense = original_sense
-    opti.constraints = original_constraints
-    
+            print(f"Error during sweep at {dict(zip(param_names, params))}: {str(e)}")
+            objective_values.append(np.nan)
+
+    # Create results object
+    results = SweepResults(sweep_data, var_objects, objective_values)
+
     # Save results if requested
     if save_path:
-        results.save(save_path)
-        
+        results.save_to_csv(save_path)
+
     return results

@@ -23,8 +23,14 @@ class BaseWorkSpace:
         points_df = pd.DataFrame(points, columns=self.df.columns[:3])
         # Add the metric values to the new samples DataFrame
         points_df[metric] = metric_values
-        # Concatenate the existing DataFrame with the new samples
-        self.df = pd.concat([self.df, points_df], axis=0, ignore_index=True)
+        # Filter out empty or all-NA entries before concatenation
+        filtered_df = self.df.dropna(how="all", axis=1)  # Drop columns that are all NA
+        filtered_points_df = points_df.dropna(how="all", axis=1)  # Same for points_df
+
+        # Then concatenate the filtered DataFrames
+        self.df = pd.concat(
+            [filtered_df, filtered_points_df], axis=0, ignore_index=True
+        )
 
     def add_new_metric(self, metric: str):
         """
