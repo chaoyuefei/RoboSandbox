@@ -1,5 +1,7 @@
 import numpy as np
 from scipy.optimize import minimize
+from .sweep import solve_sweep, SweepResults
+
 
 class Variable:
     _count = 0  # Class variable to assign unique IDs to variables
@@ -20,54 +22,56 @@ class Variable:
 
     # Operator Overloading for Expression Building
     def __add__(self, other):
-        return Expression('+', self, other)
+        return Expression("+", self, other)
 
     def __radd__(self, other):
-        return Expression('+', other, self)
+        return Expression("+", other, self)
 
     def __sub__(self, other):
-        return Expression('-', self, other)
+        return Expression("-", self, other)
 
     def __rsub__(self, other):
-        return Expression('-', other, self)
+        return Expression("-", other, self)
 
     def __mul__(self, other):
-        return Expression('*', self, other)
+        return Expression("*", self, other)
 
     def __rmul__(self, other):
-        return Expression('*', other, self)
+        return Expression("*", other, self)
 
     def __truediv__(self, other):
-        return Expression('/', self, other)
+        return Expression("/", self, other)
 
     def __rtruediv__(self, other):
-        return Expression('/', other, self)
+        return Expression("/", other, self)
 
     def __pow__(self, power):
-        return Expression('**', self, power)
+        return Expression("**", self, power)
 
     def __rpow__(self, base):
-        return Expression('**', base, self)
+        return Expression("**", base, self)
 
     def __gt__(self, other):
-        return Constraint('ineq', Expression('-', self, other))
+        return Constraint("ineq", Expression("-", self, other))
 
     def __lt__(self, other):
-        return Constraint('ineq', Expression('-', other, self))
+        return Constraint("ineq", Expression("-", other, self))
 
     def __ge__(self, other):
-        return Constraint('ineq', Expression('-', self, other))
+        return Constraint("ineq", Expression("-", self, other))
 
     def __le__(self, other):
-        return Constraint('ineq', Expression('-', other, self))
+        return Constraint("ineq", Expression("-", other, self))
 
     def __eq__(self, other):
-        return Constraint('eq', Expression('-', self, other))
+        return Constraint("eq", Expression("-", self, other))
+
 
 class Expression:
     """
     Represents a mathematical expression built from Variables and constants.
     """
+
     def __init__(self, operator, left, right=None):
         self.operator = operator
         self.left = left
@@ -95,16 +99,16 @@ class Expression:
                 right_val = self.right
 
         # Perform the operation
-        if self.operator == '+':
+        if self.operator == "+":
             return left_val + right_val
-        elif self.operator == '-':
+        elif self.operator == "-":
             return left_val - right_val
-        elif self.operator == '*':
+        elif self.operator == "*":
             return left_val * right_val
-        elif self.operator == '/':
+        elif self.operator == "/":
             return left_val / right_val
-        elif self.operator == '**':
-            return left_val ** right_val
+        elif self.operator == "**":
+            return left_val**right_val
         else:
             raise ValueError(f"Unsupported operator: {self.operator}")
 
@@ -112,45 +116,64 @@ class Expression:
         """
         Convert the expression into a callable function that takes a variable vector.
         """
+
         def func(x):
             return self.evaluate(x, opti_env.parameters)
+
         return func
 
     # Operator Overloading Methods
     def __add__(self, other):
-        return Expression('+', self, other)
+        return Expression("+", self, other)
 
     def __radd__(self, other):
-        return Expression('+', other, self)
+        return Expression("+", other, self)
 
     def __sub__(self, other):
-        return Expression('-', self, other)
+        return Expression("-", self, other)
 
     def __rsub__(self, other):
-        return Expression('-', other, self)
+        return Expression("-", other, self)
 
     def __mul__(self, other):
-        return Expression('*', self, other)
+        return Expression("*", self, other)
 
     def __rmul__(self, other):
-        return Expression('*', other, self)
+        return Expression("*", other, self)
 
     def __truediv__(self, other):
-        return Expression('/', self, other)
+        return Expression("/", self, other)
 
     def __rtruediv__(self, other):
-        return Expression('/', other, self)
+        return Expression("/", other, self)
 
     def __pow__(self, power):
-        return Expression('**', self, power)
+        return Expression("**", self, power)
 
     def __rpow__(self, base):
-        return Expression('**', base, self)
+        return Expression("**", base, self)
+
+    def __gt__(self, other):
+        return Constraint("ineq", Expression("-", self, other))
+
+    def __lt__(self, other):
+        return Constraint("ineq", Expression("-", other, self))
+
+    def __ge__(self, other):
+        return Constraint("ineq", Expression("-", self, other))
+
+    def __le__(self, other):
+        return Constraint("ineq", Expression("-", other, self))
+
+    def __eq__(self, other):
+        return Constraint("eq", Expression("-", self, other))
+
 
 class ExternalFunctionExpression(Expression):
     """
     Represents an external function as an expression in the optimization problem.
     """
+
     def __init__(self, func, variables):
         """
         Initialize with a callable function and the variables it depends on.
@@ -173,16 +196,18 @@ class ExternalFunctionExpression(Expression):
         current_values = [var_values[var.index] for var in self.variables]
         return self.func(*current_values)
 
+
 class Constraint:
     """
     Represents a constraint in the optimization problem.
     """
+
     def __init__(self, type_, expression):
         """
         :param type_: 'eq' for equality, 'ineq' for inequality.
         :param expression: An Expression object representing the constraint.
         """
-        assert type_ in ['eq', 'ineq'], "Constraint type must be 'eq' or 'ineq'."
+        assert type_ in ["eq", "ineq"], "Constraint type must be 'eq' or 'ineq'."
         self.type = type_
         self.expression = expression
 
@@ -190,14 +215,18 @@ class Constraint:
         """
         Convert the constraint into a callable function for scipy.optimize.
         """
+
         def func(x):
             return self.expression.evaluate(x, opti_env.parameters)
-        return {'type': self.type, 'fun': func}
+
+        return {"type": self.type, "fun": func}
+
 
 class Solution:
     """
     Represents the solution to the optimization problem.
     """
+
     def __init__(self, result, variables):
         self.result = result
         self.variables = variables
@@ -213,6 +242,7 @@ class Solution:
     def message(self):
         return self.result.message
 
+
 class Opti:
     def __init__(self):
         """
@@ -221,10 +251,10 @@ class Opti:
         self.variables = []
         self.constraints = []
         self.objective = None
-        self.objective_sense = 'min'  # 'min' or 'max'
+        self.objective_sense = "min"  # 'min' or 'max'
         self.parameters = {}  # For additional parameters if needed
 
-    def variable(self, init_guess=None, name=None, bounds=(None, None)):
+    def variable(self, init_guess, name=None, bounds=(None, None)):
         """
         Create and add a new variable to the environment.
 
@@ -256,7 +286,7 @@ class Opti:
         :param objective_expr: An Expression representing the objective.
         """
         self.objective = objective_expr
-        self.objective_sense = 'min'
+        self.objective_sense = "min"
 
     def maximize(self, objective_expr):
         """
@@ -265,18 +295,18 @@ class Opti:
         :param objective_expr: An Expression representing the objective.
         """
         self.objective = objective_expr
-        self.objective_sense = 'max'
+        self.objective_sense = "max"
 
     def external_func(self, func, variables):
-            """
-            Create an ExternalFunctionExpression with a callable function.
-            :param func: A callable function.
-            :param variables: A list of Variable instances.
-            :return: An ExternalFunctionExpression instance.
-            """
-            return ExternalFunctionExpression(func, variables)
+        """
+        Create an ExternalFunctionExpression with a callable function.
+        :param func: A callable function.
+        :param variables: A list of Variable instances.
+        :return: An ExternalFunctionExpression instance.
+        """
+        return ExternalFunctionExpression(func, variables)
 
-    def solve(self, method='SLSQP'):
+    def solve(self, method="SLSQP"):
         """
         Solve the optimization problem using scipy.optimize.minimize.
 
@@ -291,9 +321,9 @@ class Opti:
         bounds = [var.bounds for var in self.variables]
 
         # Define the objective function
-        if self.objective_sense == 'min':
+        if self.objective_sense == "min":
             obj_func = lambda x: self.objective.evaluate(x, self.parameters)
-        elif self.objective_sense == 'max':
+        elif self.objective_sense == "max":
             # To maximize, minimize the negative
             obj_func = lambda x: -self.objective.evaluate(x, self.parameters)
         else:
@@ -311,11 +341,32 @@ class Opti:
             method=method,
             bounds=bounds,
             constraints=scipy_constraints,
-            options={'maxiter': 1000, 'disp': True}  # Set disp=False to control output
+            options={"maxiter": 1000, "disp": True},  # Set disp=False to control output
         )
 
         # If maximization, adjust the objective value
-        if self.objective_sense == 'max' and result.success:
+        if self.objective_sense == "max" and result.success:
             result.fun = -result.fun
 
         return Solution(result, self.variables)
+
+    def sweep(self, objective_expr):
+        """
+        Set up an objective function to be used for parameter sweeping.
+
+        :param objective_expr: An Expression or function to evaluate during sweeping.
+        :return: self for method chaining
+        """
+        self.sweep_objective = objective_expr
+        return self
+
+    def solve_sweep(self, variables_dict, save_path=None, **kwargs):
+        """
+        Perform a parameter sweep by solving the optimization problem for different variable values.
+
+        :param variables_dict: Dictionary mapping Variables to lists of values or (start, stop, num_steps) tuples
+        :param save_path: Optional path to save results to CSV file
+        :param kwargs: Additional arguments to pass to solve() method
+        :return: SweepResults object containing the results of the sweep
+        """
+        return solve_sweep(self, variables_dict, save_path, **kwargs)
