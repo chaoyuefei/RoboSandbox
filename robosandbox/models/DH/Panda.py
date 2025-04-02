@@ -1,10 +1,4 @@
 #!/usr/bin/env python
-"""
-@author: Chaoyue Fei
-powered by Robotics Toolbox for Python
-modified from roboticstoolbox.models.DH.Panda
-"""
-
 import numpy as np
 from spatialmath.base import trotz, transl
 from roboticstoolbox import DHRobot, RevoluteMDH
@@ -28,12 +22,14 @@ class Panda(DHRobot, PlotlyRobot):
     .. note::
         - SI units of metres are used.
         - The model includes a tool offset.
+        - powered by Robotics Toolbox for Python and modified from roboticstoolbox.models.DH.Panda
 
     :references:
         - https://frankaemika.github.io/docs/control_parameters.html
 
     .. codeauthor:: Samuel Drew
     .. codeauthor:: Peter Corke
+    .. codeauthor:: Chaoyue Fei
     """
 
     def __init__(self):

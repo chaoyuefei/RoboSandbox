@@ -9,18 +9,8 @@ def _():
     import robosandbox as rsb
     import numpy as np
     import plotly.graph_objects as go # import new fig env
-    return go, np, rsb
-
-
-@app.cell
-def _():
     import marimo as mo
-    return (mo,)
-
-
-@app.cell
-def _():
-    return
+    return go, mo, np, rsb
 
 
 @app.cell
@@ -56,14 +46,14 @@ def _(mo):
 def _(go):
     import robosandbox.models.DH.Generic as generic
     robot4 = generic.GenericFour()
-    robot4.plotly(robot4.qz, fig=go.Figure()) # In the Marimo notebook, use the "fig" parameter for improved visual effects.
+    robot4.plotly(robot4.qz, fig=go.Figure(), isShow=False) # In the Marimo notebook, use the "fig" parameter for improved visual effects.
     return generic, robot4
 
 
 @app.cell
 def _(generic, go):
     robot6 = generic.GenericSix()
-    robot6.plotly(robot6.qz, fig=go.Figure())
+    robot6.plotly(robot6.qz, fig=go.Figure(), isShow=False)
     return (robot6,)
 
 
@@ -88,7 +78,7 @@ def _(mo):
 @app.cell
 def _(go, rsb):
     Panda = rsb.models.DH.Panda()
-    Panda.plotly(Panda.qr, fig=go.Figure())
+    Panda.plotly(Panda.qr, fig=go.Figure(), isShow=False)
     return (Panda,)
 
 
@@ -101,7 +91,7 @@ def _(mo):
 @app.cell
 def _(go, rsb):
     Puma560 = rsb.models.DH.Puma560()
-    Puma560.plotly(Puma560.qr, fig=go.Figure())
+    Puma560.plotly(Puma560.qr, fig=go.Figure(), isShow=False)
     return (Puma560,)
 
 
@@ -124,7 +114,7 @@ def _(generic, go, np):
                     alpha=[0, np.pi/2, np.pi/2, 0],
                 )
 
-    new_robot.plotly(new_robot.qz, save=False, fig=go.Figure())
+    new_robot.plotly(new_robot.qz, fig=go.Figure(), isShow=False)
     return (new_robot,)
 
 
@@ -135,16 +125,23 @@ def _(mo):
 
 
 @app.cell
-def _(np, robot4):
+def _(mo):
+    mo.md(r"""### Link Length Influence""")
+    return
+
+
+@app.cell
+def _(np, rsb):
     from robosandbox.performance.workspace import WorkSpace
     np.random.seed(42)
 
-    ws = WorkSpace(robot4)
+    robot_planar = rsb.models.DH.Generic.GenericFour()
+    ws = WorkSpace(robot_planar)
     method = "yoshikawa"
     axes = "trans"
 
     G = ws.global_indice(
-        initial_samples=3000,
+        initial_samples=5000,
         batch_ratio=0.1,
         error_tolerance_percentage=1e-2,
         method="yoshikawa", 
@@ -152,8 +149,14 @@ def _(np, robot4):
         max_samples=20000, 
         is_normalized=False
     )
+    print(f"The Global Manipulability of a planar robot with 4 Dofs is {G}")
+    return G, WorkSpace, axes, method, robot_planar, ws
 
-    return G, WorkSpace, axes, method, ws
+
+@app.cell
+def _(go, method, ws):
+    ws.plot(color=method, fig=go.Figure(), isShow=True, isUpdate=True)
+    return
 
 
 @app.cell

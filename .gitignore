@@ -4,3 +4,4 @@ robosandbox.egg-info
 robosandbox/__pycache__
 robosandbox/.DS_Store
 robosandbox/geometry/.DS_Store
+docs/build
