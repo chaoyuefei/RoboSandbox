@@ -9,7 +9,7 @@ class ParameterSweeper:
     A class for sweeping across parameter spaces and evaluating objective functions.
     """
 
-    def __init__(self, objective_function: Callable, save_path: str = None):
+    def __init__(self, objective_function: Callable):
         """
         Initialize the sweeper with an objective function to evaluate.
 
@@ -18,7 +18,7 @@ class ParameterSweeper:
             save_path: Path to save results (optional)
         """
         self.objective_function = objective_function
-        self.save_path = save_path
+        # self.save_path = save_path
         self.results = None
         self.result_matrix = None
 
@@ -29,6 +29,7 @@ class ParameterSweeper:
         display_progress: bool = True,
         save_intermediate: bool = False,
         intermediate_save_interval: int = 10,
+        save_path: str = None,
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Sweep across parameter space and evaluate objective function.
@@ -143,8 +144,8 @@ class ParameterSweeper:
         self.results = np.array(results)
 
         # Save final results if path is provided
-        if self.save_path:
-            self._save_results(self.results, self.result_matrix)
+        if save_path:
+            self._save_results(self.results, self.result_matrix, save_path)
 
         return self.results, self.result_matrix
 
@@ -183,7 +184,8 @@ class ParameterSweeper:
                 results,
             )
 
-    def _save_results(self, results, result_matrix):
+
+    def _save_results(self, results, result_matrix, save_path):
         """Save results to file"""
-        if self.save_path:
-            np.savez(self.save_path, results=results, result_matrix=result_matrix)
+        if save_path:
+            np.savez(save_path, results=results, result_matrix=result_matrix)
