@@ -14,7 +14,7 @@ alpha1_list = np.deg2rad(np.arange(0, 181, step))
 alpha2_list = np.deg2rad(np.arange(0, 181, step))
 
 # Define the method and axes for the sweep
-method = "invcondition"
+method = "yoshikawa"
 axes = "trans"
 isNormalized = False
 isRun = False

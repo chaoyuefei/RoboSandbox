@@ -60,7 +60,7 @@ def plot_global_index_results(
             )
         )
         # Apply proper 3D scene layout settings for surface plot
-        fontsize = 18
+        fontsize = 17
         fig.update_layout(
             scene=dict(
                 xaxis_title="alpha1 [deg]",
