@@ -11,6 +11,7 @@ def plot_global_index_results(
     isSave=False,
     step=15,
     isNormalized=False,
+    colorscale='Viridis'
 ):
     """
     Plot the effect of alpha on the global indices using Plotly.
@@ -25,7 +26,7 @@ def plot_global_index_results(
                 z=G_mat,
                 x=alpha_list_deg1,
                 y=alpha_list_deg2,
-                # colorscale='Viridis',
+                colorscale=colorscale,
                 colorbar=dict(
                     title=dict(text=method, font=dict(size=fontsize)),
                     tickfont=dict(size=fontsize),
@@ -41,8 +42,8 @@ def plot_global_index_results(
             width=1000,
             xaxis_title_font=dict(size=fontsize),
             yaxis_title_font=dict(size=fontsize),
-            xaxis=dict(tickfont=dict(size=fontsize), dtick=step),
-            yaxis=dict(tickfont=dict(size=fontsize), dtick=step),
+            xaxis=dict(tickfont=dict(size=fontsize), dtick=step*2),
+            yaxis=dict(tickfont=dict(size=fontsize), dtick=step*2),
         )
     elif plot_type == "surface":
         fontsize = 40
@@ -55,10 +56,11 @@ def plot_global_index_results(
                     title=dict(text=method, font=dict(size=fontsize)),
                     tickfont=dict(size=fontsize),
                 ),
+                colorscale=colorscale,
             )
         )
         # Apply proper 3D scene layout settings for surface plot
-        fontsize = 16
+        fontsize = 18
         fig.update_layout(
             scene=dict(
                 xaxis_title="alpha1 [deg]",
@@ -72,12 +74,14 @@ def plot_global_index_results(
                     tickfont=dict(size=fontsize),
                     dtick=step * 4,
                 ),
-                zaxis=dict(
-                    # titlefont=dict(size=fontsize),
-                    tickfont=dict(size=fontsize)
-                ),
-                camera=dict(eye=dict(x=1.5, y=1.5, z=1.5), up=dict(x=0, y=0, z=1)),
-                aspectratio=dict(x=1, y=1, z=0.8),
+                # zaxis=dict(
+                #     # titlefont=dict(size=fontsize),
+                #     tickfont=dict(size=fontsize)
+                # ),
+                # Do not display z axis's tick and title
+                zaxis=dict(showticklabels=False, title=""),
+                camera=dict(eye=dict(x=-1.2, y=-1.2, z=1.65), up=dict(x=0, y=0, z=1)),
+                # aspectratio=dict(x=1, y=1, z=0.8),
             ),
             autosize=True,
             height=800,
