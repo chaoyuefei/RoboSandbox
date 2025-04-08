@@ -147,7 +147,7 @@ class ParameterSweeper:
         if save_path:
             self._save_results(self.results, self.result_matrix, save_path)
 
-        return self.results, self.result_matrix
+        return self.results, self.result_matrix.T
 
     def _evaluate_deeper_params(
         self, param_names, param_values, indices, current_vals, fixed_params, results
@@ -183,7 +183,6 @@ class ParameterSweeper:
                 fixed_params,
                 results,
             )
-
 
     def _save_results(self, results, result_matrix, save_path):
         """Save results to file"""
