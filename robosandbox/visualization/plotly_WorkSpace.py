@@ -20,7 +20,7 @@ class PlotlyWorkSpace:
                     color=self.df[
                         color
                     ],  # set color to an array/list of desired values
-                    # colorscale="Viridis"  # choose a colorscale
+                    colorscale="Viridis",  # choose a colorscale
                     colorbar=dict(title=color),
                     opacity=0.5,
                 ),
