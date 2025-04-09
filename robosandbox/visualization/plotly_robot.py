@@ -17,7 +17,14 @@ class PlotlyRobot:
         return np.array(positions)
 
     def plotly(
-        self, q, save=False, path="", fig=go.Figure(), isShow=True, isUpdate=True
+        self,
+        q,
+        save=False,
+        path="",
+        fig=go.Figure(),
+        isShow=True,
+        isUpdate=True,
+        axis_length_factor=1.0,
     ):
         self.tfs = self.fkine_all(q)
         self.joint_positions = self.compute_joint_positions()
@@ -41,9 +48,11 @@ class PlotlyRobot:
             max_distance = np.linalg.norm(self.tfs[-1][:3, 3])
         else:
             max_distance = np.linalg.norm(self.tfs[-1].t)
-        axis_length = round(max_distance / 10, 2)  # Uniform length for all axes
+        axis_length = (
+            round(max_distance / 10, 2) * axis_length_factor
+        )  # Uniform length for all axes
         # print(f"max_distance is {max_distance} and axis_length is {axis_length}")
-        arrow_length = axis_length / 10  # Length of the arrowhead
+        arrow_length = axis_length / 10 * axis_length_factor  # Length of the arrowhead
 
         # Adding axes at each joint
         for index, (tf, pos) in enumerate(zip(self.tfs, self.joint_positions)):
