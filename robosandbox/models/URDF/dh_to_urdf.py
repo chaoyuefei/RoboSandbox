@@ -113,7 +113,10 @@ def xml_string(DH_Params, scale=1):
         outstring = outstring + "\t\t\t<geometry>\n"
         outstring = outstring + "\t\t\t\t<cylinder length='1' radius='0.5'/>\n"
         outstring = outstring + "\t\t\t</geometry>\n"
-        outstring = outstring + "\t\t\t<material name='blue'/>\n"
+        outstring = (
+            outstring
+            + "\t\t\t<material name='blue'><color rgba='0 0 0.8 1'/></material>\n"
+        )
         outstring = outstring + "\t\t</visual>\n"
         outstring = outstring + "\t</link>\n"
 
@@ -171,7 +174,10 @@ def xml_string(DH_Params, scale=1):
             origins_vector_norm
         )
         outstring = outstring + "\t\t\t</geometry>\n"
-        outstring = outstring + "\t\t\t<material name='red'/>\n"
+        outstring = (
+            outstring
+            + "\t\t\t<material name='red'><color rgba='0.8 0 0 1'/></material>\n"
+        )
         outstring = outstring + "\t\t</visual>\n"
         outstring = outstring + "\t</link>\n"
 
@@ -206,14 +212,20 @@ def xml_string(DH_Params, scale=1):
 
 if __name__ == "__main__":
     f = open("outfile.xml", "w")
+    # DH Parameter Layout:
+    # ['r', d, a, alpha] for revolute joints
+    # ['p', theta, a, alpha] for prismatic joints
+    # ['f', d, theta, a, alpha] for fixed joints
 
     DH_Params = []
-    DH_Params.append(["r", 4.45, -1.50, -pi / 2])
-    DH_Params.append(["r", 0, 9.00, 0])
-    DH_Params.append(["r", 0, 1.50, -pi / 2])
-    DH_Params.append(["r", 9.38, 0, pi / 2])
-    DH_Params.append(["r", 0, 0, pi / 2])
-    DH_Params.append(["r", 2.00, 0, 0])
+    DH_Params.append(["r", 2.4, 0, pi / 2])
+    DH_Params.append(["r", 0, -2.4, 0])
+    DH_Params.append(["r", 0, -2.4, 0])
+    DH_Params.append(["r", 0, -2.4, 0])
+    # DH_Params.append(["r", 0, 1.50, -pi / 2])
+    # DH_Params.append(["r", 9.38, 0, pi / 2])
+    # DH_Params.append(["r", 0, 0, pi / 2])
+    # DH_Params.append(["r", 2.00, 0, 0])
 
     f.write(xml_string(DH_Params))
 
