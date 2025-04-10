@@ -113,10 +113,7 @@ def xml_string(DH_Params, scale=1):
         outstring = outstring + "\t\t\t<geometry>\n"
         outstring = outstring + "\t\t\t\t<cylinder length='1' radius='0.5'/>\n"
         outstring = outstring + "\t\t\t</geometry>\n"
-        outstring = (
-            outstring
-            + "\t\t\t<material name='blue'><color rgba='0 0 0.8 1'/></material>\n"
-        )
+        outstring = outstring + "\t\t\t<material name='blue'/>\n"
         outstring = outstring + "\t\t</visual>\n"
         outstring = outstring + "\t</link>\n"
 
@@ -174,10 +171,7 @@ def xml_string(DH_Params, scale=1):
             origins_vector_norm
         )
         outstring = outstring + "\t\t\t</geometry>\n"
-        outstring = (
-            outstring
-            + "\t\t\t<material name='red'><color rgba='0.8 0 0 1'/></material>\n"
-        )
+        outstring = outstring + "\t\t\t<material name='red'/>\n"
         outstring = outstring + "\t\t</visual>\n"
         outstring = outstring + "\t</link>\n"
 
@@ -198,7 +192,7 @@ def xml_string(DH_Params, scale=1):
         outstring = outstring + "\t\t<parent link='a{}'/>\n".format(i)
         outstring = outstring + "\t\t<child link='l{}'/>\n".format(i)
         outstring = outstring + "\t\t<axis xyz='{} {} {}'/>\n".format(
-            fr[0, 2], fr[1, 2], fr[2, 2]
+            fr[0, 2], fr[1, 2], np.round(fr[2, 2], 2)
         )
         outstring = outstring + "\t\t<origin rpy='0 0 0' xyz='{} {} {}'/>\n".format(
             el[0, 3], el[1, 3], el[2, 3]

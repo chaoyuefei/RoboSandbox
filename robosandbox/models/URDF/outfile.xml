@@ -11,7 +11,7 @@
 			<geometry>
 				<cylinder length='1' radius='0.5'/>
 			</geometry>
-			<material name='blue'><color rgba='0 0 0.8 1'/></material>
+			<material name='blue'/>
 		</visual>
 	</link>
 	<link name='l0'>
@@ -20,7 +20,7 @@
 			<geometry>
 				<cylinder length='2.4' radius='0.4'/>
 			</geometry>
-			<material name='red'><color rgba='0.8 0 0 1'/></material>
+			<material name='red'/>
 		</visual>
 	</link>
 	<joint name='move_l0_from_a0' type='continuous'>
@@ -35,7 +35,7 @@
 			<geometry>
 				<cylinder length='1' radius='0.5'/>
 			</geometry>
-			<material name='blue'><color rgba='0 0 0.8 1'/></material>
+			<material name='blue'/>
 		</visual>
 	</link>
 	<joint name='fix_a1_to_l0' type='fixed'>
@@ -49,13 +49,13 @@
 			<geometry>
 				<cylinder length='2.4' radius='0.4'/>
 			</geometry>
-			<material name='red'><color rgba='0.8 0 0 1'/></material>
+			<material name='red'/>
 		</visual>
 	</link>
 	<joint name='move_l1_from_a1' type='continuous'>
 		<parent link='a1'/>
 		<child link='l1'/>
-		<axis xyz='0.0 -1.0 6.123233995736766e-17'/>
+		<axis xyz='0.0 -1.0 0.0'/>
 		<origin rpy='0 0 0' xyz='0.0 0.0 2.4'/>
 	</joint>
 	<link name='a2'>
@@ -64,7 +64,7 @@
 			<geometry>
 				<cylinder length='1' radius='0.5'/>
 			</geometry>
-			<material name='blue'><color rgba='0 0 0.8 1'/></material>
+			<material name='blue'/>
 		</visual>
 	</link>
 	<joint name='fix_a2_to_l1' type='fixed'>
@@ -78,13 +78,13 @@
 			<geometry>
 				<cylinder length='2.4' radius='0.4'/>
 			</geometry>
-			<material name='red'><color rgba='0.8 0 0 1'/></material>
+			<material name='red'/>
 		</visual>
 	</link>
 	<joint name='move_l2_from_a2' type='continuous'>
 		<parent link='a2'/>
 		<child link='l2'/>
-		<axis xyz='0.0 -1.0 6.123233995736766e-17'/>
+		<axis xyz='0.0 -1.0 0.0'/>
 		<origin rpy='0 0 0' xyz='-2.4 -0.0 0.0'/>
 	</joint>
 	<link name='a3'>
@@ -93,7 +93,7 @@
 			<geometry>
 				<cylinder length='1' radius='0.5'/>
 			</geometry>
-			<material name='blue'><color rgba='0 0 0.8 1'/></material>
+			<material name='blue'/>
 		</visual>
 	</link>
 	<joint name='fix_a3_to_l2' type='fixed'>
@@ -107,13 +107,13 @@
 			<geometry>
 				<cylinder length='2.4' radius='0.4'/>
 			</geometry>
-			<material name='red'><color rgba='0.8 0 0 1'/></material>
+			<material name='red'/>
 		</visual>
 	</link>
 	<joint name='move_l3_from_a3' type='continuous'>
 		<parent link='a3'/>
 		<child link='l3'/>
-		<axis xyz='0.0 -1.0 6.123233995736766e-17'/>
+		<axis xyz='0.0 -1.0 0.0'/>
 		<origin rpy='0 0 0' xyz='-2.4 -0.0 0.0'/>
 	</joint>
 </robot>

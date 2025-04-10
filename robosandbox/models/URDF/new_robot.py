@@ -36,4 +36,4 @@ if __name__ == "__main__":  # pragma nocover
     # r.plot(q=r.qz, backend="swift", block=True)
     print(r.fkine(r.qz))
     print(r.links[2])
-    # r.plot(q=[np.pi / 2, 90, 0, 0], backend="swift", block=True)
+    r.plot(q=[0, 0, 0, 0], backend="swift", block=True)
