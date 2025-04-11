@@ -111,11 +111,11 @@ def xml_string(DH_Params, scale=1):
             )
         )
         outstring = outstring + "\t\t\t<geometry>\n"
-        outstring = outstring + "\t\t\t\t<cylinder length='1' radius='0.5'/>\n"
+        outstring = outstring + "\t\t\t\t<cylinder length='0.1' radius='0.05'/>\n"
         outstring = outstring + "\t\t\t</geometry>\n"
         outstring = (
             outstring
-            + "\t\t\t<material name='blue'><color rgba='0 0 0.8 1'/></material>\n"
+            + "\t\t\t<material name='blue'><color rgba='0.56 0.76 0.89 1'/></material>\n"
         )
         outstring = outstring + "\t\t</visual>\n"
         outstring = outstring + "\t</link>\n"
@@ -170,13 +170,16 @@ def xml_string(DH_Params, scale=1):
             )
         )
         outstring = outstring + "\t\t\t<geometry>\n"
-        outstring = outstring + "\t\t\t\t<cylinder length='{}' radius='0.4'/>\n".format(
-            origins_vector_norm
+        outstring = (
+            outstring
+            + "\t\t\t\t<cylinder length='{}' radius='0.04'/>\n".format(
+                origins_vector_norm
+            )
         )
         outstring = outstring + "\t\t\t</geometry>\n"
         outstring = (
             outstring
-            + "\t\t\t<material name='red'><color rgba='0.8 0 0 1'/></material>\n"
+            + "\t\t\t<material name='red'><color rgba='0.88 0.43 0.44 1'/></material>\n"
         )
         outstring = outstring + "\t\t</visual>\n"
         outstring = outstring + "\t</link>\n"
@@ -218,10 +221,10 @@ if __name__ == "__main__":
     # ['f', d, theta, a, alpha] for fixed joints
 
     DH_Params = []
-    DH_Params.append(["r", 2.4, 0, pi / 2])
-    DH_Params.append(["r", 0, -2.4, 0])
-    DH_Params.append(["r", 0, -2.4, 0])
-    DH_Params.append(["r", 0, -2.4, 0])
+    DH_Params.append(["r", 0.4, 0, pi / 2])
+    DH_Params.append(["r", 0, -0.4, 0])
+    DH_Params.append(["r", 0, -0.4, 0])
+    DH_Params.append(["r", 0, -0.4, 0])
     # DH_Params.append(["r", 0, 1.50, -pi / 2])
     # DH_Params.append(["r", 9.38, 0, pi / 2])
     # DH_Params.append(["r", 0, 0, pi / 2])
