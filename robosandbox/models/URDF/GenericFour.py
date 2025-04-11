@@ -21,7 +21,9 @@ class GenericFour(ERobot):
         )
 
         self.qz = np.zeros(4)
+        self.qr = np.array([0, -0.8, 0.8, 0.8])
         self.addconfiguration("qz", self.qz)
+        self.addconfiguration("qr", self.qr)
 
 
 if __name__ == "__main__":  # pragma nocover
@@ -30,12 +32,17 @@ if __name__ == "__main__":  # pragma nocover
 
     robot = robosandbox.models.URDF.GenericFour.GenericFour()
     q0 = robot.qz
-    qe = np.array([0.7, -1, 0, 1.2])
+    qe = robot.qr
     qtraj = jtraj(q0, qe, 100)
 
     env = swift.Swift()  # instantiate 3D browser-based visualizer       # activate it
     env.launch(realtime=True)
     env.add(robot)  # add robot to the 3D scene
+    dt = 0.05
+    # env.start_recording("G4", 1 / dt, format="gif")
     for qk in qtraj.q:  # for each joint configuration on trajectory
         robot.q = qk  # update the robot state
         env.step()  # update visualization
+
+    # env.stop_recording()
+    # env.close()
