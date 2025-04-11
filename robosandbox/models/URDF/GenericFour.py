@@ -3,6 +3,8 @@
 import numpy as np
 from roboticstoolbox.robot.ERobot import ERobot
 
+import robosandbox
+
 
 class GenericFour(ERobot):
     def __init__(self):
@@ -26,7 +28,7 @@ if __name__ == "__main__":  # pragma nocover
     from roboticstoolbox import jtraj
     import swift
 
-    robot = GenericFour()
+    robot = robosandbox.models.URDF.GenericFour.GenericFour()
     q0 = robot.qz
     qe = np.array([0.7, -1, 0, 1.2])
     qtraj = jtraj(q0, qe, 100)

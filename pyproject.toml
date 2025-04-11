@@ -190,6 +190,7 @@ packages = [
     "robosandbox.performance",
     "robosandbox.performance.workspace",
     "robosandbox.models",
+    "robosandbox.models.URDF",
     "robosandbox.models.DH",
     "robosandbox.models.DH.Generic",
     "robosandbox.models.DHRoboLink",
