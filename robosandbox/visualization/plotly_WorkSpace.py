@@ -177,7 +177,7 @@ class PlotlyWorkSpace:
         if isUpdate:
             fig.update_layout(
                 # title="Percentage of Values Approaching Zero",
-                xaxis_title="Range",
+                xaxis_title="Local Indice Range",
                 yaxis_title="Percentage of Total (%)",
                 template="plotly_white",
                 bargap=0.2,
