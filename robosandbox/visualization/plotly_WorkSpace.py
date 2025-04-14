@@ -168,6 +168,7 @@ class PlotlyWorkSpace:
                 ),
                 text=[f"{p:.2f}%" for p in plot_data["Percentage"]],
                 textposition="outside",
+                textfont=dict(size=18),
                 hovertemplate="Range: %{x}<br>Percentage: %{y:.2f}%<br>Count: %{customdata}<extra></extra>",
                 customdata=plot_data["Count"],
             )
@@ -179,6 +180,10 @@ class PlotlyWorkSpace:
                 # title="Percentage of Values Approaching Zero",
                 xaxis_title="Local Indice Range",
                 yaxis_title="Percentage of Total (%)",
+                xaxis=dict(tickfont=dict(size=18)),
+                yaxis=dict(tickfont=dict(size=18)),
+                xaxis_title_font=dict(size=18),
+                yaxis_title_font=dict(size=18),
                 template="plotly_white",
                 bargap=0.2,
                 height=600,
