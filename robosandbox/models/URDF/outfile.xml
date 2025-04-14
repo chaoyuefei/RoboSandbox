@@ -20,7 +20,7 @@
 			<geometry>
 				<cylinder length='0.4' radius='0.04'/>
 			</geometry>
-			<material name='grey'><color rgba='0.44 0.44 0.44 1'/></material>
+			<material name='grey'><color rgba='0.78 0.78 0.78 1'/></material>
 		</visual>
 	</link>
 	<joint name='move_l0_from_a0' type='continuous'>
@@ -49,7 +49,7 @@
 			<geometry>
 				<cylinder length='0.4' radius='0.04'/>
 			</geometry>
-			<material name='grey'><color rgba='0.44 0.44 0.44 1'/></material>
+			<material name='grey'><color rgba='0.78 0.78 0.78 1'/></material>
 		</visual>
 	</link>
 	<joint name='move_l1_from_a1' type='continuous'>
@@ -78,7 +78,7 @@
 			<geometry>
 				<cylinder length='0.4' radius='0.04'/>
 			</geometry>
-			<material name='grey'><color rgba='0.44 0.44 0.44 1'/></material>
+			<material name='grey'><color rgba='0.78 0.78 0.78 1'/></material>
 		</visual>
 	</link>
 	<joint name='move_l2_from_a2' type='continuous'>
@@ -107,7 +107,7 @@
 			<geometry>
 				<cylinder length='0.4' radius='0.04'/>
 			</geometry>
-			<material name='grey'><color rgba='0.44 0.44 0.44 1'/></material>
+			<material name='grey'><color rgba='0.78 0.78 0.78 1'/></material>
 		</visual>
 	</link>
 	<joint name='move_l3_from_a3' type='continuous'>

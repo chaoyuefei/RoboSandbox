@@ -19,6 +19,9 @@ class GenericFour(ERobot):
             urdf_string=urdf_string,
             urdf_filepath=urdf_filepath,
         )
+        self.qlim = np.array(
+            [[-np.pi, -np.pi, -np.pi, -np.pi], [np.pi, np.pi, np.pi, np.pi]]
+        )
 
         self.qz = np.zeros(4)
         self.qr = np.array([0, -0.8, 0.8, 0.8])

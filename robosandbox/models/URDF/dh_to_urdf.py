@@ -115,7 +115,7 @@ def xml_string(DH_Params, scale=1):
         outstring = outstring + "\t\t\t</geometry>\n"
         outstring = (
             outstring
-            + "\t\t\t<material name='blue'><color rgba='0.56 0.76 0.89 1'/></material>\n"
+            + "\t\t\t<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>\n"
         )
         outstring = outstring + "\t\t</visual>\n"
         outstring = outstring + "\t</link>\n"
@@ -179,7 +179,7 @@ def xml_string(DH_Params, scale=1):
         outstring = outstring + "\t\t\t</geometry>\n"
         outstring = (
             outstring
-            + "\t\t\t<material name='red'><color rgba='0.88 0.43 0.44 1'/></material>\n"
+            + "\t\t\t<material name='grey'><color rgba='0.78 0.78 0.78 1'/></material>\n"
         )
         outstring = outstring + "\t\t</visual>\n"
         outstring = outstring + "\t</link>\n"
