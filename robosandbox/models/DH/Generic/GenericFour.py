@@ -27,7 +27,13 @@ class GenericFour(DHRobot, PlotlyRobot):
         - qz: "zero" position [0, 0, 0, 0]
     """
 
-    def __init__(self, dofs=4, linklengths=[0.4] * 4, alpha=[pi / 2, 0, 0, 0]):
+    def __init__(
+        self,
+        dofs=4,
+        linklengths=[0.4] * 4,
+        alpha=[pi / 2, 0, 0, 0],
+        offset=[0, -pi / 2, 0, 0],
+    ):
         self.dofs = dofs
         deg = pi / 180
         d = [
@@ -42,6 +48,7 @@ class GenericFour(DHRobot, PlotlyRobot):
             -linklengths[2],
             -linklengths[3],
         ]  # Link length along common normal
+        theta = offset
         r = [[0] * 3 for _ in range(dofs)]  # Position of COM with respect to link frame
         I = [
             [0] * 6 for _ in range(dofs)
@@ -60,6 +67,7 @@ class GenericFour(DHRobot, PlotlyRobot):
                 d=d[i],
                 a=a[i],
                 alpha=alpha[i],
+                offset=offset[i],
                 r=r[i],
                 I=I[i],
                 m=m[i],
