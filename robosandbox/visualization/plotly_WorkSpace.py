@@ -1,5 +1,7 @@
 import plotly.graph_objects as go
 import pandas as pd
+# import plotly.express as px
+# import numpy as np
 
 
 class PlotlyWorkSpace:
@@ -45,6 +47,8 @@ class PlotlyWorkSpace:
             )
         if isShow:
             fig.show()
+
+        return fig
 
     def plot_distribution(
         self,
@@ -223,3 +227,173 @@ class PlotlyWorkSpace:
             fig.show()
 
         return fig
+
+    # def plot_zero_approach_pie(
+    #     self,
+    #     data_column="invcondition",
+    #     thresholds=None,
+    #     path="",
+    #     fig=go.Figure(),
+    #     isShow=True,
+    #     isUpdate=True,
+    #     color_scheme="Blues",
+    # ):
+    #     """
+    #     Plot the percentage of data points approaching zero compared to the total number of data points
+    #     as a pie chart.
+
+    #     Parameters:
+    #     -----------
+    #     data_column : str
+    #         Column name containing the data to analyze
+    #     thresholds : list
+    #         List of threshold values to define the ranges approaching zero (default: [0.001, 0.01, 0.05, 0.1, 0.5, 1.0])
+    #     path : str
+    #         Path to save the figure
+    #     fig : go.Figure
+    #         Plotly figure object
+    #     isShow : bool
+    #         Whether to display the figure
+    #     isUpdate : bool
+    #         Whether to update the figure layout
+    #     color_scheme : str
+    #         Color scheme for the pie slices (Blues, Greens, Reds, Purples, Oranges, etc.)
+    #     """
+    #     # Set default thresholds if not provided
+    #     if thresholds is None:
+    #         thresholds = [0.001, 0.01, 0.05, 0.1, 0.5, 1.0]
+
+    #     # Ensure thresholds are sorted
+    #     thresholds = sorted(thresholds)
+
+    #     # Get absolute values to focus on proximity to zero
+    #     abs_values = self.df[data_column].abs()
+
+    #     # Total number of data points
+    #     total_points = len(abs_values)
+
+    #     # Calculate counts for each threshold range
+    #     counts = []
+    #     labels = []
+
+    #     # For the first threshold
+    #     count_first = sum(abs_values < thresholds[0])
+    #     counts.append(count_first)
+    #     labels.append(f"< {thresholds[0]}")
+
+    #     # For intermediate thresholds
+    #     for i in range(1, len(thresholds)):
+    #         count = sum(
+    #             (abs_values >= thresholds[i - 1]) & (abs_values < thresholds[i])
+    #         )
+    #         counts.append(count)
+    #         labels.append(f"{thresholds[i - 1]} - {thresholds[i]}")
+
+    #     # For values greater than the last threshold
+    #     count_last = sum(abs_values >= thresholds[-1])
+    #     if count_last > 0:
+    #         counts.append(count_last)
+    #         labels.append(f"≥ {thresholds[-1]}")
+
+    #     # Define color maps based on the color scheme
+    #     color_maps = {
+    #         "blues": px.colors.sequential.Blues,
+    #         "greens": px.colors.sequential.Greens,
+    #         "reds": px.colors.sequential.Reds,
+    #         "purples": px.colors.sequential.Purples,
+    #         "oranges": px.colors.sequential.Oranges,
+    #         "greys": px.colors.sequential.Greys,
+    #         "ylorbr": px.colors.sequential.YlOrBr,
+    #         "ylgnbu": px.colors.sequential.YlGnBu,
+    #         "rdpu": px.colors.sequential.RdPu,
+    #     }
+
+    #     # Get the color scale based on the selected scheme
+    #     color_scale = color_maps.get(color_scheme.lower(), px.colors.sequential.Blues)
+
+    #     # For pie charts, we want distinct but related colors
+    #     # Extract a subset from the color scale based on the number of slices needed
+    #     if len(labels) <= len(color_scale):
+    #         # If we have enough colors in the scale, select evenly spaced colors
+    #         indices = np.linspace(0, len(color_scale) - 1, len(labels)).astype(int)
+    #         colors = [color_scale[i] for i in indices]
+    #     else:
+    #         # If we need more colors than available in the scale, interpolate
+    #         from scipy.interpolate import interp1d
+
+    #         # Convert hex colors to RGB for interpolation
+    #         def hex_to_rgb(hex_color):
+    #             hex_color = hex_color.lstrip("#")
+    #             return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+
+    #         # Convert RGB back to hex
+    #         def rgb_to_hex(rgb):
+    #             return f"#{int(rgb[0]):02x}{int(rgb[1]):02x}{int(rgb[2]):02x}"
+
+    #         # Get RGB values for interpolation
+    #         rgb_colors = [hex_to_rgb(color) for color in color_scale]
+
+    #         # Create interpolation function for each RGB component
+    #         r_interp = interp1d(
+    #             np.linspace(0, 1, len(rgb_colors)), [c[0] for c in rgb_colors]
+    #         )
+    #         g_interp = interp1d(
+    #             np.linspace(0, 1, len(rgb_colors)), [c[1] for c in rgb_colors]
+    #         )
+    #         b_interp = interp1d(
+    #             np.linspace(0, 1, len(rgb_colors)), [c[2] for c in rgb_colors]
+    #         )
+
+    #         # Generate new colors
+    #         new_points = np.linspace(0, 1, len(labels))
+    #         colors = [
+    #             rgb_to_hex((r_interp(x), g_interp(x), b_interp(x))) for x in new_points
+    #         ]
+
+    #     # Calculate percentages
+    #     percentages = [(count / total_points) * 100 for count in counts]
+
+    #     # Add a pie trace to the figure
+    #     fig.add_trace(
+    #         go.Pie(
+    #             labels=labels,
+    #             values=counts,
+    #             marker=dict(
+    #                 colors=colors, line=dict(color="rgba(255,255,255,0.5)", width=0.5)
+    #             ),
+    #             text=[f"{p:.2f}%" for p in percentages],
+    #             textposition="inside",
+    #             textfont=dict(size=14, color="white"),
+    #             hovertemplate="Range: %{label}<br>Percentage: %{percent}<br>Count: %{value}<extra></extra>",
+    #             textinfo="label+percent",
+    #             insidetextorientation="radial",
+    #         )
+    #     )
+
+    #     # Update layout
+    #     if isUpdate:
+    #         fig.update_layout(
+    #             title="Distribution of Values Approaching Zero",
+    #             template="plotly_white",
+    #             height=600,
+    #             width=800,
+    #             margin=dict(l=50, r=50, t=80, b=50),
+    #             legend=dict(
+    #                 font=dict(size=14),
+    #                 orientation="h",
+    #                 yanchor="bottom",
+    #                 y=-0.2,
+    #                 xanchor="center",
+    #                 x=0.5,
+    #             ),
+    #         )
+
+    #     # Save the figure if path is provided
+    #     if path:
+    #         fig.write_image(path)
+
+    #     # Show the figure
+    #     if isShow:
+    #         fig.show()
+
+    #     return fig
