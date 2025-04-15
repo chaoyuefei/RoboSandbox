@@ -21,7 +21,10 @@ class PlotlyWorkSpace:
                         color
                     ],  # set color to an array/list of desired values
                     colorscale="Viridis",  # choose a colorscale
-                    colorbar=dict(title=color),
+                    colorbar=dict(
+                        title=dict(text=color),
+                        # tickfont=dict(size=40),
+                    ),
                     opacity=0.5,
                 ),
             )
@@ -32,6 +35,12 @@ class PlotlyWorkSpace:
                     xaxis_title="X",
                     yaxis_title="Y",
                     zaxis_title="Z",
+                    # xaxis_title_font=dict(size=16),
+                    # yaxis_title_font=dict(size=16),
+                    # zaxis_title_font=dict(size=16),
+                    # xaxis=dict(tickfont=dict(size=16)),
+                    # yaxis=dict(tickfont=dict(size=16)),
+                    # zaxis=dict(tickfont=dict(size=16)),
                 ),
             )
         if isShow:
