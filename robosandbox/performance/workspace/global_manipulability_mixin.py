@@ -9,10 +9,19 @@ class GlobalManipulabilityMixin:
     ):
         v = self.get_volume()
         S_max = self.df[method].max()
-        S_sum = self.df[method].sum(skipna=True)
+        S_sum = self.df[method].sum()
+        S_rootb = (
+            self.df[method].apply(lambda x: x ** (1 / (self.robot.dofs + 1))).sum()
+        )
         if isNormalized:
-            S_sum_div = S_sum / (len(self.df) * S_max)
-            G = S_sum_div / v
+            if S_max == 0:
+                S_sum_div = S_sum / (len(self.df))
+            else:
+                S_sum_div = S_sum / (len(self.df) * S_max)
+            # G = S_sum_div / v
+            G = S_sum_div
+            # G = S_rootb / (len(self.df))
+
         else:
             G = S_sum / len(self.df)
         return G
