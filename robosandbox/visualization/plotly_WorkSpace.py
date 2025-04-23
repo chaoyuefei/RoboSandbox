@@ -9,28 +9,52 @@ class PlotlyWorkSpace:
         self.df = df
 
     def plot(
-        self, color="invcondition", path="", fig=go.Figure(), isShow=True, isUpdate=True
+        self,
+        color="invcondition",
+        path="",
+        fig=go.Figure(),
+        isShow=True,
+        isUpdate=True,
+        show_colorbar=True,
     ):
-        fig.add_trace(
-            go.Scatter3d(
-                x=self.df["x"],
-                y=self.df["y"],
-                z=self.df["z"],
-                mode="markers",
-                marker=dict(
-                    size=5,
-                    color=self.df[
-                        color
-                    ],  # set color to an array/list of desired values
-                    colorscale="Viridis",  # choose a colorscale
-                    colorbar=dict(
-                        title=dict(text=color),
-                        # tickfont=dict(size=40),
-                    ),
-                    opacity=0.5,
-                ),
-            )
+        trace = go.Scatter3d(
+            x=self.df["x"],
+            y=self.df["y"],
+            z=self.df["z"],
+            mode="markers",
+            marker=dict(
+                size=5,
+                color=self.df[color],
+                colorscale="Viridis",
+                opacity=0.5,
+            ),
         )
+        if show_colorbar:
+            trace.marker["colorbar"] = dict(
+                title=dict(text=color),
+            )
+
+        fig.add_trace(trace)
+        # fig.add_trace(
+        #     go.Scatter3d(
+        #         x=self.df["x"],
+        #         y=self.df["y"],
+        #         z=self.df["z"],
+        #         mode="markers",
+        #         marker=dict(
+        #             size=5,
+        #             color=self.df[
+        #                 color
+        #             ],  # set color to an array/list of desired values
+        #             colorscale="Viridis",  # choose a colorscale
+        #             colorbar=dict(
+        #                 title=dict(text=color),
+        #                 # tickfont=dict(size=40),
+        #             ),
+        #             opacity=0.5,
+        #         ),
+        #     )
+        # )
         if isUpdate:
             fig.update_layout(
                 scene=dict(
