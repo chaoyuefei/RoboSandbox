@@ -5,3 +5,4 @@ robosandbox/__pycache__
 robosandbox/.DS_Store
 robosandbox/geometry/.DS_Store
 docs/build
+tests/__pycache__

@@ -1,7 +1,5 @@
 [build-system]
-requires = [
-    "setuptools>=42"
-]
+requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -12,19 +10,15 @@ readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.8"
 license = { file = "LICENSE.txt" }
 keywords = ["robotics", "manipulator", "design", "analysis", "simulation"]
-authors = [
-    { name = "Chaoyue Fei", email = "chaoyue.fei@vub.be" }
-]
-maintainers = [
-    { name = "Chaoyue Fei", email = "chaoyue.fei@vub.be" }
-]
+authors = [{ name = "Chaoyue Fei", email = "chaoyue.fei@vub.be" }]
+maintainers = [{ name = "Chaoyue Fei", email = "chaoyue.fei@vub.be" }]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Topic :: Scientific/Engineering :: Visualization",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9"
+    "Programming Language :: Python :: 3.9",
 ]
 dependencies = [
     "numpy<2",
@@ -43,7 +37,7 @@ dependencies = [
     "dash",
     "dash-bootstrap-components",
     "pywebview",
-    "pymoo"
+    "pymoo",
 ]
 
 [project.optional-dependencies]
@@ -78,5 +72,6 @@ packages = [
     "robosandbox.geometry",
     "robosandbox.geometry.Link",
     "robosandbox.visualization",
-    "robosandbox.optimization"
+    "robosandbox.optimization",
+    "tests",
 ]
