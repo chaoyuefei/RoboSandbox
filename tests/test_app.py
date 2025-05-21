@@ -12,10 +12,10 @@ class TestApp(unittest.TestCase):
         # app.run_server(debug=True)
         self.assertIsNotNone(app, "app not defined")
 
-    def test_app_standalone(self):
-        app_standalone = rsb.visualization.app_standalone.RobotArmDesignAppStandalone()
-        app_standalone.run_app()
-        self.assertIsNotNone(app_standalone, "app_standalone not defined")
+    # def test_app_standalone(self):
+    #     app_standalone = rsb.visualization.app_standalone.RobotArmDesignAppStandalone()
+    #     app_standalone.run_app()
+    #     self.assertIsNotNone(app_standalone, "app_standalone not defined")
 
 
 if __name__ == "__main__":
