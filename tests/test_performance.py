@@ -1,4 +1,3 @@
-from pandas.core.nanops import F
 import robosandbox as rsb
 import unittest
 

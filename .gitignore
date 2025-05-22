@@ -6,3 +6,5 @@ robosandbox/.DS_Store
 robosandbox/geometry/.DS_Store
 docs/build
 tests/__pycache__
+tests/models
+tests/performance
