@@ -9,7 +9,7 @@ import robosandbox
 class GenericFour(ERobot):
     def __init__(self):
         links, name, urdf_string, urdf_filepath = self.URDF_read(
-            file_path="GenericFour.urdf", tld="./data/"
+            file_path="GenericFour.urdf", tld="rsb-data"
         )
 
         super().__init__(

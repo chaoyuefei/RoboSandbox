@@ -74,4 +74,5 @@ packages = [
     "robosandbox.visualization",
     "robosandbox.optimization",
     "tests",
+    "rsb-data",
 ]
