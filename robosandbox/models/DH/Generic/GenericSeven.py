@@ -69,7 +69,7 @@ class GenericSeven(DHRobot, PlotlyRobot):
 
         super().__init__(
             links,
-            name="GenericTwoDH",
+            name="GenericSevenDH",
             keywords=("dynamics", "symbolic", "mesh"),
             manufacturer="chaoyue",
         )
