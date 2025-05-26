@@ -10,22 +10,29 @@ import roboticstoolbox as rtb
 
 def main():
     # robot = rtb.models.Panda()
-    robot = rsb.models.DH.Panda()
+    # robot = rsb.models.DH.Panda()
+    robot = rsb.models.DH.Generic.GenericTwo()
     workspace = WorkSpace(robot)
     num_samples = 10
     joint_points = workspace.generate_joints_samples(num_samples)
     print(f"Generated {num_samples} joint configurations")
     # calculate yoshikawa
-    values = workspace.indice(method="yoshikawa", joint_points=joint_points, axes="all")
+    values = workspace.local_indice(
+        method="invcondition", joint_points=joint_points, axes="all"
+    )
     print(f"Yoshikawa value: {values}")
     # compare with robot manipulability
     robot_values = np.array(
         [
-            robot.manipulability(point, method="yoshikawa", axes="all")
+            robot.manipulability(point, method="invcondition", axes="all")
             for point in joint_points
         ]
     )
     print(f"Robot Yoshikawa value: {robot_values}")
+
+    # calculate global indices
+    G = workspace.global_indice(method="invcondition", axes="all", is_normalized=False)
+    print("Global Yoshikawa value:", G)
 
 
 if __name__ == "__main__":
