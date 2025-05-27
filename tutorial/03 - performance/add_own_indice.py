@@ -24,7 +24,7 @@ def order_independent_manipulability(
         det_H = np.linalg.det(H)
 
         # Calculate the nth root of the determinant (n is the matrix dimension)
-        n = robot.dofs
+        n = workspace.robot.dofs
         if det_H > 0:
             order_independent_manip = det_H ** (1 / n)
         else:
