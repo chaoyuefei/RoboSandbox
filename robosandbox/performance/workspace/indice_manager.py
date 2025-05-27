@@ -2,63 +2,64 @@ from typing import Callable, Dict, List, Tuple
 import numpy as np
 
 
-class ManipulabilityIndices:
+class RobotIndices:
     """
-    Class that implements manipulability indices calculations.
+    Class that implements various robot performance indices calculations including
+    manipulability indices and other performance metrics.
     """
 
     @staticmethod
     def yoshikawa(workspace, joint_points, axes="all") -> float:
         """
-        Calculate the Yoshikawa manipulability index.
+        Calculate the Yoshikawa manipulability index, one of the standard robot performance metrics.
 
         :param workspace: The workspace instance providing access to the robot.
         :param joint_points: List of joint configurations to evaluate.
         :param axes: Which axes to consider ('all', 'trans', 'rot').
         :return: The average Yoshikawa manipulability index.
         """
-        return ManipulabilityIndices._calculate_manipulability(
+        return RobotIndices._calculate_manipulability(
             workspace, joint_points, method="yoshikawa", axes=axes
         )
 
     @staticmethod
     def invcondition(workspace, joint_points, axes="all") -> float:
         """
-        Calculate the inverse condition number manipulability index.
+        Calculate the inverse condition number index, a performance metric for robot dexterity.
 
         :param workspace: The workspace instance providing access to the robot.
         :param joint_points: List of joint configurations to evaluate.
         :param axes: Which axes to consider ('all', 'trans', 'rot').
         :return: The average inverse condition number index.
         """
-        return ManipulabilityIndices._calculate_manipulability(
+        return RobotIndices._calculate_manipulability(
             workspace, joint_points, method="invcondition", axes=axes
         )
 
     @staticmethod
     def asada(workspace, joint_points, axes="all") -> float:
         """
-        Calculate the Asada manipulability index.
+        Calculate the Asada index, a performance metric based on minimum singular value.
 
         :param workspace: The workspace instance providing access to the robot.
         :param joint_points: List of joint configurations to evaluate.
         :param axes: Which axes to consider ('all', 'trans', 'rot').
-        :return: The average Asada manipulability index.
+        :return: The average Asada index.
         """
-        return ManipulabilityIndices._calculate_manipulability(
+        return RobotIndices._calculate_manipulability(
             workspace, joint_points, method="asada", axes=axes
         )
 
     @staticmethod
     def _calculate_manipulability(workspace, joint_points, method, axes="all") -> float:
         """
-        Base method to calculate any manipulability index.
+        Base method to calculate any robot performance index.
 
         :param workspace: The workspace instance providing access to the robot.
         :param joint_points: List of joint configurations to evaluate.
-        :param method: The manipulability method to use ('yoshikawa', 'invcondition', 'asada').
+        :param method: The index method to use ('yoshikawa', 'invcondition', 'asada').
         :param axes: Which axes to consider ('all', 'trans', 'rot').
-        :return: The average manipulability index value.
+        :return: The average index value.
         """
         if workspace.robot is None:
             raise ValueError("Robot is not set in the workspace")
@@ -74,7 +75,7 @@ class ManipulabilityIndices:
         # Return the average manipulability
         return manipulability_values
 
-    # Mapping of string identifiers to method functions
+    # Mapping of string identifiers to index calculation method functions
     METHOD_MAP = {"yoshikawa": yoshikawa, "invcondition": invcondition, "asada": asada}
 
 
@@ -85,18 +86,18 @@ class IndiceRegistry:
 
     # Mapping from string identifiers to (function, description) tuples
     INDICES_MAP = {
-        # Manipulability indices
+        # Robot performance indices
         "yoshikawa": (
-            ManipulabilityIndices.yoshikawa,
-            "Yoshikawa manipulability index (determinant of Jacobian)",
+            RobotIndices.yoshikawa,
+            "Yoshikawa index (determinant of Jacobian) - measures manipulability",
         ),
         "invcondition": (
-            ManipulabilityIndices.invcondition,
-            "Inverse condition number of the Jacobian",
+            RobotIndices.invcondition,
+            "Inverse condition number of the Jacobian - measures dexterity",
         ),
         "asada": (
-            ManipulabilityIndices.asada,
-            "Asada manipulability index (minimum singular value)",
+            RobotIndices.asada,
+            "Asada index (minimum singular value) - measures worst-case performance",
         ),
     }
 
@@ -138,8 +139,8 @@ class IndiceRegistry:
 
 class IndiceManager:
     """
-    A manager class that handles registration, retrieval, and calculation of indices
-    for robotic workspace analysis.
+    A manager class that handles registration, retrieval, and calculation of performance indices
+    for robotic workspace analysis and optimization.
     """
 
     def __init__(self):
@@ -154,15 +155,15 @@ class IndiceManager:
         self, name: str, function: Callable, *args, description: str = "", **kwargs
     ):
         """
-        Register a custom global indice function to the standard registry.
+        Register a custom global performance index function to the standard registry.
         
         Note: This method no longer stores the custom indices in the instance.
         Instead, it adds the function to the IndiceRegistry.
 
-        :param name: The name of the custom indice.
-        :param function: The callable function that computes the indice.
+        :param name: The name of the custom performance index.
+        :param function: The callable function that computes the index.
         :param args: Additional positional arguments for the function.
-        :param description: A description of what the indice measures.
+        :param description: A description of what the index measures.
         :param kwargs: Additional keyword arguments for the function.
         """
         # Add the custom function to the registry instead of storing locally
@@ -170,47 +171,47 @@ class IndiceManager:
 
     def get_indice(self, name: str) -> Tuple[Callable, Tuple, Dict, str]:
         """
-        Retrieve a specific indice by name from the registry.
+        Retrieve a specific performance index by name from the registry.
 
-        :param name: The name of the indice.
+        :param name: The name of the index.
         :return: Tuple containing (function, args, kwargs, description).
-        :raises ValueError: If the indice name is not found.
+        :raises ValueError: If the index name is not found.
         """
         # Check standard indices from registry
         if name in IndiceRegistry.INDICES_MAP:
             function, description = IndiceRegistry.INDICES_MAP[name]
             return (function, (), {}, description)
 
-        raise ValueError(f"Indice '{name}' not found.")
+        raise ValueError(f"Performance index '{name}' not found.")
 
     def list_indices(self) -> List[str]:
         """
-        List all available indices from the registry.
+        List all available performance indices from the registry.
 
-        :return: List of all registered indice names.
+        :return: List of all registered performance index names.
         """
         return list(IndiceRegistry.INDICES_MAP.keys())
 
     def get_indices_info(self) -> Dict[str, str]:
         """
-        Get information about all registered indices.
+        Get information about all registered performance indices.
 
-        :return: Dictionary mapping indice names to their descriptions.
+        :return: Dictionary mapping performance index names to their descriptions.
         """
         # Get indices from the registry
         return {name: desc for name, (_, desc) in IndiceRegistry.INDICES_MAP.items()}
 
     def calculate(self, name: str, workspace, joint_points, *args, **kwargs) -> float:
         """
-        Calculate a specific indice.
+        Calculate a specific robot performance index.
 
-        :param name: The name of the indice to calculate.
+        :param name: The name of the index to calculate.
         :param workspace: The workspace instance.
         :param joint_points: Joint configurations to evaluate.
-        :param args: Additional arguments to pass to the indice function.
-        :param kwargs: Additional keyword arguments to pass to the indice function.
-        :return: The calculated indice value.
-        :raises ValueError: If the indice name is not found.
+        :param args: Additional arguments to pass to the index function.
+        :param kwargs: Additional keyword arguments to pass to the index function.
+        :return: The calculated index value.
+        :raises ValueError: If the index name is not found.
         """
         function, _, _, _ = self.get_indice(name)
 
