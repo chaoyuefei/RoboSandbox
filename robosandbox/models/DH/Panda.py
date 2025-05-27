@@ -173,6 +173,8 @@ class Panda(DHRobot, PlotlyRobot):
         self.addconfiguration("qr", self.qr)
         self.addconfiguration("qz", self.qz)
 
+        self.dofs = 7
+
 
 if __name__ == "__main__":  # pragma nocover
     panda = Panda()
