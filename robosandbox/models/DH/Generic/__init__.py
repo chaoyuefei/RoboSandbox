@@ -1,3 +1,4 @@
+from robosandbox.models.DH.Generic.Generic import Generic
 from robosandbox.models.DH.Generic.GenericSeven import GenericSeven
 from robosandbox.models.DH.Generic.GenericSix import GenericSix
 from robosandbox.models.DH.Generic.GenericFive import GenericFive
@@ -7,6 +8,7 @@ from robosandbox.models.DH.Generic.GenericTwo import GenericTwo
 
 
 __all__ = [
+    "Generic",
     "GenericThree",
     "GenericFour",
     "GenericTwo",
