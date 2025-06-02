@@ -2,7 +2,7 @@
 
 [![Powered by the Robotics Toolbox](https://raw.githubusercontent.com/petercorke/robotics-toolbox-python/master/.github/svg/rtb_powered.min.svg)](https://github.com/petercorke/robotics-toolbox-python)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
+[![CI](https://github.com/chaoyuefei/RoboSandbox/workflows/CI/badge.svg)](https://github.com/chaoyuefei/RoboSandbox/actions?query=workflow%3Aci)
 <table style="border:0px">
 <tr style="border:0px">
 <td style="border:0px">
