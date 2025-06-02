@@ -4,6 +4,7 @@ import numpy as np
 from roboticstoolbox.robot.ERobot import ERobot
 import os
 import pathlib
+import time
 
 try:
     from .dh_to_urdf import xml_string
@@ -25,8 +26,8 @@ class GenericDH(ERobot):
         """
         Create a generic robot from DH parameters
 
-        This class generates a URDF file from DH parameters and stores it 
-        persistently in the rsb-data directory for later access. The URDF 
+        This class generates a URDF file from DH parameters and stores it
+        persistently in the rsb-data directory for later access. The URDF
         filename is automatically generated to avoid conflicts.
 
         Parameters:
@@ -45,7 +46,7 @@ class GenericDH(ERobot):
             Joint limits [[qmin], [qmax]] (default: [-pi, pi] for all joints)
         name : str, optional
             Robot name (default: "GenericDH")
-            
+
         Note:
         -----
         The generated URDF file is stored in rsb-data/{name}_{dofs}dof.urdf
@@ -88,10 +89,10 @@ class GenericDH(ERobot):
         current_dir = pathlib.Path(__file__).parent
         project_root = current_dir.parent.parent.parent
         rsb_data_dir = project_root / "rsb-data"
-        
+
         # Ensure rsb-data directory exists
         rsb_data_dir.mkdir(exist_ok=True)
-        
+
         # Create unique filename based on robot name and parameters
         urdf_filename = self._generate_unique_filename(rsb_data_dir, name, dofs)
         urdf_filepath = rsb_data_dir / urdf_filename
@@ -128,14 +129,14 @@ class GenericDH(ERobot):
         self._dh_d = d
         self._dh_alpha = alpha
         self._dh_offset = offset
-        
+
         # Store URDF file path for reference
         self._urdf_filepath = str(urdf_filepath)
 
     def _generate_unique_filename(self, directory, name, dofs):
         """
         Generate a unique URDF filename to avoid conflicts
-        
+
         Parameters:
         -----------
         directory : pathlib.Path
@@ -144,7 +145,7 @@ class GenericDH(ERobot):
             Base name for the robot
         dofs : int
             Number of degrees of freedom
-            
+
         Returns:
         --------
         str
@@ -152,59 +153,59 @@ class GenericDH(ERobot):
         """
         base_filename = f"{name}_{dofs}dof"
         urdf_filename = f"{base_filename}.urdf"
-        
+
         # Check if file already exists and create unique name if needed
         counter = 1
         while (directory / urdf_filename).exists():
             urdf_filename = f"{base_filename}_{counter}.urdf"
             counter += 1
-            
+
         return urdf_filename
-    
+
     @property
     def urdf_file_path(self):
         """
         Get the path to the stored URDF file
-        
+
         Returns:
         --------
         str
             Path to the URDF file
         """
         return self._urdf_filepath
-    
+
     @classmethod
     def cleanup_generated_urdf_files(cls, name_pattern=None):
         """
         Clean up generated URDF files from rsb-data directory
-        
+
         Parameters:
         -----------
         name_pattern : str, optional
             Pattern to match filenames (e.g., "GenericDH*" or "test_robot*")
             If None, removes all *_*dof*.urdf files
-        
+
         Returns:
         --------
         list
             List of deleted file paths
         """
         import glob
-        
+
         # Get rsb-data directory path
         current_dir = pathlib.Path(__file__).parent
         project_root = current_dir.parent.parent.parent
         rsb_data_dir = project_root / "rsb-data"
-        
+
         if not rsb_data_dir.exists():
             return []
-        
+
         # Define search pattern
         if name_pattern is None:
             search_pattern = str(rsb_data_dir / "*_*dof*.urdf")
         else:
             search_pattern = str(rsb_data_dir / f"{name_pattern}.urdf")
-        
+
         # Find and remove matching files
         deleted_files = []
         for file_path in glob.glob(search_pattern):
@@ -213,5 +214,124 @@ class GenericDH(ERobot):
                 deleted_files.append(file_path)
             except OSError:
                 pass  # File might be in use or already deleted
-                
+
         return deleted_files
+
+    def teach(self, realtime=True, config="qr"):
+        """
+        Launch an interactive teaching interface for the robot using Swift
+
+        This method creates a Swift environment with sliders to control each
+        joint of the robot in real-time. Similar to the MATLAB Robotics
+        Toolbox teach() function.
+
+        Parameters:
+        -----------
+        realtime : bool, optional
+            Whether to run the simulation in real-time (default: True)
+        config : str, optional
+            Initial configuration to use ('qr', 'qz', or None for current)
+            (default: 'qr')
+
+        Returns:
+        --------
+        None
+
+        Example:
+        --------
+        >>> robot = GenericDH(dofs=4, name="MyRobot")
+        >>> robot.teach()  # Opens interactive interface with ready pose
+        >>> robot.teach(config='qz')  # Start from zero configuration
+        """
+        try:
+            import swift
+        except ImportError:
+            raise ImportError(
+                "Swift package is required for teach functionality. "
+                "Please install it with: pip install swift-sim"
+            )
+
+        # Launch the simulator Swift
+        env = swift.Swift()
+        env.launch(realtime=realtime)
+
+        # Set robot to specified initial configuration
+        if config == "qr":
+            self.q = self.qr
+        elif config == "qz":
+            self.q = self.qz
+        elif config is not None:
+            print(f"Warning: Unknown configuration '{config}', using current pose")
+
+        env.add(self)
+
+        # Callback function for sliders to set joint angles
+        def set_joint(j, value):
+            self.q[j] = np.deg2rad(float(value))
+
+        # Add sliders for each joint
+        j = 0
+        for link in self.links:
+            if link.isjoint and hasattr(link, "qlim") and link.qlim is not None:
+                # Add slider with joint limits and current position
+                env.add(
+                    swift.Slider(
+                        lambda x, j=j: set_joint(j, x),
+                        min=np.round(np.rad2deg(link.qlim[0]), 2),
+                        max=np.round(np.rad2deg(link.qlim[1]), 2),
+                        step=1,
+                        value=np.round(np.rad2deg(self.q[j]), 2),
+                        desc=f"{self.name} Joint {j}",
+                        unit="&#176;",  # HTML unicode for degree sign
+                    )
+                )
+                j += 1
+
+        print(f"Teaching interface launched for {self.name}")
+        print(f"Robot has {self.n} joints with the following limits:")
+        j = 0
+        for link in self.links:
+            if link.isjoint and hasattr(link, "qlim") and link.qlim is not None:
+                print(
+                    f"  Joint {j}: [{np.rad2deg(link.qlim[0]):.1f}°, {np.rad2deg(link.qlim[1]):.1f}°]"
+                )
+                j += 1
+        print(
+            "Use the sliders to control joint angles. Press Ctrl+C or close the Swift window to exit."
+        )
+
+        # Main control loop
+        try:
+            while True:
+                # Update the environment with the new robot pose
+                env.step(0.0)
+                time.sleep(0.01)
+        except KeyboardInterrupt:
+            print("\nTeaching session ended by user.")
+            print(f"Final joint configuration: {np.rad2deg(self.q)}")
+        except Exception as e:
+            print(f"Teaching session ended due to error: {e}")
+        finally:
+            # Clean up
+            try:
+                env.close()
+            except Exception:
+                pass
+
+    def interactive_teach(self, **kwargs):
+        """
+        Convenience method that calls teach_gui() with the same parameters
+
+        This method provides an alternative name for the interactive teaching interface.
+
+        Parameters:
+        -----------
+        **kwargs
+            All keyword arguments are passed to teach()
+
+        Example:
+        --------
+        >>> robot = GenericDH(dofs=4, name="MyRobot")
+        >>> robot.interactive_teach()  # Opens interactive interface
+        """
+        return self.teach(**kwargs)
