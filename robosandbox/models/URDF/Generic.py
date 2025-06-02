@@ -2,8 +2,8 @@
 
 import numpy as np
 from roboticstoolbox.robot.ERobot import ERobot
-import tempfile
 import os
+import pathlib
 
 try:
     from .dh_to_urdf import xml_string
@@ -25,6 +25,10 @@ class GenericDH(ERobot):
         """
         Create a generic robot from DH parameters
 
+        This class generates a URDF file from DH parameters and stores it 
+        persistently in the rsb-data directory for later access. The URDF 
+        filename is automatically generated to avoid conflicts.
+
         Parameters:
         -----------
         dofs : int
@@ -41,6 +45,11 @@ class GenericDH(ERobot):
             Joint limits [[qmin], [qmax]] (default: [-pi, pi] for all joints)
         name : str, optional
             Robot name (default: "GenericDH")
+            
+        Note:
+        -----
+        The generated URDF file is stored in rsb-data/{name}_{dofs}dof.urdf
+        and can be accessed later via the urdf_file_path property.
         """
 
         # Set default values
@@ -74,29 +83,35 @@ class GenericDH(ERobot):
         # Generate URDF string
         urdf_string = xml_string(DH_Params)
 
-        # Create temporary URDF file
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".urdf", delete=False) as f:
+        # Create persistent URDF file in rsb-data folder
+        # Get the project root directory (assuming this file is in robosandbox/models/URDF/)
+        current_dir = pathlib.Path(__file__).parent
+        project_root = current_dir.parent.parent.parent
+        rsb_data_dir = project_root / "rsb-data"
+        
+        # Ensure rsb-data directory exists
+        rsb_data_dir.mkdir(exist_ok=True)
+        
+        # Create unique filename based on robot name and parameters
+        urdf_filename = self._generate_unique_filename(rsb_data_dir, name, dofs)
+        urdf_filepath = rsb_data_dir / urdf_filename
+
+        # Write URDF file
+        with open(urdf_filepath, "w") as f:
             f.write(urdf_string)
-            urdf_filepath = f.name
 
-        try:
-            # Read the URDF
-            links, robot_name, urdf_string, _ = self.URDF_read(
-                file_path=urdf_filepath, tld=None
-            )
+        # Read the URDF
+        links, robot_name, urdf_string, _ = self.URDF_read(
+            file_path=str(urdf_filepath), tld=None
+        )
 
-            super().__init__(
-                links,
-                name=name,
-                manufacturer="Generic",
-                urdf_string=urdf_string,
-                urdf_filepath=urdf_filepath,
-            )
-
-        finally:
-            # Clean up temporary file
-            if os.path.exists(urdf_filepath):
-                os.unlink(urdf_filepath)
+        super().__init__(
+            links,
+            name=name,
+            manufacturer="Generic",
+            urdf_string=urdf_string,
+            urdf_filepath=str(urdf_filepath),
+        )
 
         # Set joint limits
         self.qlim = qlim
@@ -113,3 +128,90 @@ class GenericDH(ERobot):
         self._dh_d = d
         self._dh_alpha = alpha
         self._dh_offset = offset
+        
+        # Store URDF file path for reference
+        self._urdf_filepath = str(urdf_filepath)
+
+    def _generate_unique_filename(self, directory, name, dofs):
+        """
+        Generate a unique URDF filename to avoid conflicts
+        
+        Parameters:
+        -----------
+        directory : pathlib.Path
+            Directory where the file will be stored
+        name : str
+            Base name for the robot
+        dofs : int
+            Number of degrees of freedom
+            
+        Returns:
+        --------
+        str
+            Unique filename
+        """
+        base_filename = f"{name}_{dofs}dof"
+        urdf_filename = f"{base_filename}.urdf"
+        
+        # Check if file already exists and create unique name if needed
+        counter = 1
+        while (directory / urdf_filename).exists():
+            urdf_filename = f"{base_filename}_{counter}.urdf"
+            counter += 1
+            
+        return urdf_filename
+    
+    @property
+    def urdf_file_path(self):
+        """
+        Get the path to the stored URDF file
+        
+        Returns:
+        --------
+        str
+            Path to the URDF file
+        """
+        return self._urdf_filepath
+    
+    @classmethod
+    def cleanup_generated_urdf_files(cls, name_pattern=None):
+        """
+        Clean up generated URDF files from rsb-data directory
+        
+        Parameters:
+        -----------
+        name_pattern : str, optional
+            Pattern to match filenames (e.g., "GenericDH*" or "test_robot*")
+            If None, removes all *_*dof*.urdf files
+        
+        Returns:
+        --------
+        list
+            List of deleted file paths
+        """
+        import glob
+        
+        # Get rsb-data directory path
+        current_dir = pathlib.Path(__file__).parent
+        project_root = current_dir.parent.parent.parent
+        rsb_data_dir = project_root / "rsb-data"
+        
+        if not rsb_data_dir.exists():
+            return []
+        
+        # Define search pattern
+        if name_pattern is None:
+            search_pattern = str(rsb_data_dir / "*_*dof*.urdf")
+        else:
+            search_pattern = str(rsb_data_dir / f"{name_pattern}.urdf")
+        
+        # Find and remove matching files
+        deleted_files = []
+        for file_path in glob.glob(search_pattern):
+            try:
+                os.unlink(file_path)
+                deleted_files.append(file_path)
+            except OSError:
+                pass  # File might be in use or already deleted
+                
+        return deleted_files
