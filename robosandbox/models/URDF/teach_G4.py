@@ -13,7 +13,7 @@ env = swift.Swift()
 env.launch()
 
 # Make a Panda robot and add it to Swift
-G4 = rsb.models.URDF.GenericFour.GenericFour()
+G4 = rsb.models.URDF.GenericFour()
 G4.q = G4.qr
 env.add(G4)
 
