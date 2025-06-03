@@ -58,3 +58,9 @@ print(f"Global order-independent manipulability: {global_oim:.4f}")
 # %%
 fig = ws.plot(color="order_independent_manipulability", fig=go.Figure())
 fig.show("png")
+
+# %%
+voxel_data = rsb.visualization.voxel_data.VoxelData(
+    ws.df, method="order_independent_manipulability", voxel_size=0.1
+)
+fig = voxel_data.plot()
