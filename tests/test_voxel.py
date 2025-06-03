@@ -1,39 +1,60 @@
+# %%
+import robosandbox as rsb
 import numpy as np
 import plotly.graph_objects as go
 
-# Create a grid from 0 to 20 without using j notation
-x = np.linspace(0, 20, 21)
-y = np.linspace(0, 20, 20)
-z = np.linspace(0, 20, 20)
 
-# Create the 3D grid using meshgrid
-X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
-print(x)
+# %%
+def order_independent_manipulability(
+    workspace, joint_points, method="order_independent_manipulability", axes="all"
+):
+    """
+    \sqrt[n]{(\operatorname{det}(\mathbf{H}(\mathbf{q}))}
+    Calculate the order-independent manipulability index for a robot.
 
-# Define the volume data
-vol = (X - 10) ** 2 + (Y - 10) ** 2 + (Z - 10) ** 2
+    :param workspace: The workspace instance providing access to the robot.
+    :param joint_points: List of joint configurations to evaluate.
+    :param method: The method name (for compatibility with the indice registry).
+    :param axes: Which axes to consider ('all', 'trans', 'rot').
+    :return: The order-independent manipulability indices for each configuration.
+    """
+    results = []
 
-# Create the 3D volume plot
-fig = go.Figure(
-    data=go.Volume(
-        x=X.flatten(),
-        y=Y.flatten(),
-        z=Z.flatten(),
-        value=vol.flatten(),
-        isomin=50,
-        isomax=200,
-        opacity=0.2,
-        surface_count=21,
-        caps=dict(x_show=False, y_show=False, z_show=False),  # no caps
-    )
+    for point in joint_points:
+        J = workspace.robot.jacob0(point)
+        H = J @ J.T
+
+        # Get the determinant of the manipulability matrix
+        det_H = np.linalg.det(H)
+
+        # Calculate the nth root of the determinant (n is the matrix dimension)
+        n = workspace.robot.dofs
+        if det_H > 0:
+            order_independent_manip = det_H ** (1 / n)
+        else:
+            order_independent_manip = 0
+
+        results.append(order_independent_manip)
+
+    return np.array(results)
+
+
+# %%
+robot = rsb.models.DH.Panda()
+ws = rsb.performance.workspace.WorkSpace(robot)
+
+# Register the new manipulability index
+ws.add_indice(
+    method="order_independent_manipulability",
+    function=order_independent_manipulability,
+    description="Order-independent manipulability index (nth root of determinant)",
 )
 
-# Update layout for better visualization
-fig.update_layout(
-    title="3D Volume Plot (0-20 scale)",
-    scene=dict(
-        xaxis=dict(range=[0, 20]), yaxis=dict(range=[0, 20]), zaxis=dict(range=[0, 20])
-    ),
-)
+# Calculate the global indices
+print("\nCalculating global indices (this may take a moment)...")
+global_oim = ws.global_indice(method="order_independent_manipulability")
+print(f"Global order-independent manipulability: {global_oim:.4f}")
 
-fig.show()
+# %%
+fig = ws.plot(color="order_independent_manipulability", fig=go.Figure())
+fig.show("png")

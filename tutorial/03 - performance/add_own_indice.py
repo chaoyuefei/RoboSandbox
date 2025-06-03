@@ -1,6 +1,10 @@
+# %%
 import robosandbox as rsb
+import numpy as np
+import plotly.graph_objects as go
 
 
+# %%
 def order_independent_manipulability(
     workspace, joint_points, method="order_independent_manipulability", axes="all"
 ):
@@ -35,10 +39,7 @@ def order_independent_manipulability(
     return np.array(results)
 
 
-import numpy as np
-
-# Create robot model
-# robot = rsb.models.DH.Generic.GenericSeven()
+# %%
 robot = rsb.models.DH.Panda()
 ws = rsb.performance.workspace.WorkSpace(robot)
 
@@ -49,38 +50,11 @@ ws.add_indice(
     description="Order-independent manipulability index (nth root of determinant)",
 )
 
-# Test the new index
-print("Available indices:", ws.list_indice())
-
-# Generate some joint configurations for testing
-qlist = ws.generate_joints_samples(100)
-
-# Calculate the order-independent manipulability index
-result = ws.local_indice("order_independent_manipulability", joint_points=qlist)
-print(f"Order-independent manipulability values for {len(result)} configurations:")
-print(f"  Min: {np.min(result):.4f}")
-print(f"  Max: {np.max(result):.4f}")
-print(f"  Mean: {np.mean(result):.4f}")
-
-# Compare with standard Yoshikawa index
-yoshi_result = ws.local_indice("yoshikawa", joint_points=qlist)
-print(f"\nStandard Yoshikawa values for {len(yoshi_result)} configurations:")
-print(f"  Min: {np.min(yoshi_result):.4f}")
-print(f"  Max: {np.max(yoshi_result):.4f}")
-print(f"  Mean: {np.mean(yoshi_result):.4f}")
-
 # Calculate the global indices
 print("\nCalculating global indices (this may take a moment)...")
-global_oim = ws.global_indice(
-    initial_samples=500,  # Using fewer samples for demonstration
-    method="order_independent_manipulability",
-    max_samples=1000,
-)
+global_oim = ws.global_indice(method="order_independent_manipulability")
 print(f"Global order-independent manipulability: {global_oim:.4f}")
 
-global_yoshi = ws.global_indice(
-    initial_samples=500,  # Using fewer samples for demonstration
-    method="yoshikawa",
-    max_samples=1000,
-)
-print(f"Global Yoshikawa manipulability: {global_yoshi:.4f}")
+# %%
+fig = ws.plot(color="order_independent_manipulability", fig=go.Figure())
+fig.show("png")
