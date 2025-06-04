@@ -3,7 +3,7 @@ import numpy as np
 
 def yoshikawa(workspace, joint_points, axes="all") -> np.ndarray:
     """
-    Calculate the Yoshikawa manipulability index, one of the standard robot performance metrics.
+    Yoshikawa index (determinant of Jacobian) - measures manipulability
 
     :param workspace: The workspace instance providing access to the robot.
     :param joint_points: List of joint configurations to evaluate.
@@ -17,7 +17,7 @@ def yoshikawa(workspace, joint_points, axes="all") -> np.ndarray:
 
 def invcondition(workspace, joint_points, axes="all") -> np.ndarray:
     """
-    Calculate the inverse condition number index, a performance metric for robot dexterity.
+    Inverse condition number of the Jacobian - measures dexterity
 
     :param workspace: The workspace instance providing access to the robot.
     :param joint_points: List of joint configurations to evaluate.
@@ -31,7 +31,7 @@ def invcondition(workspace, joint_points, axes="all") -> np.ndarray:
 
 def asada(workspace, joint_points, axes="all") -> np.ndarray:
     """
-    Calculate the Asada index, a performance metric based on minimum singular value.
+    Asada index (minimum singular value) - measures worst-case performance
 
     :param workspace: The workspace instance providing access to the robot.
     :param joint_points: List of joint configurations to evaluate.
@@ -68,5 +68,8 @@ def _calculate_manipulability(
     return manipulability_values
 
 
-# Mapping of string identifiers to index calculation method functions
-METHOD_MAP = {"yoshikawa": yoshikawa, "invcondition": invcondition, "asada": asada}
+# Dynamic mapping of string identifiers to index calculation method functions
+# This is automatically populated from all non-private functions in this module
+METHOD_MAP = {name: obj for name, obj in globals().items() 
+              if callable(obj) and not name.startswith('_') and hasattr(obj, '__module__') 
+              and obj.__module__ == __name__}

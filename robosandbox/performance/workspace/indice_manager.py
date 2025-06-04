@@ -1,9 +1,37 @@
 from typing import Callable, Dict, List, Tuple
-from .robot_indices import yoshikawa, invcondition, asada
+import inspect
+from . import robot_indices
 
 
-# Mapping of string identifiers to index calculation method functions
-METHOD_MAP = {"yoshikawa": yoshikawa, "invcondition": invcondition, "asada": asada}
+def _get_index_functions_from_module():
+    """
+    Automatically discover all index functions from the robot_indices module.
+    
+    :return: Dictionary mapping function names to (function, description) tuples.
+    """
+    indices_map = {}
+    
+    # Get all functions from the robot_indices module
+    for name, obj in inspect.getmembers(robot_indices, inspect.isfunction):
+        # Skip private functions (starting with _)
+        if name.startswith('_'):
+            continue
+            
+        # Skip functions that don't belong to the robot_indices module
+        if obj.__module__ != robot_indices.__name__:
+            continue
+            
+        # Extract description from docstring
+        description = ""
+        if obj.__doc__:
+            # Get the first line of the docstring as description
+            lines = obj.__doc__.strip().split('\n')
+            if lines:
+                description = lines[0].strip()
+        
+        indices_map[name] = (obj, description)
+    
+    return indices_map
 
 
 class IndiceRegistry:
@@ -11,22 +39,8 @@ class IndiceRegistry:
     A registry class that provides a catalog of all available indices.
     """
 
-    # Mapping from string identifiers to (function, description) tuples
-    INDICES_MAP = {
-        # Robot performance indices
-        "yoshikawa": (
-            yoshikawa,
-            "Yoshikawa index (determinant of Jacobian) - measures manipulability",
-        ),
-        "invcondition": (
-            invcondition,
-            "Inverse condition number of the Jacobian - measures dexterity",
-        ),
-        "asada": (
-            asada,
-            "Asada index (minimum singular value) - measures worst-case performance",
-        ),
-    }
+    # Dynamically populate indices map from robot_indices module
+    INDICES_MAP = _get_index_functions_from_module()
 
     @staticmethod
     def get_all_indices() -> Dict[str, Tuple[Callable, str]]:
