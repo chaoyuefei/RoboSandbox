@@ -1,82 +1,9 @@
 from typing import Callable, Dict, List, Tuple
-import numpy as np
+from .robot_indices import yoshikawa, invcondition, asada
 
 
-class RobotIndices:
-    """
-    Class that implements various robot performance indices calculations including
-    manipulability indices and other performance metrics.
-    """
-
-    @staticmethod
-    def yoshikawa(workspace, joint_points, axes="all") -> float:
-        """
-        Calculate the Yoshikawa manipulability index, one of the standard robot performance metrics.
-
-        :param workspace: The workspace instance providing access to the robot.
-        :param joint_points: List of joint configurations to evaluate.
-        :param axes: Which axes to consider ('all', 'trans', 'rot').
-        :return: The average Yoshikawa manipulability index.
-        """
-        return RobotIndices._calculate_manipulability(
-            workspace, joint_points, method="yoshikawa", axes=axes
-        )
-
-    @staticmethod
-    def invcondition(workspace, joint_points, axes="all") -> float:
-        """
-        Calculate the inverse condition number index, a performance metric for robot dexterity.
-
-        :param workspace: The workspace instance providing access to the robot.
-        :param joint_points: List of joint configurations to evaluate.
-        :param axes: Which axes to consider ('all', 'trans', 'rot').
-        :return: The average inverse condition number index.
-        """
-        return RobotIndices._calculate_manipulability(
-            workspace, joint_points, method="invcondition", axes=axes
-        )
-
-    @staticmethod
-    def asada(workspace, joint_points, axes="all") -> float:
-        """
-        Calculate the Asada index, a performance metric based on minimum singular value.
-
-        :param workspace: The workspace instance providing access to the robot.
-        :param joint_points: List of joint configurations to evaluate.
-        :param axes: Which axes to consider ('all', 'trans', 'rot').
-        :return: The average Asada index.
-        """
-        return RobotIndices._calculate_manipulability(
-            workspace, joint_points, method="asada", axes=axes
-        )
-
-    @staticmethod
-    def _calculate_manipulability(workspace, joint_points, method, axes="all") -> float:
-        """
-        Base method to calculate any robot performance index.
-
-        :param workspace: The workspace instance providing access to the robot.
-        :param joint_points: List of joint configurations to evaluate.
-        :param method: The index method to use ('yoshikawa', 'invcondition', 'asada').
-        :param axes: Which axes to consider ('all', 'trans', 'rot').
-        :return: The average index value.
-        """
-        if workspace.robot is None:
-            raise ValueError("Robot is not set in the workspace")
-
-        # Calculate manipulability for each joint configuration
-        manipulability_values = np.array(
-            [
-                workspace.robot.manipulability(point, method=method, axes=axes)
-                for point in joint_points
-            ]
-        )
-
-        # Return the average manipulability
-        return manipulability_values
-
-    # Mapping of string identifiers to index calculation method functions
-    METHOD_MAP = {"yoshikawa": yoshikawa, "invcondition": invcondition, "asada": asada}
+# Mapping of string identifiers to index calculation method functions
+METHOD_MAP = {"yoshikawa": yoshikawa, "invcondition": invcondition, "asada": asada}
 
 
 class IndiceRegistry:
@@ -88,15 +15,15 @@ class IndiceRegistry:
     INDICES_MAP = {
         # Robot performance indices
         "yoshikawa": (
-            RobotIndices.yoshikawa,
+            yoshikawa,
             "Yoshikawa index (determinant of Jacobian) - measures manipulability",
         ),
         "invcondition": (
-            RobotIndices.invcondition,
+            invcondition,
             "Inverse condition number of the Jacobian - measures dexterity",
         ),
         "asada": (
-            RobotIndices.asada,
+            asada,
             "Asada index (minimum singular value) - measures worst-case performance",
         ),
     }
