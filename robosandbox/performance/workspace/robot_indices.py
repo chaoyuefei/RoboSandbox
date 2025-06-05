@@ -47,6 +47,9 @@ def order_independent_manipulability(
     """
     \sqrt[n]{(\operatorname{det}(\mathbf{H}(\mathbf{q}))}
     Calculate the order-independent manipulability index for a robot.
+    Reference:
+    Kim, J.-O., & Khosla, P. K. (1991). Dexterity measures for design and control of manipulators. IEEE/RJS International Conference on Intelligent RObots and Systems (IROS), 758–763. https://doi.org/10.1109/IROS.1991.174572
+
 
     :param workspace: The workspace instance providing access to the robot.
     :param joint_points: List of joint configurations to evaluate.
