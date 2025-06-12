@@ -21,11 +21,14 @@ class PlotlyRobot:
         q,
         save=False,
         path="",
-        fig=go.Figure(),
+        fig=None,
         isShow=True,
         isUpdate=True,
         axis_length_factor=1.0,
+        zoom_factor=1.5,
     ):
+        if fig is None:
+            fig = go.Figure()
         self.tfs = self.fkine_all(q)
         self.joint_positions = self.compute_joint_positions()
         # fig = go.Figure()
@@ -111,9 +114,9 @@ class PlotlyRobot:
                     aspectmode="cube",
                     camera=dict(
                         eye=dict(
-                            x=1.5 * max_distance,
-                            y=-1.5 * max_distance,
-                            z=1.5 * max_distance,
+                            x=zoom_factor * max_distance,
+                            y=-zoom_factor * max_distance,
+                            z=zoom_factor * max_distance,
                         ),  # Position of the camera
                         center=dict(x=0, y=0, z=0),  # Point the camera is looking at
                         up=dict(x=0, y=0, z=1),  # Up vector direction
