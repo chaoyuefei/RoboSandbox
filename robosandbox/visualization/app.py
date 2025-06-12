@@ -392,9 +392,9 @@ class RobotArmDesignApp:
                 is_normalized_value,
             )
 
-    def run_server(self, debug=False):
+    def run_server(self, debug=False, *args, **kwargs):
         """Run the Dash server."""
-        self.app.run(debug=debug, use_reloader=False)
+        self.app.run(debug=debug, use_reloader=False, *args, **kwargs)
 
 
 class RobotHelper:
