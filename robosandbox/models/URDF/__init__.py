@@ -5,13 +5,15 @@ from robosandbox.models.URDF.GenericFour import GenericFour
 from robosandbox.models.URDF.GenericFive import GenericFive
 from robosandbox.models.URDF.GenericSix import GenericSix
 from robosandbox.models.URDF.GenericSeven import GenericSeven
+from robosandbox.models.URDF.Panda import Panda
 
 __all__ = [
     "GenericDH",
-    "GenericTwo", 
+    "GenericTwo",
     "GenericThree",
     "GenericFour",
     "GenericFive",
-    "GenericSix", 
-    "GenericSeven"
+    "GenericSix",
+    "GenericSeven",
+    "Panda",
 ]
