@@ -12,11 +12,13 @@ class PlotlyWorkSpace:
         self,
         color="invcondition",
         path="",
-        fig=go.Figure(),
+        fig=None,
         isShow=True,
         isUpdate=True,
         show_colorbar=True,
     ):
+        if fig is None:
+            fig = go.Figure()
         trace = go.Scatter3d(
             x=self.df["x"],
             y=self.df["y"],
