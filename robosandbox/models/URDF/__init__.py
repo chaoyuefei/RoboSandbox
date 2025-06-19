@@ -7,6 +7,7 @@ from robosandbox.models.URDF.GenericSix import GenericSix
 from robosandbox.models.URDF.GenericSeven import GenericSeven
 from robosandbox.models.URDF.Panda import Panda
 from robosandbox.models.URDF.Model import Model
+from robosandbox.models.URDF.Puma560 import Puma560
 
 __all__ = [
     "GenericDH",
@@ -17,5 +18,6 @@ __all__ = [
     "GenericSix",
     "GenericSeven",
     "Panda",
+    "Puma560",
     "Model",
 ]

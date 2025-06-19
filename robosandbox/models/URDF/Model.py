@@ -54,12 +54,12 @@ class Model(Robot):
         # )
 
 
-if __name__ == "__main__":  # pragma nocover
-    # SO101 = Model(
-    #     name="SO101",
-    #     file_path="so100.urdf",
-    #     tld="/Users/chaoyue/Documents/coding/RoboSandbox/robosandbox/models/URDF/data/SO100",
-    # )
-    # SO101.q = np.zeros(6)
-    # print(SO101)
-    # SO101.plot(q=SO101.q)
+# if __name__ == "__main__":  # pragma nocover
+# SO101 = Model(
+#     name="SO101",
+#     file_path="so100.urdf",
+#     tld="/Users/chaoyue/Documents/coding/RoboSandbox/robosandbox/models/URDF/data/SO100",
+# )
+# SO101.q = np.zeros(6)
+# print(SO101)
+# SO101.plot(q=SO101.q)
