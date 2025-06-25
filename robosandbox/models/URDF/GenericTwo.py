@@ -23,6 +23,108 @@ class GenericTwo(GenericDH):
         self.qr = np.array([np.pi / 4, np.pi / 3])
         self.addconfiguration("qr", self.qr)
 
+    def teach(self, realtime=True, config="qr"):
+        """
+        Launch an interactive teaching interface for the robot using Swift
+
+        This method creates a Swift environment with sliders to control each
+        joint of the robot in real-time. Similar to the MATLAB Robotics
+        Toolbox teach() function.
+
+        Parameters:
+        -----------
+        realtime : bool, optional
+            Whether to run the simulation in real-time (default: True)
+        config : str, optional
+            Initial configuration to use ('qr', 'qz', or None for current)
+            (default: 'qr')
+
+        Returns:
+        --------
+        None
+
+        Example:
+        --------
+        >>> robot = GenericDH(dofs=4, name="MyRobot")
+        >>> robot.teach()  # Opens interactive interface with ready pose
+        >>> robot.teach(config='qz')  # Start from zero configuration
+        """
+        try:
+            import swift
+            import time
+        except ImportError:
+            raise ImportError(
+                "Swift package is required for teach functionality. "
+                "Please install it with: pip install swift-sim"
+            )
+
+        # Launch the simulator Swift
+        env = swift.Swift()
+        env.launch(realtime=realtime)
+
+        # Set robot to specified initial configuration
+        if config == "qr":
+            self.q = self.qr
+        elif config == "qz":
+            self.q = self.qz
+        elif config is not None:
+            print(f"Warning: Unknown configuration '{config}', using current pose")
+
+        env.add(self)
+
+        # Callback function for sliders to set joint angles
+        def set_joint(j, value):
+            self.q[j] = np.deg2rad(float(value))
+
+        # Add sliders for each joint
+        j = 0
+        for link in self.links:
+            if link.isjoint and hasattr(link, "qlim") and link.qlim is not None:
+                # Add slider with joint limits and current position
+                env.add(
+                    swift.Slider(
+                        lambda x, j=j: set_joint(j, x),
+                        min=np.round(np.rad2deg(link.qlim[0]), 2),
+                        max=np.round(np.rad2deg(link.qlim[1]), 2),
+                        step=1,
+                        value=np.round(np.rad2deg(self.q[j]), 2),
+                        desc=f"{self.name} Joint {j}",
+                        unit="&#176;",  # HTML unicode for degree sign
+                    )
+                )
+                j += 1
+
+        print(f"Teaching interface launched for {self.name}")
+        print(f"Robot has {self.n} joints with the following limits:")
+        j = 0
+        for link in self.links:
+            if link.isjoint and hasattr(link, "qlim") and link.qlim is not None:
+                print(
+                    f"  Joint {j}: [{np.rad2deg(link.qlim[0]):.1f}°, {np.rad2deg(link.qlim[1]):.1f}°]"
+                )
+                j += 1
+        print(
+            "Use the sliders to control joint angles. Press Ctrl+C or close the Swift window to exit."
+        )
+
+        # Main control loop
+        try:
+            while True:
+                # Update the environment with the new robot pose
+                env.step(0.0)
+                time.sleep(0.01)
+        except KeyboardInterrupt:
+            print("\nTeaching session ended by user.")
+            print(f"Final joint configuration: {np.rad2deg(self.q)}")
+        except Exception as e:
+            print(f"Teaching session ended due to error: {e}")
+        finally:
+            # Clean up
+            try:
+                env.close()
+            except Exception:
+                pass
+
 
 if __name__ == "__main__":  # pragma nocover
     from roboticstoolbox import jtraj
@@ -31,13 +133,14 @@ if __name__ == "__main__":  # pragma nocover
     robot = GenericTwo()
     q0 = robot.qz
     qe = robot.qr
-    qtraj = jtraj(q0, qe, 100)
+    robot.teach(realtime=False, config="qr")
+    # qtraj = jtraj(q0, qe, 100)
 
-    env = swift.Swift()
-    env.launch(realtime=True)
-    env.add(robot)
-    dt = 0.05
+    # env = swift.Swift()
+    # env.launch(realtime=True)
+    # env.add(robot)
+    # dt = 0.05
 
-    for qk in qtraj.q:
-        robot.q = qk
-        env.step()
+    # for qk in qtraj.q:
+    #     robot.q = qk
+    #     env.step()
