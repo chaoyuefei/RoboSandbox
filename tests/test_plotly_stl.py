@@ -87,8 +87,8 @@ def plot_inertia_ellipsoid(
     inertia_matrix,
     com_position,
     scale_factor=10.0,
-    opacity=0.8,
-    colorscale="Viridis",
+    opacity=0.4,
+    colorscale=[[0, "rgb(178,223,138)"]],
 ):
     """
     Add inertia ellipsoid and principal axes to the plot.
@@ -105,7 +105,6 @@ def plot_inertia_ellipsoid(
     x_ell, y_ell, z_ell, eigenvals, eigenvecs = create_inertia_ellipsoid(
         inertia_matrix, com_position, scale=scale_factor
     )
-
     # Add ellipsoid surface
     fig.add_trace(
         go.Surface(
@@ -116,7 +115,7 @@ def plot_inertia_ellipsoid(
             colorscale=colorscale,
             name="Inertia Ellipsoid",
             showscale=False,
-            surfacecolor=np.ones_like(x_ell),
+            surfacecolor=np.zeros_like(x_ell),
             cmin=0,
             cmax=1,
             hovertemplate="<b>Inertia Ellipsoid</b><br>X: %{x:.2f}<br>Y: %{y:.2f}<br>Z: %{z:.2f}<extra></extra>",
@@ -186,25 +185,46 @@ def create_inertia_heatmap(inertia_matrix):
     Returns:
         Plotly figure with heatmap
     """
+    # Create custom text annotations for each cell
+    annotations = []
+    labels = [["Ixx", "Ixy", "Ixz"], ["Iyx", "Iyy", "Iyz"], ["Izx", "Izy", "Izz"]]
+
+    for i in range(3):
+        for j in range(3):
+            annotations.append(
+                dict(
+                    x=j,
+                    y=i,
+                    text=f"{labels[i][j]}<br>{inertia_matrix[i][j]:.2e}",
+                    showarrow=False,
+                    font=dict(
+                        color="white"
+                        if abs(inertia_matrix[i][j])
+                        > np.max(np.abs(inertia_matrix)) / 2
+                        else "black"
+                    ),
+                )
+            )
+
     fig_heatmap = go.Figure(
         data=go.Heatmap(
             z=inertia_matrix,
-            x=["Ixx", "Ixy", "Ixz"],
-            y=["Iyx", "Iyy", "Iyz"],
+            x=["X", "Y", "Z"],
+            y=["X", "Y", "Z"],
             colorscale="RdBu",
-            text=inertia_matrix,
-            texttemplate="%{text:.2e}",
-            textfont={"size": 12},
+            showscale=True,
             hoverongaps=False,
+            hovertemplate="<b>I%{y}%{x}</b><br>Value: %{z:.2e}<extra></extra>",
         )
     )
 
     fig_heatmap.update_layout(
         title="Inertia Matrix Heatmap",
-        xaxis_title="Column",
-        yaxis_title="Row",
+        xaxis_title="Column (j)",
+        yaxis_title="Row (i)",
         width=500,
         height=400,
+        annotations=annotations,
     )
 
     return fig_heatmap
