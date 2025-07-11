@@ -12,14 +12,7 @@ license = { file = "LICENSE.txt" }
 keywords = ["robotics", "manipulator", "design", "analysis", "simulation"]
 authors = [{ name = "Chaoyue Fei", email = "chaoyue.fei@vub.be" }]
 maintainers = [{ name = "Chaoyue Fei", email = "chaoyue.fei@vub.be" }]
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "Topic :: Scientific/Engineering :: Visualization",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-]
+classifiers = ["Private :: Do Not Upload"]
 dependencies = [
     "numpy<2",
     "websockets<=12.0",
@@ -42,7 +35,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["check-manifest"]
-test = ["coverage"]
+test = ["pytest>=7.0.0", "pytest-cov>=4.0.0"]
 
 [project.urls]
 # Homepage = "https://github.com/yourusername/robosandbox"
@@ -58,7 +51,7 @@ robosandbox = "robosandbox.__main__:main"
 package-data = { "robosandbox" = ["*.dat"] }
 packages = [
     "robosandbox",
-    "tutorial",
+    # "tutorial",
     "robosandbox.performance",
     "robosandbox.performance.workspace",
     "robosandbox.models",
@@ -74,5 +67,5 @@ packages = [
     "robosandbox.visualization",
     "robosandbox.optimization",
     "tests",
-    "rsb-data",
+    # "rsb-data",
 ]
