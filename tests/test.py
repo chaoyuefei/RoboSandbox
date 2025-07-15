@@ -1,5 +1,6 @@
 import numpy as np
 import robosandbox as rsb
+import robosandbox.models as rsb_models
 from robosandbox.performance.workspace.indice_manager import (
     IndiceManager,
     IndiceRegistry,
@@ -10,11 +11,14 @@ import roboticstoolbox as rtb
 
 def main():
     # robot = rtb.models.Panda()
-    # robot = rsb.models.DH.Panda()
-    robot = rsb.models.DH.Generic.GenericTwo()
+    robot = rsb.models.DH.Panda.Panda()
+    robot = rsb_models.DH.UR5.UR5()
+    # robot = rsb.models.DH.Generic.GenericTwo()
     workspace = WorkSpace(robot)
-    num_samples = 10
+    num_samples = 1
     joint_points = workspace.generate_joints_samples(num_samples)
+    print(f"Robot.qlim: {robot.qlim.shape}")
+    print(f"Joint points: {joint_points}")
     print(f"Generated {num_samples} joint configurations")
     # calculate yoshikawa
     values = workspace.local_indice(
