@@ -374,6 +374,7 @@ if __name__ == "__main__":
         offset=[0, 0, 0, 0, 0, 0],
         link_radius=[0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
         actuator_radius=[0.02, 0.02, 0.02, 0.02, 0.01, 0.01],
+        actuator_length=[0.02, 0.02, 0.02, 0.02, 0.02, 0.02],
     )
     print(f"Created robot: {robot.name} with {robot.n} DOFs")
     print(f"URDF file path: {robot.urdf_file_path}")

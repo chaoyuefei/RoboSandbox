@@ -1,3 +1,3 @@
-from robosandbox.models.DHRoboLink import Generic
+from . import Generic
 
 __all__ = ["Generic"]

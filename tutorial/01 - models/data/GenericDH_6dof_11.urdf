@@ -142,7 +142,7 @@
 	<joint name='move_l4_from_a4' type='continuous'>
 		<parent link='a4'/>
 		<child link='l4'/>
-		<axis xyz='0.0 0 -1.0'/>
+		<axis xyz='0.0 -1.2246467991473532e-16 -1.0'/>
 		<origin rpy='0 0 0' xyz='0.0 0.0 0.10915'/>
 	</joint>
 	<link name='a5'>
