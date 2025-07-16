@@ -201,7 +201,7 @@ class DH_2_URDF:
             urdf += f"\t\t<parent link='a{i}'/>\n"
             urdf += f"\t\t<child link='l{i}'/>\n"
             # Axis: use z-axis of the frame
-            urdf += f"\t\t<axis xyz='{fr[0, 2]} {fr[1, 2]} {np.round(fr[2, 2], 2)}'/>\n"
+            urdf += f"\t\t<axis xyz='{np.round(fr[0, 2], 5)} {np.round(fr[1, 2], 5)} {np.round(fr[2, 2], 5)}'/>\n"
             urdf += (
                 f"\t\t<origin rpy='0 0 0' xyz='{el[0, 3]} {el[1, 3]} {el[2, 3]}'/>\n"
             )

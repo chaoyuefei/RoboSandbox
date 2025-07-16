@@ -9,3 +9,4 @@ tests/__pycache__
 tests/models
 tests/performance
 archive
+src/rsb-data

@@ -16,7 +16,7 @@
 	</link>
 	<link name='l0'>
 		<visual>
-			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.0447295'/>
+			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.045'/>
 			<geometry>
 				<cylinder length='0.089459' radius='0.04'/>
 			</geometry>
@@ -31,7 +31,7 @@
 	</joint>
 	<link name='a1'>
 		<visual>
-			<origin rpy='1.5707963267948966 0.0 0.0' xyz='0.0 0.0 0.089459'/>
+			<origin rpy='1.571 0.0 0.0' xyz='0.0 0.0 0.089'/>
 			<geometry>
 				<cylinder length='0.05' radius='0.02'/>
 			</geometry>
@@ -45,7 +45,7 @@
 	</joint>
 	<link name='l1'>
 		<visual>
-			<origin rpy='-0.0 -1.5707963267948963 0.0' xyz='-0.2125 -0.0 0.0'/>
+			<origin rpy='-0.0 -1.571 0.0' xyz='-0.212 -0.0 0.0'/>
 			<geometry>
 				<cylinder length='0.425' radius='0.04'/>
 			</geometry>
@@ -60,7 +60,7 @@
 	</joint>
 	<link name='a2'>
 		<visual>
-			<origin rpy='1.5707963267948966 0.0 0.0' xyz='-0.425 -0.0 0.0'/>
+			<origin rpy='1.571 0.0 0.0' xyz='-0.425 -0.0 0.0'/>
 			<geometry>
 				<cylinder length='0.05' radius='0.02'/>
 			</geometry>
@@ -74,7 +74,7 @@
 	</joint>
 	<link name='l2'>
 		<visual>
-			<origin rpy='-0.0 -1.5707963267948963 0.0' xyz='-0.196125 -0.0 0.0'/>
+			<origin rpy='-0.0 -1.571 0.0' xyz='-0.196 -0.0 0.0'/>
 			<geometry>
 				<cylinder length='0.39225' radius='0.04'/>
 			</geometry>
@@ -89,7 +89,7 @@
 	</joint>
 	<link name='a3'>
 		<visual>
-			<origin rpy='1.5707963267948966 0.0 0.0' xyz='-0.39225 -0.0 0.0'/>
+			<origin rpy='1.571 0.0 0.0' xyz='-0.392 -0.0 0.0'/>
 			<geometry>
 				<cylinder length='0.05' radius='0.02'/>
 			</geometry>
@@ -103,7 +103,7 @@
 	</joint>
 	<link name='l3'>
 		<visual>
-			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.054575'/>
+			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.055'/>
 			<geometry>
 				<cylinder length='0.10915' radius='0.04'/>
 			</geometry>
@@ -118,7 +118,7 @@
 	</joint>
 	<link name='a4'>
 		<visual>
-			<origin rpy='3.141592653589793 0.0 0.0' xyz='0.0 0.0 0.10915'/>
+			<origin rpy='3.142 0.0 0.0' xyz='0.0 0.0 0.109'/>
 			<geometry>
 				<cylinder length='0.05' radius='0.02'/>
 			</geometry>
@@ -132,7 +132,7 @@
 	</joint>
 	<link name='l4'>
 		<visual>
-			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.047325'/>
+			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.047'/>
 			<geometry>
 				<cylinder length='0.09465' radius='0.04'/>
 			</geometry>
@@ -147,7 +147,7 @@
 	</joint>
 	<link name='a5'>
 		<visual>
-			<origin rpy='1.5707963267948966 0.0 0.0' xyz='0.0 0.0 0.09465'/>
+			<origin rpy='1.571 0.0 0.0' xyz='0.0 0.0 0.095'/>
 			<geometry>
 				<cylinder length='0.05' radius='0.02'/>
 			</geometry>
@@ -161,7 +161,7 @@
 	</joint>
 	<link name='l5'>
 		<visual>
-			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.04115'/>
+			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.041'/>
 			<geometry>
 				<cylinder length='0.0823' radius='0.04'/>
 			</geometry>
