@@ -7,9 +7,9 @@ import pathlib
 import time
 
 try:
-    from .dh_to_urdf import xml_string
+    from .generic_dh_robot import DH_2_URDF
 except ImportError:
-    from dh_to_urdf import xml_string
+    from generic_dh_robot import DH_2_URDF
 
 
 class GenericDH(ERobot):
@@ -22,6 +22,10 @@ class GenericDH(ERobot):
         offset=None,
         qlim=None,
         name="GenericDH",
+        joint_types=None,
+        link_radius=0.04,
+        actuator_radius=0.05,
+        actuator_length=0.1,
     ):
         """
         Create a generic robot from DH parameters
@@ -46,6 +50,14 @@ class GenericDH(ERobot):
             Joint limits [[qmin], [qmax]] (default: [-pi, pi] for all joints)
         name : str, optional
             Robot name (default: "GenericDH")
+        joint_types : list, optional
+            List of joint types, e.g. ['r', 'p', 'f'] (default: all 'r')
+        link_radius : float, optional
+            Radius of the links (default: 0.04)
+        actuator_radius : float, optional
+            Radius of the actuators (default: 0.05)
+        actuator_length : float, optional
+            Length of the actuators (default: 0.1)
 
         Note:
         -----
@@ -55,37 +67,57 @@ class GenericDH(ERobot):
 
         # Set default values
         if a is None:
-            a = np.zeros(dofs)
+            a = [0.0] * dofs
         if d is None:
-            d = np.zeros(dofs)
+            d = [0.0] * dofs
         if alpha is None:
-            alpha = np.zeros(dofs)
+            alpha = [0.0] * dofs
         if offset is None:
-            offset = np.zeros(dofs)
+            offset = [0.0] * dofs
         if qlim is None:
             qlim = np.array([[-np.pi] * dofs, [np.pi] * dofs])
+        if joint_types is None:
+            joint_types = ["r"] * dofs
 
-        # Convert to numpy arrays
-        a = np.array(a)
-        d = np.array(d)
-        alpha = np.array(alpha)
-        offset = np.array(offset)
+        # Allow link_radius, actuator_radius, actuator_length as float or list
+        def ensure_list(val, length):
+            if isinstance(val, (float, int)):
+                return [val] * length
+            if isinstance(val, list) or isinstance(val, np.ndarray):
+                if len(val) != length:
+                    raise ValueError("Length of list parameter does not match dofs")
+                return list(val)
+            raise ValueError(
+                "Parameter must be a float, int, or list of correct length"
+            )
+
+        link_radius = ensure_list(link_radius, dofs)
+        actuator_radius = ensure_list(actuator_radius, dofs)
+        actuator_length = ensure_list(actuator_length, dofs)
 
         # Validate dimensions
-        if not all(len(param) == dofs for param in [a, d, alpha, offset]):
-            raise ValueError("All DH parameter arrays must have length equal to dofs")
+        if not all(len(param) == dofs for param in [a, d, alpha, offset, joint_types]):
+            raise ValueError(
+                "All DH parameter arrays and joint_types must have length equal to dofs"
+            )
 
-        # Create DH parameter list for URDF generation
-        # Assuming all joints are revolute for now
-        DH_Params = []
-        for i in range(dofs):
-            DH_Params.append(["r", d[i], a[i], alpha[i]])
-
-        # Generate URDF string
-        urdf_string = xml_string(DH_Params)
+        # Generate URDF string using DH_2_URDF
+        dh2urdf = DH_2_URDF(
+            dofs=dofs,
+            a=a,
+            d=d,
+            alpha=alpha,
+            link_radius=link_radius,
+            actuator_radius=actuator_radius,
+            actuator_length=actuator_length,
+            qlim=[(None, None)]
+            * dofs,  # qlim not used in URDF string, but kept for compatibility
+            name=name,
+            joint_types=joint_types,
+        )
+        urdf_string = dh2urdf.generate_urdf()
 
         # Create persistent URDF file in rsb-data folder
-        # Get the project root directory (assuming this file is in robosandbox/models/URDF/)
         current_dir = pathlib.Path(__file__).parent
         project_root = current_dir.parent.parent.parent
         rsb_data_dir = project_root / "rsb-data"
@@ -125,10 +157,11 @@ class GenericDH(ERobot):
         self.addconfiguration("qr", self.qr)
 
         # Store DH parameters for reference
-        self._dh_a = a
-        self._dh_d = d
-        self._dh_alpha = alpha
-        self._dh_offset = offset
+        self._dh_a = np.array(a)
+        self._dh_d = np.array(d)
+        self._dh_alpha = np.array(alpha)
+        self._dh_offset = np.array(offset)
+        self._joint_types = joint_types
 
         # Store URDF file path for reference
         self._urdf_filepath = str(urdf_filepath)
@@ -217,7 +250,7 @@ class GenericDH(ERobot):
 
         return deleted_files
 
-    def teach(self, realtime=True, config="qr"):
+    def teach(self, q=None, realtime=True):
         """
         Launch an interactive teaching interface for the robot using Swift
 
@@ -255,13 +288,7 @@ class GenericDH(ERobot):
         env = swift.Swift()
         env.launch(realtime=realtime)
 
-        # Set robot to specified initial configuration
-        if config == "qr":
-            self.q = self.qr
-        elif config == "qz":
-            self.q = self.qz
-        elif config is not None:
-            print(f"Warning: Unknown configuration '{config}', using current pose")
+        self.q = np.zeros(self.n) if q is None else np.array(q)
 
         env.add(self)
 
@@ -277,10 +304,10 @@ class GenericDH(ERobot):
                 env.add(
                     swift.Slider(
                         lambda x, j=j: set_joint(j, x),
-                        min=np.round(np.rad2deg(link.qlim[0]), 2),
-                        max=np.round(np.rad2deg(link.qlim[1]), 2),
+                        min=np.round(np.rad2deg(link.qlim[0]), 3),
+                        max=np.round(np.rad2deg(link.qlim[1]), 3),
                         step=1,
-                        value=np.round(np.rad2deg(self.q[j]), 2),
+                        value=np.round(np.rad2deg(self.q[j]), 3),
                         desc=f"{self.name} Joint {j}",
                         unit="&#176;",  # HTML unicode for degree sign
                     )
@@ -293,7 +320,7 @@ class GenericDH(ERobot):
         for link in self.links:
             if link.isjoint and hasattr(link, "qlim") and link.qlim is not None:
                 print(
-                    f"  Joint {j}: [{np.rad2deg(link.qlim[0]):.1f}°, {np.rad2deg(link.qlim[1]):.1f}°]"
+                    f"  Joint {j}: [{np.rad2deg(link.qlim[0]):.3f}°, {np.rad2deg(link.qlim[1]):.3f}°]"
                 )
                 j += 1
         print(
@@ -335,3 +362,22 @@ class GenericDH(ERobot):
         >>> robot.interactive_teach()  # Opens interactive interface
         """
         return self.teach(**kwargs)
+
+
+if __name__ == "__main__":
+    # Example usage
+    robot = GenericDH(
+        dofs=6,
+        a=[0, -0.42500, -0.39225, 0, 0, 0],
+        d=[0.089459, 0, 0, 0.10915, 0.09465, 0.0823],
+        alpha=[np.pi / 2, 0, 0, np.pi / 2, -np.pi / 2, 0],
+        offset=[0, 0, 0, 0, np.pi / 3, 0],
+        link_radius=[0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+        actuator_radius=[0.02, 0.02, 0.02, 0.02, 0.05, 0.05],
+    )
+    print(f"Created robot: {robot.name} with {robot.n} DOFs")
+    print(f"URDF file path: {robot.urdf_file_path}")
+
+    # Launch interactive teaching interface
+    print(robot)
+    robot.teach()

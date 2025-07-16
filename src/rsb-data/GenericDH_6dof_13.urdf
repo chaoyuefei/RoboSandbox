@@ -1,0 +1,177 @@
+<robot name='GenericDH'>
+	<material name='blue'>
+		<color rgba='0 0 0.8 1'/>
+	</material>
+	<material name='red'>
+		<color rgba='0.8 0 0 1'/>
+	</material>
+	<link name='a0'>
+		<visual>
+			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.0'/>
+			<geometry>
+				<cylinder length='0.1' radius='0.02'/>
+			</geometry>
+			<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>
+		</visual>
+	</link>
+	<link name='l0'>
+		<visual>
+			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.0447295'/>
+			<geometry>
+				<cylinder length='0.089459' radius='0.01'/>
+			</geometry>
+			<material name='grey'><color rgba='0.99 0.54 0.54 1'/></material>
+		</visual>
+	</link>
+	<joint name='move_l0_from_a0' type='continuous'>
+		<parent link='a0'/>
+		<child link='l0'/>
+		<axis xyz='0.0 0.0 1.0'/>
+		<origin rpy='0 0 0' xyz='0.0 0.0 0.0'/>
+	</joint>
+	<link name='a1'>
+		<visual>
+			<origin rpy='1.571 0.0 0.0' xyz='0.0 0.0 0.089459'/>
+			<geometry>
+				<cylinder length='0.1' radius='0.02'/>
+			</geometry>
+			<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>
+		</visual>
+	</link>
+	<joint name='fix_a1_to_l0' type='fixed'>
+		<parent link='l0'/>
+		<child link='a1'/>
+		<origin rpy='0 0 0' xyz='0 0 0'/>
+	</joint>
+	<link name='l1'>
+		<visual>
+			<origin rpy='-0.0 -1.571 0.0' xyz='-0.2125 -0.0 0.0'/>
+			<geometry>
+				<cylinder length='0.425' radius='0.01'/>
+			</geometry>
+			<material name='grey'><color rgba='0.99 0.54 0.54 1'/></material>
+		</visual>
+	</link>
+	<joint name='move_l1_from_a1' type='continuous'>
+		<parent link='a1'/>
+		<child link='l1'/>
+		<axis xyz='0.0 -1.0 0.0'/>
+		<origin rpy='0 0 0' xyz='0.0 0.0 0.089459'/>
+	</joint>
+	<link name='a2'>
+		<visual>
+			<origin rpy='1.571 0.0 0.0' xyz='-0.425 -0.0 0.0'/>
+			<geometry>
+				<cylinder length='0.1' radius='0.02'/>
+			</geometry>
+			<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>
+		</visual>
+	</link>
+	<joint name='fix_a2_to_l1' type='fixed'>
+		<parent link='l1'/>
+		<child link='a2'/>
+		<origin rpy='0 0 0' xyz='0 0 0'/>
+	</joint>
+	<link name='l2'>
+		<visual>
+			<origin rpy='-0.0 -1.571 0.0' xyz='-0.196125 -0.0 0.0'/>
+			<geometry>
+				<cylinder length='0.39225' radius='0.01'/>
+			</geometry>
+			<material name='grey'><color rgba='0.99 0.54 0.54 1'/></material>
+		</visual>
+	</link>
+	<joint name='move_l2_from_a2' type='continuous'>
+		<parent link='a2'/>
+		<child link='l2'/>
+		<axis xyz='0.0 -1.0 0.0'/>
+		<origin rpy='0 0 0' xyz='-0.425 -0.0 0.0'/>
+	</joint>
+	<link name='a3'>
+		<visual>
+			<origin rpy='1.571 0.0 0.0' xyz='-0.39225 -0.0 0.0'/>
+			<geometry>
+				<cylinder length='0.1' radius='0.02'/>
+			</geometry>
+			<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>
+		</visual>
+	</link>
+	<joint name='fix_a3_to_l2' type='fixed'>
+		<parent link='l2'/>
+		<child link='a3'/>
+		<origin rpy='0 0 0' xyz='0 0 0'/>
+	</joint>
+	<link name='l3'>
+		<visual>
+			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.054575'/>
+			<geometry>
+				<cylinder length='0.10915' radius='0.01'/>
+			</geometry>
+			<material name='grey'><color rgba='0.99 0.54 0.54 1'/></material>
+		</visual>
+	</link>
+	<joint name='move_l3_from_a3' type='continuous'>
+		<parent link='a3'/>
+		<child link='l3'/>
+		<axis xyz='0.0 -1.0 0.0'/>
+		<origin rpy='0 0 0' xyz='-0.39225 -0.0 0.0'/>
+	</joint>
+	<link name='a4'>
+		<visual>
+			<origin rpy='3.142 0.0 0.0' xyz='0.0 0.0 0.10915'/>
+			<geometry>
+				<cylinder length='0.1' radius='0.05'/>
+			</geometry>
+			<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>
+		</visual>
+	</link>
+	<joint name='fix_a4_to_l3' type='fixed'>
+		<parent link='l3'/>
+		<child link='a4'/>
+		<origin rpy='0 0 0' xyz='0 0 0'/>
+	</joint>
+	<link name='l4'>
+		<visual>
+			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.047325'/>
+			<geometry>
+				<cylinder length='0.09465' radius='0.01'/>
+			</geometry>
+			<material name='grey'><color rgba='0.99 0.54 0.54 1'/></material>
+		</visual>
+	</link>
+	<joint name='move_l4_from_a4' type='continuous'>
+		<parent link='a4'/>
+		<child link='l4'/>
+		<axis xyz='0.0 -1.2246467991473532e-16 -1.0'/>
+		<origin rpy='0 0 0' xyz='0.0 0.0 0.10915'/>
+	</joint>
+	<link name='a5'>
+		<visual>
+			<origin rpy='1.571 0.0 0.0' xyz='0.0 0.0 0.09465'/>
+			<geometry>
+				<cylinder length='0.1' radius='0.05'/>
+			</geometry>
+			<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>
+		</visual>
+	</link>
+	<joint name='fix_a5_to_l4' type='fixed'>
+		<parent link='l4'/>
+		<child link='a5'/>
+		<origin rpy='0 0 0' xyz='0 0 0'/>
+	</joint>
+	<link name='l5'>
+		<visual>
+			<origin rpy='-0.0 0.0 0.0' xyz='0.0 0.0 0.04115'/>
+			<geometry>
+				<cylinder length='0.0823' radius='0.01'/>
+			</geometry>
+			<material name='grey'><color rgba='0.99 0.54 0.54 1'/></material>
+		</visual>
+	</link>
+	<joint name='move_l5_from_a5' type='continuous'>
+		<parent link='a5'/>
+		<child link='l5'/>
+		<axis xyz='0.0 -1.0 0.0'/>
+		<origin rpy='0 0 0' xyz='0.0 0.0 0.09465'/>
+	</joint>
+</robot>

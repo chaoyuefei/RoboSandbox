@@ -8,7 +8,7 @@ from .GenericSeven import GenericSeven
 from .Panda import Panda
 from .Puma560 import Puma560
 from .Model import Model
-
+from .generic_dh_robot import DH_2_URDF
 
 __all__ = [
     "GenericDH",
@@ -21,4 +21,5 @@ __all__ = [
     "Panda",
     "Puma560",
     "Model",
+    "DH_2_URDF",
 ]
