@@ -3357,6 +3357,12 @@ wheels = [
 ]
 
 [[package]]
+name = "pybullet"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/93/4e6b070220fb6cd29cbcc09665efa5d0f6b27eb91db60dea5537fc552b01/pybullet-2.0.0.tar.gz", hash = "sha256:0a3d359879e9b6bb352c296f8b142c5afe1b0b105bb63fbe68a7062c5bb56cbf", size = 28109295, upload-time = "2018-05-29T16:07:42.107Z" }
+
+[[package]]
 name = "pycparser"
 version = "2.22"
 source = { registry = "https://pypi.org/simple" }
@@ -4182,6 +4188,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+collision = [
+    { name = "pybullet" },
+]
 dev = [
     { name = "check-manifest" },
 ]
@@ -4206,6 +4215,7 @@ requires-dist = [
     { name = "numpy-stl" },
     { name = "pandas" },
     { name = "plotly" },
+    { name = "pybullet", marker = "extra == 'collision'", specifier = "<=2.0.0" },
     { name = "pymoo" },
     { name = "pytest" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0.0" },
@@ -4215,7 +4225,7 @@ requires-dist = [
     { name = "tqdm" },
     { name = "websockets", specifier = "<=12.0" },
 ]
-provides-extras = ["dev", "test"]
+provides-extras = ["dev", "collision", "test"]
 
 [[package]]
 name = "roboticstoolbox-python"
