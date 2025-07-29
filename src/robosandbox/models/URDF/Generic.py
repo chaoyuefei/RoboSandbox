@@ -23,6 +23,7 @@ class GenericDH(ERobot):
         qlim=None,
         name="GenericDH",
         joint_types=None,
+        gripper_links=None,
         link_radius=0.04,
         actuator_radius=0.05,
         actuator_length=0.1,
@@ -64,7 +65,8 @@ class GenericDH(ERobot):
         The generated URDF file is stored in rsb-data/{name}_{dofs}dof.urdf
         and can be accessed later via the urdf_file_path property.
         """
-
+        # print(qlim.shape)
+        # print(qlim)
         # Set default values
         if a is None:
             a = [0.0] * dofs
@@ -144,9 +146,13 @@ class GenericDH(ERobot):
             manufacturer="Generic",
             urdf_string=urdf_string,
             urdf_filepath=str(urdf_filepath),
+            # gripper_links=links[-1],
         )
 
         # Set joint limits
+        print(qlim.shape)
+        print(links)
+        print(self.n)
         self.qlim = qlim
 
         # Set default configurations
@@ -365,6 +371,11 @@ class GenericDH(ERobot):
 
 
 if __name__ == "__main__":
+    import roboticstoolbox as rtb
+
+    ur5 = rtb.models.UR5()
+    print(ur5.fkine(ur5.qz))
+    print(ur5)
     # Example usage
     robot = GenericDH(
         dofs=6,
@@ -375,10 +386,12 @@ if __name__ == "__main__":
         link_radius=[0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
         actuator_radius=[0.02, 0.02, 0.02, 0.02, 0.01, 0.01],
         actuator_length=[0.02, 0.02, 0.02, 0.02, 0.02, 0.02],
+        # qlim=np.array([-np.pi * np.ones(6), np.pi * np.ones(6)]),
     )
     print(f"Created robot: {robot.name} with {robot.n} DOFs")
     print(f"URDF file path: {robot.urdf_file_path}")
 
     # Launch interactive teaching interface
     print(robot)
-    robot.teach()
+    print(robot.fkine(robot.qz))
+    # robot.teach()

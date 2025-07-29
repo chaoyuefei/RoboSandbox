@@ -133,79 +133,109 @@ class DH_2_URDF:
             "\t<material name='red'>\n\t\t<color rgba='0.8 0 0 1'/>\n\t</material>\n"
         )
 
-        for i in range(len(transforms) - 1):
-            el = transforms[i]
-            fr = frames[i]
+        for i in range(len(transforms)):
+            print(i)
+            if i < self.dofs:
+                el = transforms[i]
+                fr = frames[i]
 
-            # Link for actuator
-            rpy = R.from_matrix(fr[0:3, 0:3]).as_euler("XYZ")
-            rpy_str = f"{round(rpy[0], 3)} {round(rpy[1], 3)} {round(rpy[2], 3)}"
-            xyz_str = f"{round(el[0, 3], 3)} {round(el[1, 3], 3)} {round(el[2, 3], 3)}"
-            urdf += f"\t<link name='a{i}'>\n"
-            urdf += "\t\t<visual>\n"
-            urdf += f"\t\t\t<origin rpy='{rpy_str}' xyz='{xyz_str}'/>\n"
-            urdf += "\t\t\t<geometry>\n"
-            urdf += f"\t\t\t\t<cylinder length='{self.actuator_length[i]}' radius='{self.actuator_radius[i]}'/>\n"
-            urdf += "\t\t\t</geometry>\n"
-            urdf += "\t\t\t<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>\n"
-            urdf += "\t\t</visual>\n"
-            urdf += "\t</link>\n"
-
-            # If not on the first transformation, fix the actuator to the previous link
-            if i != 0:
-                urdf += f"\t<joint name='fix_a{i}_to_l{i - 1}' type='fixed'>\n"
-                urdf += f"\t\t<parent link='l{i - 1}'/>\n"
-                urdf += f"\t\t<child link='a{i}'/>\n"
-                urdf += "\t\t<origin rpy='0 0 0' xyz='0 0 0'/>\n"
-                urdf += "\t</joint>\n"
-
-            # Link for the actual link (cylinder between origins)
-            origins_vector = transforms[i + 1][0:3, 3]
-            origins_vector_norm = np.linalg.norm(origins_vector)
-            cylinder_origin = (
-                origins_vector / 2 if origins_vector_norm != 0 else origins_vector
-            )
-
-            rpy_link = [0, 0, 0]
-            if origins_vector_norm != 0.0:
-                origins_vector_unit = origins_vector / origins_vector_norm
-                axis = np.cross(origins_vector, np.array([0, 0, -1]))
-                axis_norm = np.linalg.norm(axis)
-                if axis_norm != 0.0:
-                    axis = axis / axis_norm
-                angle = np.arccos(origins_vector_unit @ np.array([0, 0, 1]))
-                rpy_link = R.from_rotvec(angle * axis).as_euler("XYZ")
-                rpy_link_str = f"{round(rpy_link[0], 3)} {round(rpy_link[1], 3)} {round(rpy_link[2], 3)}"
-                xyz_link_str = f"{round(cylinder_origin[0], 3)} {round(cylinder_origin[1], 3)} {round(cylinder_origin[2], 3)}"
-
-                urdf += f"\t<link name='l{i}'>\n"
+                # Link for actuator
+                rpy = R.from_matrix(fr[0:3, 0:3]).as_euler("XYZ")
+                rpy_str = f"{round(rpy[0], 3)} {round(rpy[1], 3)} {round(rpy[2], 3)}"
+                xyz_str = (
+                    f"{round(el[0, 3], 3)} {round(el[1, 3], 3)} {round(el[2, 3], 3)}"
+                )
+                urdf += f"\t<link name='a{i}'>\n"
                 urdf += "\t\t<visual>\n"
-                urdf += f"\t\t\t<origin rpy='{rpy_link_str}' xyz='{xyz_link_str}'/>\n"
+                urdf += f"\t\t\t<origin rpy='{rpy_str}' xyz='{xyz_str}'/>\n"
                 urdf += "\t\t\t<geometry>\n"
-                urdf += f"\t\t\t\t<cylinder length='{origins_vector_norm}' radius='{self.link_radius[i]}'/>\n"
+                urdf += f"\t\t\t\t<cylinder length='{self.actuator_length[i]}' radius='{self.actuator_radius[i]}'/>\n"
                 urdf += "\t\t\t</geometry>\n"
-                urdf += "\t\t\t<material name='grey'><color rgba='0.99 0.54 0.54 1'/></material>\n"
+                urdf += "\t\t\t<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>\n"
                 urdf += "\t\t</visual>\n"
                 urdf += "\t</link>\n"
 
-            # Add the actual joint between the actuator and link
-            jt = DH_Params[i][0]
-            if jt == "r":
-                jointType = "continuous"
-            elif jt == "p":
-                jointType = "prismatic"
-            else:
-                jointType = "fixed"
+                # If not on the first transformation, fix the actuator to the previous link
+                if i != 0:
+                    urdf += f"\t<joint name='fix_a{i}_to_l{i - 1}' type='fixed'>\n"
+                    urdf += f"\t\t<parent link='l{i - 1}'/>\n"
+                    urdf += f"\t\t<child link='a{i}'/>\n"
+                    urdf += "\t\t<origin rpy='0 0 0' xyz='0 0 0'/>\n"
+                    urdf += "\t</joint>\n"
 
-            urdf += f"\t<joint name='move_l{i}_from_a{i}' type='{jointType}'>\n"
-            urdf += f"\t\t<parent link='a{i}'/>\n"
-            urdf += f"\t\t<child link='l{i}'/>\n"
-            # Axis: use z-axis of the frame
-            urdf += f"\t\t<axis xyz='{np.round(fr[0, 2], 5)} {np.round(fr[1, 2], 5)} {np.round(fr[2, 2], 5)}'/>\n"
-            urdf += (
-                f"\t\t<origin rpy='0 0 0' xyz='{el[0, 3]} {el[1, 3]} {el[2, 3]}'/>\n"
-            )
-            urdf += "\t</joint>\n"
+                # Link for the actual link (cylinder between origins)
+                origins_vector = transforms[i + 1][0:3, 3]
+                origins_vector_norm = np.linalg.norm(origins_vector)
+                cylinder_origin = (
+                    origins_vector / 2 if origins_vector_norm != 0 else origins_vector
+                )
+
+                rpy_link = [0, 0, 0]
+                if origins_vector_norm != 0.0:
+                    origins_vector_unit = origins_vector / origins_vector_norm
+                    axis = np.cross(origins_vector, np.array([0, 0, -1]))
+                    axis_norm = np.linalg.norm(axis)
+                    if axis_norm != 0.0:
+                        axis = axis / axis_norm
+                    angle = np.arccos(origins_vector_unit @ np.array([0, 0, 1]))
+                    rpy_link = R.from_rotvec(angle * axis).as_euler("XYZ")
+                    rpy_link_str = f"{round(rpy_link[0], 3)} {round(rpy_link[1], 3)} {round(rpy_link[2], 3)}"
+                    xyz_link_str = f"{round(cylinder_origin[0], 3)} {round(cylinder_origin[1], 3)} {round(cylinder_origin[2], 3)}"
+
+                    urdf += f"\t<link name='l{i}'>\n"
+                    urdf += "\t\t<visual>\n"
+                    urdf += (
+                        f"\t\t\t<origin rpy='{rpy_link_str}' xyz='{xyz_link_str}'/>\n"
+                    )
+                    urdf += "\t\t\t<geometry>\n"
+                    urdf += f"\t\t\t\t<cylinder length='{origins_vector_norm}' radius='{self.link_radius[i]}'/>\n"
+                    urdf += "\t\t\t</geometry>\n"
+                    urdf += "\t\t\t<material name='grey'><color rgba='0.99 0.54 0.54 1'/></material>\n"
+                    urdf += "\t\t</visual>\n"
+                    urdf += "\t</link>\n"
+
+                # Add the actual joint between the actuator and link
+                jt = DH_Params[i][0]
+                if jt == "r":
+                    jointType = "continuous"
+                elif jt == "p":
+                    jointType = "prismatic"
+                else:
+                    jointType = "fixed"
+
+                urdf += f"\t<joint name='move_l{i}_from_a{i}' type='{jointType}'>\n"
+                urdf += f"\t\t<parent link='a{i}'/>\n"
+                urdf += f"\t\t<child link='l{i}'/>\n"
+                # Axis: use z-axis of the frame
+                urdf += f"\t\t<axis xyz='{np.round(fr[0, 2], 5)} {np.round(fr[1, 2], 5)} {np.round(fr[2, 2], 5)}'/>\n"
+                urdf += f"\t\t<origin rpy='0 0 0' xyz='{el[0, 3]} {el[1, 3]} {el[2, 3]}'/>\n"
+                urdf += "\t</joint>\n"
+            # add the last link
+            #     <link name="${prefix}tool0"/>
+            # <joint name="${prefix}wrist_3_link-tool0_fixed_joint" type="fixed">
+            #   <origin xyz="0 ${wrist_3_length} 0" rpy="${pi/-2.0} 0 0"/>
+            #   <!-- <origin xyz="0 0 0" rpy="0 0 0"/> -->
+            #   <parent link="${prefix}wrist_3_link"/>
+            #   <child link="${prefix}tool0"/>
+            # </joint>
+
+            if i == self.dofs:
+                el = transforms[i]
+                fr = frames[i]
+                print("================")
+                print(f"Link {i}: {el}, Frame: {fr}")
+                rpy = R.from_matrix(fr[0:3, 0:3]).as_euler("XYZ")
+                rpy_str = f"{round(rpy[0], 3)} {round(rpy[1], 3)} {round(rpy[2], 3)}"
+                xyz_str = (
+                    f"{round(el[0, 3], 3)} {round(el[1, 3], 3)} {round(el[2, 3], 3)}"
+                )
+
+                urdf += "\t<link name='tool0'/>\n"
+                urdf += "\t<joint name='tool0_fixed_joint' type='fixed'>\n"
+                urdf += f"\t\t<origin rpy='{rpy_str}' xyz='{xyz_str}'/>\n"
+                urdf += f"\t\t<parent link='l{self.dofs - 1}'/>\n"
+                urdf += "\t\t<child link='tool0'/>\n"
+                urdf += "\t</joint>\n"
 
         urdf += "</robot>\n"
         return urdf
