@@ -134,7 +134,6 @@ class DH_2_URDF:
         )
 
         for i in range(len(transforms)):
-            print(i)
             if i < self.dofs:
                 el = transforms[i]
                 fr = frames[i]
@@ -210,20 +209,10 @@ class DH_2_URDF:
                 urdf += f"\t\t<axis xyz='{np.round(fr[0, 2], 5)} {np.round(fr[1, 2], 5)} {np.round(fr[2, 2], 5)}'/>\n"
                 urdf += f"\t\t<origin rpy='0 0 0' xyz='{el[0, 3]} {el[1, 3]} {el[2, 3]}'/>\n"
                 urdf += "\t</joint>\n"
-            # add the last link
-            #     <link name="${prefix}tool0"/>
-            # <joint name="${prefix}wrist_3_link-tool0_fixed_joint" type="fixed">
-            #   <origin xyz="0 ${wrist_3_length} 0" rpy="${pi/-2.0} 0 0"/>
-            #   <!-- <origin xyz="0 0 0" rpy="0 0 0"/> -->
-            #   <parent link="${prefix}wrist_3_link"/>
-            #   <child link="${prefix}tool0"/>
-            # </joint>
 
             if i == self.dofs:
                 el = transforms[i]
                 fr = frames[i]
-                print("================")
-                print(f"Link {i}: {el}, Frame: {fr}")
                 rpy = R.from_matrix(fr[0:3, 0:3]).as_euler("XYZ")
                 rpy_str = f"{round(rpy[0], 3)} {round(rpy[1], 3)} {round(rpy[2], 3)}"
                 xyz_str = (

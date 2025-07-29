@@ -150,9 +150,6 @@ class GenericDH(ERobot):
         )
 
         # Set joint limits
-        print(qlim.shape)
-        print(links)
-        print(self.n)
         self.qlim = qlim
 
         # Set default configurations
@@ -373,9 +370,6 @@ class GenericDH(ERobot):
 if __name__ == "__main__":
     import roboticstoolbox as rtb
 
-    ur5 = rtb.models.UR5()
-    print(ur5.fkine(ur5.qz))
-    print(ur5)
     # Example usage
     robot = GenericDH(
         dofs=6,
@@ -383,9 +377,9 @@ if __name__ == "__main__":
         d=[0.089459, 0, 0, 0.10915, 0.09465, 0.0823],
         alpha=[np.pi / 2, 0, 0, np.pi / 2, -np.pi / 2, 0],
         offset=[0, 0, 0, 0, 0, 0],
-        link_radius=[0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
-        actuator_radius=[0.02, 0.02, 0.02, 0.02, 0.01, 0.01],
-        actuator_length=[0.02, 0.02, 0.02, 0.02, 0.02, 0.02],
+        link_radius=[0.060, 0.054, 0.060, 0.040, 0.01, 0.01],
+        actuator_radius=[0.060, 0.060, 0.060, 0.060, 0.060, 0.060],
+        actuator_length=[0.06, 0.06, 0.06, 0.06, 0.06, 0.06],
         # qlim=np.array([-np.pi * np.ones(6), np.pi * np.ones(6)]),
     )
     print(f"Created robot: {robot.name} with {robot.n} DOFs")
@@ -394,4 +388,4 @@ if __name__ == "__main__":
     # Launch interactive teaching interface
     print(robot)
     print(robot.fkine(robot.qz))
-    # robot.teach()
+    robot.teach()
