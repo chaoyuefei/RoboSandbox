@@ -152,6 +152,11 @@ class DH_2_URDF:
                 urdf += "\t\t\t</geometry>\n"
                 urdf += "\t\t\t<material name='blue'><color rgba='0.73 0.79 0.82 1'/></material>\n"
                 urdf += "\t\t</visual>\n"
+                urdf += "\t\t<collision>\n"
+                urdf += "\t\t\t<geometry>\n"
+                urdf += f"\t\t\t\t<cylinder length='{self.actuator_length[i]}' radius='{self.actuator_radius[i]}'/>\n"
+                urdf += "\t\t\t</geometry>\n"
+                urdf += "\t\t</collision>\n"
                 urdf += "\t</link>\n"
 
                 # If not on the first transformation, fix the actuator to the previous link
@@ -191,6 +196,12 @@ class DH_2_URDF:
                     urdf += "\t\t\t</geometry>\n"
                     urdf += "\t\t\t<material name='grey'><color rgba='0.99 0.54 0.54 1'/></material>\n"
                     urdf += "\t\t</visual>\n"
+                    urdf += "\t\t<collision>\n"
+                    urdf += "\t\t\t<geometry>\n"
+                    urdf += f"\t\t\t\t<cylinder length='{origins_vector_norm}' radius='{self.link_radius[i]}'/>\n"
+                    urdf += "\t\t\t</geometry>\n"
+                    urdf += "\t\t</collision>\n"
+
                     urdf += "\t</link>\n"
 
                 # Add the actual joint between the actuator and link
