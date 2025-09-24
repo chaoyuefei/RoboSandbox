@@ -27,16 +27,21 @@ An Open-Source Python Toolbox for Manipulator Design and Analysis
 <a id='1'></a>
 ## Synopsis
 
-RoboSandbox (rsb), an open-source Python package, invented for robotic manipulator design and analysis. The design goals are:
-- **user-friendly**: it is easy to install, use, and interact with. A nicely designed interative application is provided for robot design and analysis.
-- **accessible**: it is open-source, well-documented, and well-tested, and can be accessed on various operating systems such as Windows, Linux, and MacOS.
-- **extensible**: the code structure is extensible, allowing for the easy integration of new features and functionalities, such as the incorporation of additional indices to measure robotic performance.
+RoboSandbox (rsb), an opensource Python framework designed for robotic manipulator design and analysis. Different robot models and their workspaces can be evaluated, providing a unified environment for reach, global index, and other performance metrics.
+
+The design goals are:
+
+- **accessibility**: being open-source, documented, and widely tested to ensure reliability and reproducibility, while also providing crossplatform compatibility across Windows, Linux, and MacOS environments.
+- **extensibility**: It emphasizes extensibility through a modular structure that facilitates seamless integration of new features and functionalities, such as the addition of extra indices for measuring robotic performance.
+- **optimization-driven**: the system supports optimization-driven manipulator design processes through its modular architecture, where submodules can integrate into optimization loops to enable iterative design refinement and evaluation.
 
 ## Installation
 
 ### Local Installation
 
-To install RoboSandbox, it is recommended to use uv, a lightweight and fast package manager. You can install it by following the instructions on the [official website](https://uvpkg.com/).
+To install RoboSandbox, it is recommended to use uv, a lightweight and fast package manager. You can install it by following the [instructions](https://docs.astral.sh/uv/guides/install-python/)
+
+After installing uv, you can install RoboSandbox with the following command:
 
 ```bash
 git clone git@github.com:chaoyuefei/RoboSandbox.git

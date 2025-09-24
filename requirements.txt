@@ -1,2 +1,0 @@
-plotly==5.24.1
-roboticstoolbox_python==1.1.1
