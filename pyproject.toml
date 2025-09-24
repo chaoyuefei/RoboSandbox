@@ -12,7 +12,6 @@ license = { file = "LICENSE.txt" }
 keywords = ["robotics", "manipulator", "design", "analysis", "simulation"]
 authors = [{ name = "Chaoyue Fei", email = "chaoyue.fei@vub.be" }]
 maintainers = [{ name = "Chaoyue Fei", email = "chaoyue.fei@vub.be" }]
-# classifiers = ["Private :: Do Not Upload"]
 dependencies = [
     "numpy<2",
     "websockets<=12.0",
