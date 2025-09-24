@@ -39,16 +39,40 @@ The design goals are:
 
 ## Installation
 
-### Local Installation
+### Using Pip
 
-To install RoboSandbox, it is recommended to use uv, a lightweight and fast package manager. You can install it by following the [instructions](https://docs.astral.sh/uv/guides/install-python/)
+You can install RoboSandbox using pip by running the following command:
 
-After installing uv, you can install RoboSandbox with the following command:
+```bash
+pip install robosandbox
+```
+
+### Using Conda
+
+It is recommended to use a virtual environment. To set up a [conda](https://docs.conda.io/en/latest/) and [uv](https://docs.astral.sh/uv/getting-started/installation/) environment with RoboSandbox installed, you can use the following commands:
+
+```bash
+conda create -n rsb_env python=3.10
+conda activate rsb_env
+pip install uv
+uv pip install robosandbox
+```
+
+### Local development installation
+
+To install and develop RoboSandbox, it is recommended to use `uv`, a lightweight and efficient package manager.
+
+After installing uv, you can install RoboSandbox using the following command:
 
 ```bash
 git clone git@github.com:chaoyuefei/RoboSandbox.git
 cd RoboSandbox
 uv sync
+```
+
+Then you can run the standalone app with:
+
+```bash
 uv run src/robosandbox/visualization/app_standalone.py
 ```
 
@@ -58,4 +82,25 @@ To run the tests, use the following command:
 uv run pytest tests/
 ```
 
-## Tutorials
+## Examples
+
+### Standalone App Spawn
+
+1. set up a conda environment and install uv as described above:
+
+```bash
+conda create -n rsb_env python=3.10
+conda activate rsb_env
+pip install uv
+uv pip install robosandbox
+```
+
+2. laucnh the app with:
+
+```bash
+python -c "import robosandbox as rsb; rsb.visualization.RobotArmDesignAppStandalone().run_app()"
+```
+
+3. play with the app!
+
+<img src="docs/figs/app_workflow.gif" width="800">
