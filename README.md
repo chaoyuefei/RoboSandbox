@@ -35,7 +35,7 @@ The design goals are:
 - **extensibility**: It emphasizes extensibility through a modular structure that facilitates seamless integration of new features and functionalities, such as the addition of extra indices for measuring robotic performance.
 - **optimization-driven**: the system supports optimization-driven manipulator design processes through its modular architecture, where submodules can integrate into optimization loops to enable iterative design refinement and evaluation.
 
-![Loop](docs/figs/optimization_driven_loop.pdf)
+<img src="docs/figs/optimization_driven_loop.pdf" width="650">
 
 ## Installation
 
