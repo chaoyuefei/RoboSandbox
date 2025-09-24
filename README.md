@@ -27,7 +27,7 @@ An Open-Source Python Toolbox for Manipulator Design and Analysis
 <a id='1'></a>
 ## Synopsis
 
-RoboSandbox (rsb), an opensource Python framework designed for robotic manipulator design and analysis. Different robot models and their workspaces can be evaluated, providing a unified environment for reach, global index, and other performance metrics.
+RoboSandbox, an open-source Python framework designed for robotic manipulator design and analysis. Different robot models and their workspaces can be evaluated, providing a unified environment for reach, global index, and other performance metrics.
 
 The design goals are:
 
