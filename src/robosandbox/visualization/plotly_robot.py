@@ -1,5 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
+from typing import Optional, List, Union
 
 
 class PlotlyRobot:
@@ -26,12 +27,13 @@ class PlotlyRobot:
         isUpdate=True,
         axis_length_factor=1.0,
         zoom_factor=1.5,
+        show_z_axis: bool = True,
+        show_all_axes: bool = False,
     ):
         if fig is None:
             fig = go.Figure()
         self.tfs = self.fkine_all(q)
         self.joint_positions = self.compute_joint_positions()
-        # fig = go.Figure()
 
         # Adding links between joints
         for i in range(1, len(self.joint_positions)):
@@ -54,21 +56,29 @@ class PlotlyRobot:
         axis_length = (
             round(max_distance / 10, 2) * axis_length_factor
         )  # Uniform length for all axes
-        # print(f"max_distance is {max_distance} and axis_length is {axis_length}")
         arrow_length = axis_length / 10 * axis_length_factor  # Length of the arrowhead
 
         # Adding axes at each joint
         for index, (tf, pos) in enumerate(zip(self.tfs, self.joint_positions)):
             directions = ["X", "Y", "Z"]
-            # colors = ["#fa8878", "#9bbf8a", "#8EC1E1"]
-            # colors = ["#fa8878", "#9bbf8a", "#3480b8"]
             colors = ["#F84752", "#BBDA55", "#8EC1E1"]
 
-            if index == len(self.tfs) - 1:
-                axis_length = axis_length / 2
-                arrow_length = arrow_length / 2
+            # Determine which axes to show based on parameters
+            axes_to_show = []
+            if show_all_axes:
+                axes_to_show = [0, 1, 2]  # Show X, Y, Z axes
+            elif show_z_axis:
+                axes_to_show = [2]  # Show only Z axis
+            else:
+                continue  # Skip showing axes if both parameters are False
 
-            for i in range(3):  # three axes for each joint
+            for i in axes_to_show:  # only iterate over the axes we want to show
+                # Determine color - special case for last frame's Z-axis
+                if i == 2 and index == len(self.tfs) - 1:  # Last frame Z-axis
+                    axis_color = "#800080"  # Purple for end-effector Z-axis
+                else:
+                    axis_color = colors[i]
+
                 if isinstance(tf, np.ndarray):
                     direction = tf[:3, i] / np.linalg.norm(tf[:3, i])
                 else:
@@ -84,7 +94,7 @@ class PlotlyRobot:
                         y=[pos[1], end_point[1]],
                         z=[pos[2], end_point[2]],
                         mode="lines",
-                        line=dict(color=colors[i], width=5),
+                        line=dict(color=axis_color, width=5),
                         name=f"{directions[i]}{index} Axis",
                     )
                 )
@@ -101,7 +111,7 @@ class PlotlyRobot:
                         sizemode="absolute",
                         sizeref=arrow_length,
                         showscale=False,
-                        colorscale=[[0, colors[i]], [1, colors[i]]],
+                        colorscale=[[0, axis_color], [1, axis_color]],
                         cmin=0,
                         cmax=1,
                     )
@@ -134,7 +144,6 @@ class PlotlyRobot:
                     yaxis_title="Y",
                     zaxis_title="Z",
                 ),
-                # title="3D Robot Visualization with Joint Frames",
                 width=700,
                 height=600,
             )
