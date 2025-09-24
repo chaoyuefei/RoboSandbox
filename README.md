@@ -34,9 +34,21 @@ RoboSandbox (rsb), an open-source Python package, invented for robotic manipulat
 
 ## Installation
 
+### Local Installation
 
+To install RoboSandbox, it is recommended to use uv, a lightweight and fast package manager. You can install it by following the instructions on the [official website](https://uvpkg.com/).
 
+```bash
+git clone git@github.com:chaoyuefei/RoboSandbox.git
+cd RoboSandbox
+uv sync
+uv run src/robosandbox/visualization/app_standalone.py
+```
 
+To run the tests, use the following command:
 
+```bash
+uv run pytest tests/
+```
 
 ## Tutorials
