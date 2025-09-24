@@ -84,7 +84,7 @@ uv run pytest tests/
 
 ## Examples
 
-### Standalone App Spawn
+### Standalone App Launch
 
 1. set up a conda environment and install uv as described above:
 
@@ -95,7 +95,7 @@ pip install uv
 uv pip install robosandbox
 ```
 
-2. laucnh the app with:
+2. launch the app with:
 
 ```bash
 python -c "import robosandbox as rsb; rsb.visualization.RobotArmDesignAppStandalone().run_app()"
