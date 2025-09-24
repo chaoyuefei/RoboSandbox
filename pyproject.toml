@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "robosandbox"
 version = "0.0.1"
-description = "An Open-Source Python Toolbox for Manipulator Design and Analysis"
+description = "An Open-Source Python Framework for Manipulator Design and Analysis"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.8"
 license = { file = "LICENSE.txt" }
