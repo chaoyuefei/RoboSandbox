@@ -6,7 +6,6 @@
 from robosandbox.models.MR.utils import *
 import robosandbox.models.MR.ModernRobotics as mr
 
-# import aerosandbox.numpy as np
 import numpy as np
 import matplotlib.pyplot as plt
 from robosandbox.visualization.plotly_robot import PlotlyRobot

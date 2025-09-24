@@ -28,9 +28,8 @@ Optional library: matplotlib
 """
 
 # import numpy as np
-import aerosandbox.numpy as np
-import casadi as ca
-from aerosandbox.numpy.determine_type import is_casadi_type
+import numpy as np
+
 
 """
 Update Functions

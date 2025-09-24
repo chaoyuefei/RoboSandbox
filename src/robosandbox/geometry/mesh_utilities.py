@@ -1,4 +1,4 @@
-import aerosandbox.numpy as np
+import numpy as np
 from typing import Tuple
 
 """

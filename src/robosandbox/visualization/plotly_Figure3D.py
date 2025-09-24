@@ -1,6 +1,5 @@
 import plotly.graph_objects as go
 
-# import aerosandbox.numpy as np
 import numpy as np
 
 
