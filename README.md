@@ -8,7 +8,7 @@
 <td style="border:0px">
 <img src="docs/figs/robosandbox_icon.jpeg" width="200"></td>
 <td style="border:0px">
-An Open-Source Python Toolbox for Manipulator Design and Analysis
+An Open-Source Python Framework for Manipulator Design and Analysis
 </td>
 </tr>
 </table>
